@@ -9,10 +9,18 @@ public class Program {
 
     public Program(){
         instructions = new ArrayList<>();
-        HashMap<String, String> arguments = new HashMap<>();
-        arguments.put("variable", "y");
-        instructions.add(new Instruction(Instruction.InstructionType.NEUTRAL, arguments)); // dummy at index 0
-        name = "";
+        instructions.add(null); // dummy at index 0
+        name = "unnamed";
+    }
+
+
+    public String toString(){
+        StringBuilder output = new StringBuilder();
+
+        for (int line = 1; line <= Size(); line++){
+            output.append(String.format("#%s %s\n", line, instructions.get(line).toString()));
+        }
+        return output.toString();
     }
 
     public void appendInstruction(Instruction instruction){

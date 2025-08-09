@@ -30,7 +30,7 @@ public class Instruction
         this.type = type;
         isSyntactic = !isBasicInstruction(type);
         cycles = countCycles();
-        this.arguments = arguments;
+        this.arguments = new HashMap<>(arguments);
     }
 
     private boolean isBasicInstruction(InstructionType type) {
@@ -56,70 +56,6 @@ public class Instruction
             case JUMP_EQUAL_FUNCTION -> 6;
         };
     }
-
-    /*
-    public String toString(){
-        String label = arguments.get("label") == null ? "" : arguments.get("label");
-        String variable = arguments.get("variable");
-        // syntactic phase
-        String output = "(";
-        output += isSyntactic ? "S)" : "B)";
-
-        output += String.format(" [ %-3s ] ", label);
-
-        switch (type){
-            case INCREASE:{
-                output += String.format("%s <- %s + 1", variable, variable);
-                break;
-            }
-            case DECREASE:{
-                output += String.format("%s <- %s - 1", variable, variable);
-                break;
-            }
-            case JUMP_NOT_ZERO:{
-                output += String.format("IF %s != 0 GOTO %s", variable, arguments.get("gotoLabel"));
-                break;
-            }
-            case NEUTRAL:{
-                output += String.format("%s <- %s", variable, variable);
-                break;
-            }
-            case ZERO_VARIABLE:{
-                output += String.format("%s <- 0", variable);
-                break;
-            }
-            case GOTO_LABEL:{
-                output += String.format("GOTO %s", arguments.get("gotoLabel"));
-                break;
-            }
-            case ASSIGNMENT:{
-                output += String.format("%s <- %s", variable, arguments.get("assignedVariable"));
-                break;
-            }
-            case CONSTANT_ASSIGNMENT:{
-                output += String.format("%s <- %s", variable, arguments.get("constantValue"));
-                break;
-            }
-            case JUMP_ZERO:{
-                output += String.format("IF %s = 0 GOTO %s", variable, arguments.get("JZLabel"));
-                break;
-            }
-            case JUMP_EQUAL_CONSTANT:{
-                output += String.format("IF %s = %s GOTO %s", variable, arguments.get("JEConstantLabel"), arguments.get("constantValue"));
-                break;
-            }
-            case JUMP_EQUAL_VARIABLE:{
-                output += String.format("IF %s = %s GOTO %s", variable, arguments.get("JEVariableLabel"), arguments.get("variableName"));
-                break;
-            }
-        }
-
-        output += " (" + cycles + ")";
-
-        return output;
-    }
-
-     */
 
     private String getOperationString(String variable) {
         return switch (type) {
@@ -180,7 +116,7 @@ public class Instruction
     }
 
     public HashMap<String, String> getArguments() {
-        return arguments;
+        return new HashMap<>(arguments);
     }
 
 }
