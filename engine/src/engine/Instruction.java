@@ -1,83 +1,151 @@
 
 package engine;
 
+import java.util.HashMap;
+
 public class Instruction
 {
     public enum InstructionType {
-        INCREMENT, // V <- V+1
-        DECREMENT, // V <- V-1
-        IF_GOTO, // IF V != 0 GOTO L
-        NO_OP, // V <- V
+        INCREASE, // V <- V+1
+        DECREASE, // V <- V-1
+        JUMP_NOT_ZERO, // IF V != 0 GOTO L
+        NEUTRAL, // V <- V
+        ZERO_VARIABLE, // V <- 0
+        GOTO_LABEL, // GOTO L (no condition)
+        ASSIGNMENT, // V <- V'
+        CONSTANT_ASSIGNMENT, // V <- 5
+        JUMP_ZERO, // IF V = 0 GOTO L
+        JUMP_EQUAL_CONSTANT,
+        JUMP_EQUAL_VARIABLE,
+        QUOTE,
+        JUMP_EQUAL_FUNCTION,
     }
 
     private final InstructionType type;
-    private final String variable;      // The variable being operated on
-    private final int label;   // For GOTO instructions (0 if no label)
     private final Boolean isSyntactic;
     private final int cycles;
-    private final int targetLabel;
-    public static final int EXIT_LABEL = -1;
-    public static final int MAX_LABEL = 99;
+    private final HashMap<String, String> arguments;
 
-
-    public Instruction(InstructionType type, String variable, int label, int targetLabel){
+    public Instruction(InstructionType type, HashMap<String, String> arguments){
         this.type = type;
-        this.variable = variable;
-        this.label = label;
-        this.targetLabel = targetLabel;
         isSyntactic = !isBasicInstruction(type);
         cycles = countCycles();
+        this.arguments = arguments;
     }
 
     private boolean isBasicInstruction(InstructionType type) {
-        return type == InstructionType.INCREMENT ||
-                type == InstructionType.DECREMENT ||
-                type == InstructionType.IF_GOTO ||
-                type == InstructionType.NO_OP;
+        return type == InstructionType.INCREASE ||
+                type == InstructionType.DECREASE ||
+                type == InstructionType.JUMP_NOT_ZERO ||
+                type == InstructionType.NEUTRAL;
     }
 
     private int countCycles(){
         return switch (type) {
-            case INCREMENT, DECREMENT -> 1;
-            case IF_GOTO -> 2;
-            case NO_OP -> 0;
-            // some cases in the future require running specialized functions
+            case INCREASE, DECREASE -> 1;
+            case JUMP_NOT_ZERO -> 2;
+            case NEUTRAL -> 0;
+            case ZERO_VARIABLE -> 1;
+            case GOTO_LABEL -> 1;
+            case ASSIGNMENT -> 4;
+            case CONSTANT_ASSIGNMENT -> 2;
+            case JUMP_ZERO -> 2;
+            case JUMP_EQUAL_CONSTANT -> 2;
+            case JUMP_EQUAL_VARIABLE -> 2;
+            case QUOTE -> 5;
+            case JUMP_EQUAL_FUNCTION -> 6;
         };
     }
 
+    /*
     public String toString(){
-
+        String label = arguments.get("label") == null ? "" : arguments.get("label");
+        String variable = arguments.get("variable");
         // syntactic phase
         String output = "(";
         output += isSyntactic ? "S)" : "B)";
 
-        String displayLabel = (label > 0) ? ("L" + label) : "   ";
-
-        output += String.format(" [ %-3s ] ", displayLabel);
+        output += String.format(" [ %-3s ] ", label);
 
         switch (type){
-            case INCREMENT:{
+            case INCREASE:{
                 output += String.format("%s <- %s + 1", variable, variable);
                 break;
             }
-            case DECREMENT:{
+            case DECREASE:{
                 output += String.format("%s <- %s - 1", variable, variable);
                 break;
             }
-            case IF_GOTO:{
-                String displayTargetLabel =  (targetLabel > 0) ? ("L" + targetLabel) : "   ";
-                displayTargetLabel = (targetLabel == EXIT_LABEL) ? "EXIT" : displayTargetLabel;
-                output += String.format("IF %s != 0 GOTO %s", variable, displayTargetLabel);
+            case JUMP_NOT_ZERO:{
+                output += String.format("IF %s != 0 GOTO %s", variable, arguments.get("gotoLabel"));
                 break;
             }
-            case NO_OP:{
+            case NEUTRAL:{
                 output += String.format("%s <- %s", variable, variable);
+                break;
+            }
+            case ZERO_VARIABLE:{
+                output += String.format("%s <- 0", variable);
+                break;
+            }
+            case GOTO_LABEL:{
+                output += String.format("GOTO %s", arguments.get("gotoLabel"));
+                break;
+            }
+            case ASSIGNMENT:{
+                output += String.format("%s <- %s", variable, arguments.get("assignedVariable"));
+                break;
+            }
+            case CONSTANT_ASSIGNMENT:{
+                output += String.format("%s <- %s", variable, arguments.get("constantValue"));
+                break;
+            }
+            case JUMP_ZERO:{
+                output += String.format("IF %s = 0 GOTO %s", variable, arguments.get("JZLabel"));
+                break;
+            }
+            case JUMP_EQUAL_CONSTANT:{
+                output += String.format("IF %s = %s GOTO %s", variable, arguments.get("JEConstantLabel"), arguments.get("constantValue"));
+                break;
+            }
+            case JUMP_EQUAL_VARIABLE:{
+                output += String.format("IF %s = %s GOTO %s", variable, arguments.get("JEVariableLabel"), arguments.get("variableName"));
+                break;
             }
         }
 
         output += " (" + cycles + ")";
 
         return output;
+    }
+
+     */
+
+    private String getOperationString(String variable) {
+        return switch (type) {
+            case INCREASE -> String.format("%s <- %s + 1", variable, variable);
+            case DECREASE -> String.format("%s <- %s - 1", variable, variable);
+            case JUMP_NOT_ZERO -> String.format("IF %s != 0 GOTO %s", variable, arguments.get("gotoLabel"));
+            case NEUTRAL -> String.format("%s <- %s", variable, variable);
+            case ZERO_VARIABLE -> String.format("%s <- 0", variable);
+            case GOTO_LABEL -> String.format("GOTO %s", arguments.get("gotoLabel"));
+            case ASSIGNMENT -> String.format("%s <- %s", variable, arguments.get("assignedVariable"));
+            case CONSTANT_ASSIGNMENT -> String.format("%s <- %s", variable, arguments.get("constantValue"));
+            case JUMP_ZERO -> String.format("IF %s = 0 GOTO %s", variable, arguments.get("JZLabel"));
+            case JUMP_EQUAL_CONSTANT ->
+                    String.format("IF %s = %s GOTO %s", variable, arguments.get("constantValue"), arguments.get("JEConstantLabel"));
+            case JUMP_EQUAL_VARIABLE ->
+                    String.format("IF %s = %s GOTO %s", variable, arguments.get("variableName"), arguments.get("JEVariableLabel"));
+            default -> "";
+        };
+    }
+
+    public String toString() {
+        String label = arguments.getOrDefault("label", "");
+        String phase = isSyntactic ? "S" : "B";
+        String operation = getOperationString(arguments.get("variable"));
+
+        return String.format("(%s) [ %-3s ] %s (%d)", phase, label, operation, cycles);
     }
 
     // for now case-sensitive
@@ -95,9 +163,24 @@ public class Instruction
         return input.matches("^(EXIT|L[1-9][0-9]*)$");
     }
 
-    public static boolean isValidLabel(int label){
-        return label > 0 && label <= MAX_LABEL;
+    public InstructionType getInstructionType() {
+        return type;
     }
 
+    public String getVariable() {
+        return arguments.get("variable");
+    }
+
+    public String getLabel(){
+        return arguments.get("label");
+    }
+
+    public int getCycles(){
+        return cycles;
+    }
+
+    public HashMap<String, String> getArguments() {
+        return arguments;
+    }
 
 }
