@@ -127,7 +127,7 @@ public class Interpreter
     private void stepJumpNotZero(Instruction instr){
         String variable = instr.getVariable();
         HashMap<String, String> args =  instr.getArguments();
-        String goto_label = args.get("gotoLabel");
+        String goto_label = args.get("JNZLabel");
 
         int value = variables.computeIfAbsent(variable, k -> 0);
 

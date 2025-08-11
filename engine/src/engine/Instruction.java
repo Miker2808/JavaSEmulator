@@ -23,14 +23,23 @@ public class Instruction
 
     private final InstructionType type;
     private final Boolean isSyntactic;
+    private final String variable;
+    private final String label;
     private final int cycles;
     private final HashMap<String, String> arguments;
 
-    public Instruction(InstructionType type, HashMap<String, String> arguments){
+    public Instruction(InstructionType type, String variable, String label, HashMap<String, String> arguments){
         this.type = type;
         isSyntactic = !isBasicInstruction(type);
+        this.variable = variable;
+        this.label = label;
         cycles = countCycles();
-        this.arguments = new HashMap<>(arguments);
+        if(arguments != null) {
+            this.arguments = new HashMap<>(arguments);
+        }
+        else{
+            this.arguments = new HashMap<>();
+        }
     }
 
     private boolean isBasicInstruction(InstructionType type) {
@@ -61,7 +70,7 @@ public class Instruction
         return switch (type) {
             case INCREASE -> String.format("%s <- %s + 1", variable, variable);
             case DECREASE -> String.format("%s <- %s - 1", variable, variable);
-            case JUMP_NOT_ZERO -> String.format("IF %s != 0 GOTO %s", variable, arguments.get("gotoLabel"));
+            case JUMP_NOT_ZERO -> String.format("IF %s != 0 GOTO %s", variable, arguments.get("JNZLabel"));
             case NEUTRAL -> String.format("%s <- %s", variable, variable);
             case ZERO_VARIABLE -> String.format("%s <- 0", variable);
             case GOTO_LABEL -> String.format("GOTO %s", arguments.get("gotoLabel"));
@@ -77,11 +86,10 @@ public class Instruction
     }
 
     public String toString() {
-        String label = arguments.getOrDefault("label", "");
         String phase = isSyntactic ? "S" : "B";
-        String operation = getOperationString(arguments.get("variable"));
+        String operation = getOperationString(variable);
 
-        return String.format("(%s) [ %-3s ] %s (%d)", phase, label, operation, cycles);
+        return String.format("(%s) [ %-3s ] %s (%d)", phase, this.label, operation, cycles);
     }
 
     // for now case-sensitive
@@ -104,11 +112,11 @@ public class Instruction
     }
 
     public String getVariable() {
-        return arguments.get("variable");
+        return variable;
     }
 
     public String getLabel(){
-        return arguments.get("label");
+        return label;
     }
 
     public int getCycles(){

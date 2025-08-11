@@ -3,7 +3,7 @@ package engine;
 
 public class Engine {
     private Interpreter mainInterpreter;
-    private Program loadedProgram;
+    private SProgram loadedProgram;
 
 
     public Engine(){
