@@ -14,9 +14,6 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-import java.util.ArrayList;
-
-
 /**
  * <p>Java class for anonymous complex type</p>.
  * 
@@ -45,43 +42,39 @@ import java.util.ArrayList;
 public class SProgram {
 
     @XmlElement(name = "S-Instructions", required = true)
-    protected SInstructions sInstructions;
+    protected SInstructions sInstructions = new SInstructions();
     @XmlAttribute(name = "name", required = true)
     protected String name;
+
 
     public String toString(){
         StringBuilder output = new StringBuilder();
 
         for (int line = 1; line <= Size(); line++){
-            output.append(String.format("#%s %s\n", line, sInstructions.sInstruction.get(line).toString()));
+            output.append(String.format("#%s %s\n", line, sInstructions.getSInstruction().get(line).toString()));
         }
         return output.toString();
     }
 
     public void appendInstruction(SInstruction instruction){
-        sInstructions.sInstruction.add(instruction);
+        sInstructions.getSInstruction().add(instruction);
     }
 
     public void removeInstruction(int line_num){
-        sInstructions.sInstruction.remove(line_num);
+        sInstructions.getSInstruction().remove(line_num);
     }
 
     public void insertInstruction(int line_num, SInstruction instruction){
-        sInstructions.sInstruction.add(line_num, instruction);
+        sInstructions.getSInstruction().add(line_num, instruction);
     }
 
     public SInstruction getInstruction(int line_num) {
-        return sInstructions.sInstruction.get(line_num);
+        return sInstructions.getSInstruction().get(line_num);
     }
 
     public int Size(){
-        return sInstructions.sInstruction.size() - 1; // number of instructions in the program
+        return sInstructions.getSInstruction().size() - 1; // number of instructions in the program
     }
-
-    public void rename(String new_name){
-        this.name = new_name;
-    }
-
 
 
     /**

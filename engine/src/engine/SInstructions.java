@@ -45,6 +45,7 @@ public class SInstructions {
     @XmlElement(name = "S-Instruction", required = true)
     protected List<SInstruction> sInstruction;
 
+
     /**
      * Gets the value of the sInstruction property.
      * 
@@ -73,8 +74,8 @@ public class SInstructions {
     public List<SInstruction> getSInstruction() {
         if (sInstruction == null) {
             sInstruction = new ArrayList<>();
+            sInstruction.addFirst(null); // dummy at index 0
         }
-        sInstruction.addFirst(null); // dummy at index 0
         return this.sInstruction;
     }
 
