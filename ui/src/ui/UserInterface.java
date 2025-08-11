@@ -4,12 +4,26 @@ import engine.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class UserInterface {
 
-    private Engine engine;
-
     public static void main(String[] args) {
+
+        Engine engine = new Engine();
+        Scanner scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
+
+        System.out.print("Write path to xml file: ");
+
+        String path = scanner.nextLine();  // Read a whole line of input
+
+        engine.loadFromXML(path);
+
+        System.out.print(engine.getLoadedProgram());
+
+    }
+
+    public static void test1(){
         /* # f(x) = 3x - 2
         [     ] GOTO L2
         [ L1  ] Y <- Y + 1
@@ -48,6 +62,6 @@ public class UserInterface {
         for (Map.Entry<String, Integer> entry : output.entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue());
         }
-
     }
+
 }

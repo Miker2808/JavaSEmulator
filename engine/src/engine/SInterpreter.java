@@ -121,8 +121,7 @@ public class SInterpreter
 
     private void stepJumpNotZero(SInstruction instr){
         String variable = instr.getSVariable();
-        HashMap<String, String> args =  instr.getArguments();
-        String goto_label = args.get("JNZLabel");
+        String goto_label = instr.getArgument("JNZLabel");
 
         int value = variables.computeIfAbsent(variable, k -> 0);
 
@@ -153,8 +152,7 @@ public class SInterpreter
     }
 
     private void stepGotoLabel(SInstruction instr){
-        HashMap<String, String> args =  instr.getArguments();
-        String goto_label = args.get("gotoLabel");
+        String goto_label = instr.getArgument("gotoLabel");
 
         if(Objects.equals(goto_label, "EXIT")) {
             exit = true;
@@ -168,8 +166,7 @@ public class SInterpreter
 
     private void stepAssignment(SInstruction instr){
         String variable = instr.getSVariable();
-        HashMap<String, String> args =  instr.getArguments();
-        String assignedVariable = args.get("assignedVariable");
+        String assignedVariable = instr.getArgument("assignedVariable");
         int value = variables.computeIfAbsent(assignedVariable, k -> 0);
 
         variables.put(variable, value);
@@ -179,8 +176,7 @@ public class SInterpreter
 
     private void stepConstAssignment(SInstruction instr){
         String variable = instr.getSVariable();
-        HashMap<String, String> args =  instr.getArguments();
-        int constValue = Integer.parseInt(args.get("constantValue"));
+        int constValue = Integer.parseInt(instr.getArgument("constantValue"));
 
         variables.put(variable, constValue);
         cycles += instr.getCycles();
@@ -189,8 +185,7 @@ public class SInterpreter
 
     private void stepJumpZero(SInstruction instr){
         String variable = instr.getSVariable();
-        HashMap<String, String> args =  instr.getArguments();
-        String goto_label = args.get("JZLabel");
+        String goto_label = instr.getArgument("JZLabel");
 
         int value = variables.computeIfAbsent(variable, k -> 0);
 
@@ -210,9 +205,8 @@ public class SInterpreter
     }
 
     private void stepJumpEqualConst(SInstruction instr){
-        HashMap<String, String> args =  instr.getArguments();
-        String paramLabel = args.get("JEConstantLabel");
-        int constValue = Integer.parseInt(args.get("constantValue"));
+        String paramLabel = instr.getArgument("JEConstantLabel");
+        int constValue = Integer.parseInt(instr.getArgument("constantValue"));
         int value = variables.computeIfAbsent(instr.getSVariable(), k -> 0);
 
         if(value == constValue){
@@ -231,10 +225,9 @@ public class SInterpreter
     }
 
     private void stepJumpEqualVariable(SInstruction instr){
-        HashMap<String, String> args =  instr.getArguments();
         int varValue = variables.computeIfAbsent(instr.getSVariable(), k -> 0);
-        int paramValue = variables.computeIfAbsent(args.get("variableName"), k -> 0);
-        String paramLabel =  args.get("JEVariableLabel");
+        int paramValue = variables.computeIfAbsent(instr.getArgument("variableName"), k -> 0);
+        String paramLabel =  instr.getArgument("JEVariableLabel");
 
         if(varValue == paramValue){
             if(Objects.equals(paramLabel, "EXIT")) {
@@ -247,7 +240,6 @@ public class SInterpreter
         else{
             pc += 1;
         }
-
         cycles += instr.getCycles();
     }
 

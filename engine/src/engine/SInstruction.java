@@ -14,6 +14,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -83,46 +84,19 @@ public class SInstruction {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    private HashMap<String, String> arguments = null;
 
     public SInstruction() {
-
-        List<SInstructionArgument> sInstructionArgument = sInstructionArguments.getSInstructionArgument();
-
-        if(sInstructionArgument != null) {
-            arguments = mapArguments(sInstructionArgument);
-        }
-        else{
-            arguments = new HashMap<>();
-        }
+        sLabel = "";
     }
 
     public SInstruction(String name, String variable, String label, HashMap<String, String> arguments){
         this.name = name;
         this.sVariable = variable;
         this.sLabel = label;
-        if(arguments != null) {
-            this.arguments = new HashMap<>(arguments);
-        }
-        else{
-            this.arguments = new HashMap<>();
-        }
+        setsInstructionArguments(arguments);
     }
 
-    private boolean validateType(){
-        boolean isBasic = isBasicInstruction(name);
-        if(Objects.equals(type, "synthetic") || Objects.equals(type, "basic")){
-            return isBasic && type.equals("basic");
-        }
-        return false;
-    }
 
-    private boolean isBasicInstruction(String name) {
-        return Objects.equals(name, "INCREASE") ||
-                Objects.equals(name, "DECREASE") ||
-                Objects.equals(name, "JUMP_NOT_ZERO") ||
-                Objects.equals(name, "NEUTRAL");
-    }
 
     public int getCycles(){
         return switch (name) {
@@ -146,17 +120,17 @@ public class SInstruction {
         return switch (name) {
             case "INCREASE" -> String.format("%s <- %s + 1", variable, variable);
             case "DECREASE" -> String.format("%s <- %s - 1", variable, variable);
-            case "JUMP_NOT_ZERO" -> String.format("IF %s != 0 GOTO %s", variable, arguments.get("JNZLabel"));
+            case "JUMP_NOT_ZERO" -> String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
             case "NEUTRAL" -> String.format("%s <- %s", variable, variable);
             case "ZERO_VARIABLE" -> String.format("%s <- 0", variable);
-            case "GOTO_LABEL" -> String.format("GOTO %s", arguments.get("gotoLabel"));
-            case "ASSIGNMENT" -> String.format("%s <- %s", variable, arguments.get("assignedVariable"));
-            case "CONSTANT_ASSIGNMENT" -> String.format("%s <- %s", variable, arguments.get("constantValue"));
-            case "JUMP_ZERO" -> String.format("IF %s = 0 GOTO %s", variable, arguments.get("JZLabel"));
+            case "GOTO_LABEL" -> String.format("GOTO %s", getArgument("gotoLabel"));
+            case "ASSIGNMENT" -> String.format("%s <- %s", variable, getArgument("assignedVariable"));
+            case "CONSTANT_ASSIGNMENT" -> String.format("%s <- %s", variable, getArgument("constantValue"));
+            case "JUMP_ZERO" -> String.format("IF %s = 0 GOTO %s", variable, getArgument("JZLabel"));
             case "JUMP_EQUAL_CONSTANT" ->
-                    String.format("IF %s = %s GOTO %s", variable, arguments.get("constantValue"), arguments.get("JEConstantLabel"));
+                    String.format("IF %s = %s GOTO %s", variable, getArgument("constantValue"), getArgument("JEConstantLabel"));
             case "JUMP_EQUAL_VARIABLE" ->
-                    String.format("IF %s = %s GOTO %s", variable, arguments.get("variableName"), arguments.get("JEVariableLabel"));
+                    String.format("IF %s = %s GOTO %s", variable, getArgument("variableName"), getArgument("JEVariableLabel"));
             default -> "";
         };
     }
@@ -168,32 +142,49 @@ public class SInstruction {
         return String.format("(%s) [ %-3s ] %s (%d)", phase, this.sLabel, operation, getCycles());
     }
 
-    // for now case-sensitive
-    public static boolean isValidVariable(String input) {
-        // Regex explanation:
-        // ^(y|[xz][1-9][0-9]*)$
-        // y                 → exactly "y"
-        // |                 → OR
-        // [xz][1-9][0-9]*   → x or z followed by number starting with 1-9, then digits
-        return input.matches("^(y|[xz][1-9][0-9]*)$");
-    }
 
-    // for now case-sensitive
-    public static boolean isValidLabel(String input){
-        return input.matches("^(EXIT|L[1-9][0-9]*)$");
-    }
 
-    public HashMap<String, String> getArguments() {
-        return new HashMap<>(arguments);
-    }
-
-    private HashMap<String, String> mapArguments(List<SInstructionArgument> args){
-        HashMap<String, String> map = new HashMap<>();
-        for (SInstructionArgument arg : args) {
-            map.put(arg.getName(), arg.getValue());
+    // returns value of argument name, empty string if not found
+    public String getArgument(String name){
+        List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
+        if (args != null) {
+            for (SInstructionArgument arg : args) {
+                if (name.equals(arg.getName())) {
+                    return arg.getValue();
+                }
+            }
         }
-        return map;
+        return "";
     }
+
+    /**
+     * overwrites value of existing argument name
+     * if no such name was found, adds a new argument with the value
+     * @param name
+     *      name of the argument {@link String }
+     * @param value
+     *      value of the argument {@link String }
+
+     */
+    public void setArgument(String name, String value){
+        List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
+        boolean found = false;
+        if (args != null) {
+            for (SInstructionArgument arg : args) {
+                if (name.equals(arg.getName())) {
+                    arg.setValue(value);
+                    found = true;
+                }
+            }
+            if (!found) {
+                SInstructionArgument arg = new SInstructionArgument();
+                arg.setName(name);
+                arg.setValue(value);
+                args.add(arg);
+            }
+        }
+    }
+
 
     /**
      * Gets the value of the sVariable property.
@@ -244,6 +235,30 @@ public class SInstruction {
     }
 
     /**
+     * loads from an arguments hashmap into the sInstructionArguments
+     * used to make it easy to instantiate SInstruction manually in code, or through XML
+     * using the same member object to hold the arguments
+     * @param map
+     *      allowed object is
+     *      {@link HashMap<String,String>}
+     */
+     public void setsInstructionArguments(HashMap<String, String> map) {
+        List<SInstructionArgument> argumentList = new ArrayList<>();
+
+        if (map != null) {
+            for (HashMap.Entry<String, String> entry : map.entrySet()) {
+                SInstructionArgument arg = new SInstructionArgument();
+                arg.setName(entry.getKey());
+                arg.setValue(entry.getValue());
+                argumentList.add(arg);
+            }
+        }
+
+        sInstructionArguments = new SInstructionArguments();
+        sInstructionArguments.sInstructionArgument = argumentList;
+    }
+
+    /**
      * Gets the value of the sLabel property.
      * 
      * @return
@@ -287,7 +302,7 @@ public class SInstruction {
      *     {@link String }
      *     
      */
-    public void setType(String value) {
+    public void setType(String value)  {
         this.type = value;
     }
 
