@@ -10,6 +10,11 @@ public class UserInterface {
 
     public static void main(String[] args) {
 
+        test2();
+
+    }
+
+    public static void test2(){
         Engine engine = new Engine();
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
 
@@ -17,9 +22,26 @@ public class UserInterface {
 
         String path = scanner.nextLine();  // Read a whole line of input
 
-        engine.loadFromXML(path);
+        try {
+            engine.loadFromXML(path);
 
-        System.out.print(engine.getLoadedProgram());
+            System.out.print(engine.getLoadedProgram());
+
+            SInterpreter mainInterpreter = new SInterpreter(engine.getLoadedProgram());
+
+            HashMap<String, Integer> input = new HashMap<>();
+            input.put("x1", 10000);
+            input.put("x2", 8766);
+            HashMap<String, Integer> output = mainInterpreter.run(input);
+
+            for (Map.Entry<String, Integer> entry : output.entrySet()) {
+                System.out.println(entry.getKey() + " : " + entry.getValue());
+            }
+        }
+        catch (Exception e) {
+            System.out.print(e.getMessage());
+        }
+
 
     }
 
@@ -38,7 +60,7 @@ public class UserInterface {
         SProgram program = new SProgram();
 
         HashMap<String, String> arguments = new HashMap<>();
-        arguments.put("gotoLabel", "L2");
+        arguments.put("gotoLabel", "L8");
         program.appendInstruction(new SInstruction("GOTO_LABEL", "", "", arguments));
         program.appendInstruction(new SInstruction("INCREASE","y", "L1",null));
         program.appendInstruction(new SInstruction("INCREASE","y", "",null));
@@ -47,7 +69,7 @@ public class UserInterface {
 
         arguments.clear();
         arguments.put("JNZLabel", "L1");
-        program.appendInstruction(new SInstruction("JUMP_NOT_ZERO", "x18","L2",arguments));
+        program.appendInstruction(new SInstruction("JUMP_NOT_ZERO", "x18","L8",arguments));
         program.appendInstruction(new SInstruction("DECREASE","y","",null));
         program.appendInstruction(new SInstruction("DECREASE","y","",null));
 

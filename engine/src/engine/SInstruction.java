@@ -240,7 +240,7 @@ public class SInstruction {
      * using the same member object to hold the arguments
      * @param map
      *      allowed object is
-     *      {@link HashMap<String,String>}
+     *      {@link HashMap}
      */
      public void setsInstructionArguments(HashMap<String, String> map) {
         List<SInstructionArgument> argumentList = new ArrayList<>();

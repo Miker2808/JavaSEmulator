@@ -1,8 +1,15 @@
 package engine;
 
 import java.util.Objects;
+import java.util.Set;
 
 public class InstructionValidator {
+
+    private static final Set<String> VALID_NAMES = Set.of(
+            "INCREASE", "DECREASE", "JUMP_NOT_ZERO", "NEUTRAL", "ZERO_VARIABLE",
+            "GOTO_LABEL", "ASSIGNMENT", "CONSTANT_ASSIGNMENT", "JUMP_ZERO",
+            "JUMP_EQUAL_CONSTANT", "JUMP_EQUAL_VARIABLE", "QUOTE", "JUMP_EQUAL_FUNCTION"
+    );
 
     public static void validateInstruction(SInstruction instr) throws InvalidInstructionException{
         String name = instr.getName();
@@ -10,15 +17,18 @@ public class InstructionValidator {
         String label = instr.getSLabel();
         String variable = instr.getSVariable();
 
+        isValidName(name);
+
         validateType(name, type);
 
         if(!isValidVariable(variable)){
-            throw new InvalidInstructionException("Invalid variable syntax: " + variable);
+            throw new InvalidInstructionException("invalid variable format: " + variable);
         }
 
-        if(!label.isEmpty() && isValidLabel(label)) {
-            throw new  InvalidInstructionException("Invalid label syntax: " + label);
+        if(!label.isEmpty() && !isValidLabel(label)) {
+            throw new  InvalidInstructionException("invalid label format: " + label);
         }
+
         switch (name) {
             case "INCREASE" -> validateIncrease(instr);
             case "DECREASE" -> validateDecrease(instr);
@@ -33,7 +43,7 @@ public class InstructionValidator {
             case "JUMP_EQUAL_VARIABLE" -> validateJumpEqualVariable(instr);
             case "QUOTE" -> validateQuote(instr);
             case "JUMP_EQUAL_FUNCTION" -> validateJumpEqualFunction(instr);
-            default -> throw new InvalidInstructionException("Invalid or unsupported instruction name: " + name);
+            default -> throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
         }
     }
 
@@ -96,23 +106,23 @@ public class InstructionValidator {
 
     // TODO: ADD SUPPORT
     public static void validateQuote(SInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("Instruction name %s is not supported", instruction.getName()));
+        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getName()));
     }
 
     // TODO: ADD SUPPORT
     public static void validateJumpEqualFunction(SInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("Instruction name %s is not supported", instruction.getName()));
+        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getName()));
     }
 
     public static void validateType(String name, String type) throws InvalidInstructionException{
         boolean validTypeSyntax = type.equals("basic") || type.equals("synthetic");
         if(!validTypeSyntax){
-            throw new InvalidInstructionException(String.format("Invalid type %s (supported: basic/synthetic)", type));
+            throw new InvalidInstructionException(String.format("invalid type %s (supported: basic/synthetic)", type));
         }
         boolean isBasic = isBasicInstruction(name);
         boolean valid = (isBasic && type.equals("basic")) || (!isBasic && type.equals("synthetic"));
         if(!valid){
-            throw new InvalidInstructionException(String.format("Instruction name %s is not of type %s", name, type));
+            throw new InvalidInstructionException(String.format("instruction name %s is not of type %s", name, type));
         }
     }
 
@@ -121,6 +131,12 @@ public class InstructionValidator {
                 Objects.equals(name, "DECREASE") ||
                 Objects.equals(name, "JUMP_NOT_ZERO") ||
                 Objects.equals(name, "NEUTRAL");
+    }
+
+    public static void isValidName(String name) throws InvalidInstructionException{
+        if (!VALID_NAMES.contains(name)) {
+            throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
+        }
     }
 
     // for now case-sensitive
@@ -151,7 +167,7 @@ public class InstructionValidator {
             int value = Integer.parseInt(argValue);
             if(value < 0){
                 throw new InvalidInstructionException(
-                        String.format("Argument %s value cannot be negative: %d", argName ,value));
+                        String.format("argument %s value cannot be negative: %d", argName ,value));
             }
         }
         catch(NumberFormatException e){
@@ -164,7 +180,7 @@ public class InstructionValidator {
         validateArgumentNotEmpty(argName, argValue);
 
         if(!isValidVariable(argValue)){
-            throw new InvalidInstructionException("Invalid variable format: " + argValue);
+            throw new InvalidInstructionException("invalid variable format: " + argValue);
         }
 
     }
@@ -172,7 +188,7 @@ public class InstructionValidator {
     public static void validateLabelArgument(String argName, String argValue) throws InvalidInstructionException{
         validateArgumentNotEmpty(argName, argValue);
         if(!isValidLabel(argValue)){
-            throw new InvalidInstructionException("Invalid label format: " + argValue);
+            throw new InvalidInstructionException("invalid label format: " + argValue);
         }
     }
 

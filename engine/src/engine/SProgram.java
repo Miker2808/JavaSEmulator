@@ -51,7 +51,7 @@ public class SProgram {
         StringBuilder output = new StringBuilder();
 
         for (int line = 1; line <= Size(); line++){
-            output.append(String.format("#%s %s\n", line, sInstructions.getSInstruction().get(line).toString()));
+            output.append(String.format("#%s %s\n", line, this.getInstruction(line).toString()));
         }
         return output.toString();
     }
@@ -61,19 +61,33 @@ public class SProgram {
     }
 
     public void removeInstruction(int line_num){
-        sInstructions.getSInstruction().remove(line_num);
+        sInstructions.getSInstruction().remove(line_num - 1);
     }
 
     public void insertInstruction(int line_num, SInstruction instruction){
-        sInstructions.getSInstruction().add(line_num, instruction);
+        sInstructions.getSInstruction().add(line_num - 1, instruction);
     }
 
     public SInstruction getInstruction(int line_num) {
-        return sInstructions.getSInstruction().get(line_num);
+        return sInstructions.getSInstruction().get(line_num - 1);
     }
 
     public int Size(){
-        return sInstructions.getSInstruction().size() - 1; // number of instructions in the program
+        return sInstructions.getSInstruction().size(); // number of instructions in the program
+    }
+
+    public void validateProgram() throws InvalidInstructionException{
+        if(this.name == null){
+            throw new InvalidInstructionException("S-Program name is required");
+        }
+
+        for(int line = 1; line <= Size(); line++){
+            try {
+                InstructionValidator.validateInstruction(this.getInstruction(line));
+            } catch (InvalidInstructionException e) {
+                throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
+            }
+        }
     }
 
 

@@ -7,6 +7,8 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
+
 public class Engine {
     private SInterpreter mainInterpreter;
     private SProgram loadedProgram;
@@ -17,10 +19,9 @@ public class Engine {
         return file.exists() && file.isFile() && file.canRead();
     }
 
-    public boolean loadFromXML(String path) {
+    public void loadFromXML(String path) throws Exception {
         if (!validatePath(path)) {
-            System.err.println("File does not exist or cannot be read: " + path);
-            return false;
+            throw new Exception("Couldn't load file, path is invalid");
         }
 
         try {
@@ -30,19 +31,12 @@ public class Engine {
 
             // This will throw JAXBException if XML is invalid or doesn't match class
             loadedProgram = (SProgram) unmarshaller.unmarshal(xmlFile);
-            return true;
+            loadedProgram.validateProgram();
 
         } catch (JAXBException e) {
             System.err.println("Failed to parse XML: " + e.getMessage());
             // TODO: check what went wrong
         }
-        return false;
-    }
-
-
-    public Engine(){
-        Interpreter mainInterpreter = null;
-        Program loadedProgram = null;
     }
 
     public SProgram getLoadedProgram() {
