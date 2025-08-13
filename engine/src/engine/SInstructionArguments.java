@@ -47,6 +47,7 @@ public class SInstructionArguments {
     protected List<SInstructionArgument> sInstructionArgument;
 
     public SInstructionArguments() {
+        sInstructionArgument = new ArrayList<>();
     }
 
     /**

@@ -87,6 +87,7 @@ public class SInstruction {
 
     public SInstruction() {
         sLabel = "";
+        sInstructionArguments = new SInstructionArguments();
     }
 
     public SInstruction(String name, String variable, String label, HashMap<String, String> arguments){

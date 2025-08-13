@@ -14,6 +14,8 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.util.List;
+
 /**
  * <p>Java class for anonymous complex type</p>.
  * 
@@ -48,11 +50,84 @@ public class SProgram {
 
 
     public String toString(){
-        StringBuilder output = new StringBuilder();
 
+        return "Program name: " + name + "\n" +
+                "\nUsed input variables (in order of appearance):\n" +
+                getInputVariablesString() +
+                "\nUsed labels (in order of appearance):\n" +
+                getLabelsString() +
+                "\nProgram:\n" +
+                getInstructionsString() +
+                "\n";
+    }
+
+    public String getInstructionsString(){
+        StringBuilder output = new StringBuilder();
         for (int line = 1; line <= Size(); line++){
             output.append(String.format("#%s %s\n", line, this.getInstruction(line).toString()));
         }
+        return output.toString();
+    }
+
+    /**
+     * Returns string of all variables used in the program
+     * seperated by line
+     * @return String of variables
+     */
+    public String getInputVariablesString(){
+        StringBuilder output = new StringBuilder();
+
+        for (int line = 1; line <= Size(); line++){
+            SInstruction instr = this.getInstruction(line);
+
+            String variable = instr.getSVariable();
+
+            // check that the variable itself is input variable, append if yes
+            if(variable.matches("^(x[1-9][0-9]*)$"))
+                output.append(String.format("%s\n", variable));
+
+            // I didn't design the class and members hierarchy, was done through the given xml format
+            List<SInstructionArgument> arguments = instr.getSInstructionArguments().getSInstructionArgument();
+
+            // check if one of the arguments is input variable, append if yes
+            for (SInstructionArgument argument : arguments){
+                if(argument.getValue().matches("^(x[1-9][0-9]*)$"))
+                    output.append(String.format("%s\n", argument.getValue()));
+            }
+
+            // the idea why to check both is because sometimes it might be x1 <- x2,
+            // and then you will want to add x1 and x2 to the input variables list
+            // (even though x1 is redundant logically)
+
+        }
+
+        return output.toString();
+    }
+
+    /**
+     *  Returns string of labels seperated by line
+     *  if EXIT label exists, it is printed at the end.
+     * @return String of labels
+     */
+
+    public String getLabelsString(){
+        StringBuilder output = new StringBuilder();
+        boolean isExitAvailable = false;
+
+        for (int line = 1; line <= Size(); line++){
+            String label = this.getInstruction(line).getSLabel();
+            if(!label.equals("EXIT") && !label.isEmpty()) {
+                output.append(String.format("%s\n", label));
+            }
+            else{
+                isExitAvailable = true;
+            }
+        }
+
+        if(isExitAvailable){
+            output.append("EXIT\n");
+        }
+
         return output.toString();
     }
 

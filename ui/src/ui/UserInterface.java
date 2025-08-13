@@ -18,30 +18,30 @@ public class UserInterface {
         Engine engine = new Engine();
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
 
-        System.out.print("Write path to xml file: ");
 
-        String path = scanner.nextLine();  // Read a whole line of input
+        while(true) {
+            System.out.print("Write path to xml file: ");
+            String path = scanner.nextLine();  // Read a whole line of input
 
-        try {
-            engine.loadFromXML(path);
+            try {
+                engine.loadFromXML(path);
 
-            System.out.print(engine.getLoadedProgram());
+                System.out.println(engine.getLoadedProgramString());
 
-            SInterpreter mainInterpreter = new SInterpreter(engine.getLoadedProgram());
+                SInterpreter mainInterpreter = new SInterpreter(engine.getLoadedProgram());
 
-            HashMap<String, Integer> input = new HashMap<>();
-            input.put("x1", 10000);
-            input.put("x2", 8766);
-            HashMap<String, Integer> output = mainInterpreter.run(input);
+                HashMap<String, Integer> input = new HashMap<>();
+                input.put("x1", 10000);
+                input.put("x2", 8766);
+                HashMap<String, Integer> output = mainInterpreter.run(input);
 
-            for (Map.Entry<String, Integer> entry : output.entrySet()) {
-                System.out.println(entry.getKey() + " : " + entry.getValue());
+                for (Map.Entry<String, Integer> entry : output.entrySet()) {
+                    System.out.println(entry.getKey() + " : " + entry.getValue());
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         }
-        catch (Exception e) {
-            System.out.print(e.getMessage());
-        }
-
 
     }
 

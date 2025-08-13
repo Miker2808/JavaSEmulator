@@ -1,45 +1,58 @@
 
 package engine;
 
+import engine.XMLValidator;
+import engine.XMLValidator.InvalidXMLException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
-import java.nio.file.InvalidPathException;
+
 
 public class Engine {
     private SInterpreter mainInterpreter;
-    private SProgram loadedProgram;
+    private SProgram loadedProgram = null;
 
-
-    public static boolean validatePath(String path) {
-        File file = new File(path);
-        return file.exists() && file.isFile() && file.canRead();
-    }
 
     public void loadFromXML(String path) throws Exception {
-        if (!validatePath(path)) {
-            throw new Exception("Couldn't load file, path is invalid");
-        }
+        SProgram loadedProgramtemp = new SProgram();
 
+        // verify path to a file
+        XMLValidator.validateXMLFile(path);
+
+        // try to unmarshal to SProgram object
         try {
             JAXBContext context = JAXBContext.newInstance(SProgram.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             File xmlFile = new File(path);
 
             // This will throw JAXBException if XML is invalid or doesn't match class
-            loadedProgram = (SProgram) unmarshaller.unmarshal(xmlFile);
-            loadedProgram.validateProgram();
+            loadedProgramtemp = (SProgram) unmarshaller.unmarshal(xmlFile);
 
         } catch (JAXBException e) {
-            System.err.println("Failed to parse XML: " + e.getMessage());
+            //System.err.println("[DEV ERROR (Shouldn't happen)]\n Failed to unmarshal XML: " + e.getMessage());
             // TODO: check what went wrong
+            throw new Exception("Failed to unmarshal XML file to object, XML file may be invalid schema-wise");
         }
+
+        loadedProgramtemp.validateProgram();
+        loadedProgram = loadedProgramtemp;
+
     }
 
-    public SProgram getLoadedProgram() {
+    public String getLoadedProgramString() throws Exception{
+        if(loadedProgram == null){
+            throw new Exception("No program has been loaded");
+        }
+        return loadedProgram.toString();
+    }
+
+    public SProgram getLoadedProgram() throws Exception{
+        if(loadedProgram == null){
+            throw new Exception("No program has been loaded");
+        }
         return loadedProgram;
     }
 
