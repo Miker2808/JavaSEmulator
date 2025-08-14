@@ -57,8 +57,7 @@ public class SProgram {
                 "\nUsed labels (in order of appearance):\n" +
                 getLabelsString() +
                 "\nProgram:\n" +
-                getInstructionsString() +
-                "\n";
+                getInstructionsString();
     }
 
     public String getInstructionsString(){

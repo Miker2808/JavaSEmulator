@@ -1,7 +1,7 @@
 package engine;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SInterpreter
 {
@@ -251,6 +251,33 @@ public class SInterpreter
         // TODO: complicated (not as much as the one above tho)
     }
 
+
+    public static String convertVariablesToString(HashMap<String, Integer> variables) {
+        StringBuilder sb = new StringBuilder();
+
+        Comparator<String> numericSuffixComparator = Comparator.comparingInt(k -> Integer.parseInt(k.substring(1)));
+
+        // Add y first
+        if (variables.containsKey("y")) {
+            sb.append("y = ").append(variables.get("y")).append("\n");
+        }
+
+        // Helper to append sorted keys with a prefix
+        for (String prefix : Arrays.asList("x", "z")) {
+            List<String> keys = variables.keySet().stream()
+                    .filter(k -> k.startsWith(prefix))
+                    .sorted(numericSuffixComparator)
+                    .toList();
+            for (String k : keys) {
+                sb.append(k).append(" = ").append(variables.get(k)).append("\n");
+            }
+        }
+
+        // Remove trailing newline if exists
+        if (!sb.isEmpty()) sb.setLength(sb.length() - 1);
+
+        return sb.toString();
+    }
 
 
 

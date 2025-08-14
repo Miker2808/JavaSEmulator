@@ -32,15 +32,15 @@ import jakarta.xml.bind.annotation.XmlType;
  * 
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "")
 @XmlRootElement(name = "S-Instruction-Argument")
 public class SInstructionArgument {
 
-    @XmlAttribute(name = "value", required = true)
-    protected String value;
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
+
+    private String value;
+
+    private String name;
 
     /**
      * Gets the value of the value property.
@@ -62,8 +62,9 @@ public class SInstructionArgument {
      *     {@link String }
      *     
      */
+    @XmlAttribute(name = "value", required = true)
     public void setValue(String value) {
-        this.value = value;
+        this.value = value.trim();
     }
 
     /**
@@ -74,6 +75,7 @@ public class SInstructionArgument {
      *     {@link String }
      *     
      */
+    @XmlAttribute(name = "name", required = true)
     public String getName() {
         return name;
     }
@@ -87,7 +89,7 @@ public class SInstructionArgument {
      *     
      */
     public void setName(String value) {
-        this.name = value;
+        this.name = value.trim();
     }
 
 }

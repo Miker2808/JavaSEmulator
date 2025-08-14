@@ -63,31 +63,30 @@ import java.util.Objects;
  *   </complexContent>
  * </complexType>
  * }</pre>
- * 
+ *
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "", propOrder = {
 
 })
 @XmlRootElement(name = "S-Instruction")
 public class SInstruction {
 
-    @XmlElement(name = "S-Variable", required = true)
-    protected String sVariable;
-    @XmlElement(name = "S-Instruction-Arguments")
-    protected SInstructionArguments sInstructionArguments;
-    @XmlElement(name = "S-Label")
-    protected String sLabel;
-    @XmlAttribute(name = "type", required = true)
-    protected String type;
-    @XmlAttribute(name = "name", required = true)
-    protected String name;
+
+    private String sVariable;
+    private SInstructionArguments sInstructionArguments;
+    private String sLabel;
+    private String type;
+    private String name;
 
 
     public SInstruction() {
-        sLabel = "";
+        sVariable = "";
         sInstructionArguments = new SInstructionArguments();
+        sLabel = "";
+        type = "";
+        name = "";
     }
 
     public SInstruction(String name, String variable, String label, HashMap<String, String> arguments){
@@ -96,8 +95,6 @@ public class SInstruction {
         this.sLabel = label;
         setsInstructionArguments(arguments);
     }
-
-
 
     public int getCycles(){
         return switch (name) {
@@ -142,8 +139,6 @@ public class SInstruction {
 
         return String.format("(%s) [ %-3s ] %s (%d)", phase, this.sLabel, operation, getCycles());
     }
-
-
 
     // returns value of argument name, empty string if not found
     public String getArgument(String name){
@@ -196,17 +191,19 @@ public class SInstruction {
      *     
      */
     public String getSVariable() {
+        this.sVariable = sVariable.trim();
         return sVariable;
     }
 
     /**
      * Sets the value of the sVariable property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
+    @XmlElement(name = "S-Variable", required = true)
     public void setSVariable(String value) {
         this.sVariable = value;
     }
@@ -231,6 +228,7 @@ public class SInstruction {
      *     {@link SInstructionArguments }
      *     
      */
+    @XmlElement(name = "S-Instruction-Arguments")
     public void setSInstructionArguments(SInstructionArguments value) {
         this.sInstructionArguments = value;
     }
@@ -268,6 +266,7 @@ public class SInstruction {
      *     
      */
     public String getSLabel() {
+        this.sLabel = sLabel.trim();
         return sLabel;
     }
 
@@ -279,8 +278,9 @@ public class SInstruction {
      *     {@link String }
      *     
      */
+    @XmlElement(name = "S-Label")
     public void setSLabel(String value) {
-        this.sLabel = value;
+        this.sLabel = value.trim();
     }
 
     /**
@@ -292,17 +292,20 @@ public class SInstruction {
      *     
      */
     public String getType() {
+        this.type = type.trim();
+
         return type;
     }
 
     /**
      * Sets the value of the type property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
+    @XmlAttribute(name = "type", required = true)
     public void setType(String value)  {
         this.type = value;
     }
@@ -316,6 +319,8 @@ public class SInstruction {
      *     
      */
     public String getName() {
+        name = name.trim();
+
         return name;
     }
 
@@ -327,8 +332,9 @@ public class SInstruction {
      *     {@link String }
      *     
      */
+    @XmlAttribute(name = "name", required = true)
     public void setName(String value) {
-        this.name = value;
+        this.name = value.trim();
     }
 
 }

@@ -18,7 +18,6 @@ public class UserInterface {
         Engine engine = new Engine();
         Scanner scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
 
-
         while(true) {
             System.out.print("Write path to xml file: ");
             String path = scanner.nextLine();  // Read a whole line of input
@@ -35,9 +34,9 @@ public class UserInterface {
                 input.put("x2", 8766);
                 HashMap<String, Integer> output = mainInterpreter.run(input);
 
-                for (Map.Entry<String, Integer> entry : output.entrySet()) {
-                    System.out.println(entry.getKey() + " : " + entry.getValue());
-                }
+                System.out.println("Variables results:");
+                System.out.println(SInterpreter.convertVariablesToString(output));
+
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }

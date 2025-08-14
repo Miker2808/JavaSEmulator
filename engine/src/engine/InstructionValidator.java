@@ -13,19 +13,15 @@ public class InstructionValidator {
 
     public static void validateInstruction(SInstruction instr) throws InvalidInstructionException{
         String name = instr.getName();
-        String type = instr.getType();
         String label = instr.getSLabel();
-        String variable = instr.getSVariable();
 
         isValidName(name);
 
-        validateType(name, type);
+        validateType(instr);
 
-        if(!isValidVariable(variable)){
-            throw new InvalidInstructionException("invalid variable format: " + variable);
-        }
+        validateSVariable(instr);
 
-        if(!label.isEmpty() && !isValidLabel(label)) {
+        if(!label.isEmpty() && !isValidLabelFormat(label)) {
             throw new  InvalidInstructionException("invalid label format: " + label);
         }
 
@@ -46,6 +42,7 @@ public class InstructionValidator {
             default -> throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
         }
     }
+
 
     public static void validateIncrease(SInstruction instruction) throws InvalidInstructionException{
 
@@ -114,7 +111,10 @@ public class InstructionValidator {
         throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getName()));
     }
 
-    public static void validateType(String name, String type) throws InvalidInstructionException{
+    public static void validateType(SInstruction instr) throws InvalidInstructionException{
+        String name = instr.getName();
+        String type = instr.getType();
+
         boolean validTypeSyntax = type.equals("basic") || type.equals("synthetic");
         if(!validTypeSyntax){
             throw new InvalidInstructionException(String.format("invalid type %s (supported: basic/synthetic)", type));
@@ -139,18 +139,36 @@ public class InstructionValidator {
         }
     }
 
-    // for now case-sensitive
-    public static boolean isValidVariable(String input) {
+
+    public static void validateSVariable(SInstruction instr) throws  InvalidInstructionException{
+        String name = instr.getName();
+        String svariable = instr.getSVariable();
+
+        if(svariable.isEmpty()) {
+            if (!name.equals("GOTO_LABEL")) {
+                throw new InvalidInstructionException("S-Variable is required for this instruction");
+            }
+        }
+        else{
+            if (!isValidVariableFormat(svariable)) {
+                throw new InvalidInstructionException("S-Variable format is invalid");
+            }
+        }
+    }
+
+    // case-sensitive
+    public static boolean isValidVariableFormat(String variable){
         // Regex explanation:
         // ^(y|[xz][1-9][0-9]*)$
         // y                 → exactly "y"
         // |                 → OR
         // [xz][1-9][0-9]*   → x or z followed by number starting with 1-9, then digits
-        return input.matches("^(y|[xz][1-9][0-9]*)$");
+
+        return variable.matches("^(y|[xz][1-9][0-9]*)$");
     }
 
     // for now case-sensitive
-    public static boolean isValidLabel(String input){
+    public static boolean isValidLabelFormat(String input){
         return input.matches("^(EXIT|L[1-9][0-9]*)$");
     }
 
@@ -179,7 +197,7 @@ public class InstructionValidator {
     public static void validateVariableArgument(String argName, String argValue) throws InvalidInstructionException{
         validateArgumentNotEmpty(argName, argValue);
 
-        if(!isValidVariable(argValue)){
+        if(!isValidVariableFormat(argValue)){
             throw new InvalidInstructionException("invalid variable format: " + argValue);
         }
 
@@ -187,7 +205,7 @@ public class InstructionValidator {
 
     public static void validateLabelArgument(String argName, String argValue) throws InvalidInstructionException{
         validateArgumentNotEmpty(argName, argValue);
-        if(!isValidLabel(argValue)){
+        if(!isValidLabelFormat(argValue)){
             throw new InvalidInstructionException("invalid label format: " + argValue);
         }
     }

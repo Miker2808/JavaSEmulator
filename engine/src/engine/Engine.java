@@ -15,7 +15,6 @@ public class Engine {
     private SInterpreter mainInterpreter;
     private SProgram loadedProgram = null;
 
-
     public void loadFromXML(String path) throws Exception {
         SProgram loadedProgramtemp = new SProgram();
 
