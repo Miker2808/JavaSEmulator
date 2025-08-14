@@ -154,7 +154,7 @@ public class SProgram {
         if(this.name == null){
             throw new InvalidInstructionException("S-Program name is required");
         }
-
+        // validate program in general
         for(int line = 1; line <= Size(); line++){
             try {
                 InstructionValidator.validateInstruction(this.getInstruction(line));
@@ -162,6 +162,31 @@ public class SProgram {
                 throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
             }
         }
+
+        // find that all labels are used
+        validateLabelsUsed();
+    }
+
+    // validates that all used labels jump to a line
+    private void validateLabelsUsed() throws InvalidInstructionException{
+
+        for(int line = 1; line <= Size(); line++){
+            String argLabel = this.getInstruction(line).getArgumentLabel();
+            if(!argLabel.isEmpty() && !argLabel.equals("EXIT")){
+                boolean found = false;
+                for(int line2 = 1; line2 <= Size(); line2++){
+                    String sLabel = this.getInstruction(line2).getSLabel();
+                    if(sLabel.equals(argLabel)){
+                        found = true;
+                    }
+                }
+                if(!found){
+                    throw new InvalidInstructionException(String.format("Instruction #%d, label %s does not jump anywhere",
+                            line, argLabel));
+                }
+            }
+        }
+
     }
 
 

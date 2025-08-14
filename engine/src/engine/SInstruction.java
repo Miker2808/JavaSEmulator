@@ -181,66 +181,41 @@ public class SInstruction {
         }
     }
 
+    // Checks if argument has a label, if yes, return it
+    // otherwise returns an empty string
+    // NOTE: this is not the sLabel, but label if the instruction does have a label
+    public String getArgumentLabel(){
+        List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
+        if (args != null) {
+            for (SInstructionArgument arg : args) {
+                if (InstructionValidator.isValidLabelFormat(arg.getValue())) {
+                    return arg.getValue();
+                }
+            }
+        }
+        return "";
+    }
 
-    /**
-     * Gets the value of the sVariable property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+
     public String getSVariable() {
         this.sVariable = sVariable.trim();
         return sVariable;
     }
 
-    /**
-     * Sets the value of the sVariable property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
     @XmlElement(name = "S-Variable", required = true)
     public void setSVariable(String value) {
         this.sVariable = value;
     }
 
-    /**
-     * Gets the value of the sInstructionArguments property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SInstructionArguments }
-     *     
-     */
     public SInstructionArguments getSInstructionArguments() {
         return sInstructionArguments;
     }
 
-    /**
-     * Sets the value of the sInstructionArguments property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SInstructionArguments }
-     *     
-     */
     @XmlElement(name = "S-Instruction-Arguments")
     public void setSInstructionArguments(SInstructionArguments value) {
         this.sInstructionArguments = value;
     }
 
-    /**
-     * loads from an arguments hashmap into the sInstructionArguments
-     * used to make it easy to instantiate SInstruction manually in code, or through XML
-     * using the same member object to hold the arguments
-     * @param map
-     *      allowed object is
-     *      {@link HashMap}
-     */
      public void setsInstructionArguments(HashMap<String, String> map) {
         List<SInstructionArgument> argumentList = new ArrayList<>();
 
@@ -257,81 +232,33 @@ public class SInstruction {
         sInstructionArguments.sInstructionArgument = argumentList;
     }
 
-    /**
-     * Gets the value of the sLabel property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getSLabel() {
         this.sLabel = sLabel.trim();
         return sLabel;
     }
 
-    /**
-     * Sets the value of the sLabel property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     @XmlElement(name = "S-Label")
     public void setSLabel(String value) {
         this.sLabel = value.trim();
     }
 
-    /**
-     * Gets the value of the type property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getType() {
         this.type = type.trim();
 
         return type;
     }
 
-    /**
-     * Sets the value of the type property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
     @XmlAttribute(name = "type", required = true)
     public void setType(String value)  {
         this.type = value;
     }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getName() {
         name = name.trim();
 
         return name;
     }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     @XmlAttribute(name = "name", required = true)
     public void setName(String value) {
         this.name = value.trim();

@@ -38,6 +38,7 @@ public class UserInterface {
                 System.out.println(SInterpreter.convertVariablesToString(output));
 
             } catch (Exception e) {
+                System.out.println("File failed to load");
                 System.out.println(e.getMessage());
             }
         }

@@ -23,24 +23,22 @@ public class XMLValidator
     public static void validateXMLFile(String filePathStr) throws InvalidXMLException {
         Path path;
 
-        String file_error_str = "Failed to load file: ";
-
         // 1. Check path format validity
         try {
             path = Paths.get(filePathStr);
-        } catch (InvalidPathException e) {
-            throw new InvalidXMLException(file_error_str + "Invalid path format" );
+        } catch (Exception e) {
+            throw new InvalidXMLException("Invalid path format" );
         }
 
         // 2. Check that file exists and is a file
         if (!Files.exists(path) || !Files.isRegularFile(path)) {
-            throw new InvalidXMLException(file_error_str + "Path does not point to an existing file");
+            throw new InvalidXMLException("Path does not point to an existing file");
         }
 
         // 3. Check file extension
         String fileName = path.getFileName().toString().toLowerCase();
         if (!fileName.endsWith(".xml")) {
-            throw new InvalidXMLException(file_error_str + "File is not an XML file (ends with .xml)");
+            throw new InvalidXMLException("File is not an XML file (ends with .xml)");
         }
     }
 
