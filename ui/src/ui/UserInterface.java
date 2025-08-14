@@ -7,16 +7,19 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class UserInterface {
+    Engine engine;
+    Scanner scanner;
 
     public static void main(String[] args) {
-
-        test2();
-
+        UserInterface ui = new UserInterface();
+        ui.run();
     }
 
-    public static void test2(){
-        Engine engine = new Engine();
-        Scanner scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
+    public void run(){
+        engine = new Engine();
+        scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
+
+        System.out.println("S-Emulator Console Version");
 
         while(true) {
             System.out.print("Write path to xml file: ");
@@ -45,45 +48,55 @@ public class UserInterface {
 
     }
 
-    public static void test1(){
-        /* # f(x) = 3x - 2
-        [     ] GOTO L2
-        [ L1  ] Y <- Y + 1
-        [     ] Y <- Y + 1
-        [     ] Y <- Y + 1
-        [     ] X18 <- X18 - 1
-        [ L2  ] IF X18 != 0 GOTO L1
-        [     ] Y <- Y - 1
-        [     ] Y <- Y - 1
-         */
+    public void printMenu(){
+        System.out.println("Menu:");
+        System.out.println("[ 1 ] Load program");
 
-        SProgram program = new SProgram();
-
-        HashMap<String, String> arguments = new HashMap<>();
-        arguments.put("gotoLabel", "L8");
-        program.appendInstruction(new SInstruction("GOTO_LABEL", "", "", arguments));
-        program.appendInstruction(new SInstruction("INCREASE","y", "L1",null));
-        program.appendInstruction(new SInstruction("INCREASE","y", "",null));
-        program.appendInstruction(new SInstruction("INCREASE","y", "",null));
-        program.appendInstruction(new SInstruction("DECREASE","x18", "",null));
-
-        arguments.clear();
-        arguments.put("JNZLabel", "L1");
-        program.appendInstruction(new SInstruction("JUMP_NOT_ZERO", "x18","L8",arguments));
-        program.appendInstruction(new SInstruction("DECREASE","y","",null));
-        program.appendInstruction(new SInstruction("DECREASE","y","",null));
-
-        System.out.print(program);
-
-        SInterpreter mainInterpreter = new SInterpreter(program);
-
-        HashMap<String, Integer> input = new HashMap<>();
-        input.put("x18", 100);
-        HashMap<String, Integer> output = mainInterpreter.run(input);
-
-        for (Map.Entry<String, Integer> entry : output.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+        if(engine.isProgramLoaded()){
+            System.out.println("[ 2 ] Print program");
+            System.out.println("[ 3 ] Expand program");
+            System.out.println("[ 4 ] Run program");
+            System.out.println("[ 5 ] Print execution history");
+            System.out.println("[ 6 ] Save");
         }
+
+        System.out.println("[ 7 ] Exit");
+
+    }
+
+    // scans option, and returns number if valid, 0 if invalid
+    public int scanOption(){
+        System.out.print("Enter option: ");
+        String input = scanner.nextLine().trim();
+        System.out.println();
+        int option = 0;
+        if(input.matches("\\d+")){
+            option = Integer.parseInt(input);
+        }
+        return option;
+    }
+
+    public int executeOption(int option){
+        switch(option){
+            case 1 -> loadFile();
+            case 2 -> printProgram();
+            case 3 -> expandProgramOption();
+            case 4 -> executeProgramOption();
+            case 5 -> printHistoryOption();
+            case 6 -> saveOption();
+            case 7 -> System.exit(0);
+            default -> System.out.println("Invalid option, please choose from the options in the menu");
+        }
+    }
+
+    public void printProgram(){
+
+    }
+
+    public void loadFile(){
+        System.out.print("Path to XML file: ");
+        String path = scanner.nextLine();
+
     }
 
 }

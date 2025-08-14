@@ -192,11 +192,11 @@ public class SProgram {
 
     /**
      * Gets the value of the sInstructions property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link SInstructions }
-     *     
+     *
      */
     public SInstructions getSInstructions() {
         return sInstructions;
@@ -204,11 +204,11 @@ public class SProgram {
 
     /**
      * Sets the value of the sInstructions property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link SInstructions }
-     *     
+     *
      */
     public void setSInstructions(SInstructions value) {
         this.sInstructions = value;

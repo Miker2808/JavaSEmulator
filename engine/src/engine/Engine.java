@@ -41,6 +41,7 @@ public class Engine {
 
     }
 
+    // returns string of loaded program, if no program loaded throws exception
     public String getLoadedProgramString() throws Exception{
         if(loadedProgram == null){
             throw new Exception("No program has been loaded");
@@ -48,11 +49,14 @@ public class Engine {
         return loadedProgram.toString();
     }
 
-    public SProgram getLoadedProgram() throws Exception{
-        if(loadedProgram == null){
-            throw new Exception("No program has been loaded");
-        }
+    // returns loaded program,
+    // if no program is loaded returns null
+    public SProgram getLoadedProgram(){
         return loadedProgram;
+    }
+
+    public boolean isProgramLoaded(){
+        return loadedProgram != null;
     }
 
 
