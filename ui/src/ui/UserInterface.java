@@ -15,44 +15,30 @@ public class UserInterface {
         ui.run();
     }
 
-    public void run(){
+    public void run() {
         engine = new Engine();
         scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
 
         System.out.println("S-Emulator Console Version");
+        System.out.println("------------------------------------");
 
-        while(true) {
-            System.out.print("Write path to xml file: ");
-            String path = scanner.nextLine();  // Read a whole line of input
+        int option = 0;
+        while (true) {
 
-            try {
-                engine.loadFromXML(path);
+            printMenu();
 
-                System.out.println(engine.getLoadedProgramString());
+            option = scanOption();
+            executeOption(option);
 
-                SInterpreter mainInterpreter = new SInterpreter(engine.getLoadedProgram());
-
-                HashMap<String, Integer> input = new HashMap<>();
-                input.put("x1", 10000);
-                input.put("x2", 8766);
-                HashMap<String, Integer> output = mainInterpreter.run(input);
-
-                System.out.println("Variables results:");
-                System.out.println(SInterpreter.convertVariablesToString(output));
-
-            } catch (Exception e) {
-                System.out.println("File failed to load");
-                System.out.println(e.getMessage());
-            }
         }
 
     }
 
-    public void printMenu(){
-        System.out.println("Menu:");
+    public void printMenu() {
+        System.out.println("\nMenu:");
         System.out.println("[ 1 ] Load program");
 
-        if(engine.isProgramLoaded()){
+        if (engine.isProgramLoaded()) {
             System.out.println("[ 2 ] Print program");
             System.out.println("[ 3 ] Expand program");
             System.out.println("[ 4 ] Run program");
@@ -65,31 +51,56 @@ public class UserInterface {
     }
 
     // scans option, and returns number if valid, 0 if invalid
-    public int scanOption(){
+    public int scanOption() {
         System.out.print("Enter option: ");
         String input = scanner.nextLine().trim();
         System.out.println();
         int option = 0;
-        if(input.matches("\\d+")){
+        if (input.matches("\\d+")) {
             option = Integer.parseInt(input);
         }
         return option;
     }
 
-    public int executeOption(int option){
-        switch(option){
-            case 1 -> loadFile();
-            case 2 -> printProgram();
-            case 3 -> expandProgramOption();
-            case 4 -> executeProgramOption();
-            case 5 -> printHistoryOption();
-            case 6 -> saveOption();
-            case 7 -> System.exit(0);
-            default -> System.out.println("Invalid option, please choose from the options in the menu");
+    public void executeOption(int option) {
+        boolean isProgramLoaded = engine.isProgramLoaded();
+
+        if(isProgramLoaded) {
+            switch (option) {
+                case 1 -> loadFile();
+                case 2 -> printProgram();
+                case 3 -> expandProgramOption();
+                case 4 -> executeProgramOption();
+                case 5 -> printHistoryOption();
+                case 6 -> saveOption();
+                case 7 -> System.exit(0);
+                default -> System.out.println("Invalid option, please choose from the options in the menu");
+
+            }
+        }
+        else{
+            switch (option) {
+                case 1 -> loadFile();
+                case 7 -> System.exit(0);
+                default -> System.out.println("Invalid option, please load a file first.");
+            }
         }
     }
 
     public void printProgram(){
+        SProgram loadedProgram = engine.getLoadedProgram();
+
+        System.out.println("Program name: " + loadedProgram.getName());
+
+        System.out.println("Used input variables (in order of appearance):");
+        loadedProgram.getInputVariablesUsed().forEach(System.out::println);
+        System.out.println("Used labels (in order of appearance):");
+        loadedProgram.getLabelsUsed().forEach(System.out::println);
+        System.out.println("Program:");
+
+        for (int line = 1; line <= loadedProgram.Size(); line++){
+            System.out.printf("#%d %s\n", line, loadedProgram.getInstruction(line));
+        }
 
     }
 
@@ -97,6 +108,37 @@ public class UserInterface {
         System.out.print("Path to XML file: ");
         String path = scanner.nextLine();
 
+        try {
+            engine.loadFromXML(path);
+        }
+        catch(Exception e){
+            System.out.print("Failed to load XML file: ");
+            System.out.println(e.getMessage());
+            System.out.println();
+            return;
+        }
+
+        System.out.println("Program loaded successfully");
+
     }
+
+    public void expandProgramOption(){
+        System.out.println("Not implemented yet");
+    }
+
+    public void executeProgramOption(){
+        System.out.println("Not implemented yet");
+    }
+
+    public void printHistoryOption(){
+        System.out.println("Not implemented yet");
+    }
+
+    public void saveOption(){
+        System.out.println("Not implemented yet");
+    }
+
+
+
 
 }
