@@ -1,6 +1,5 @@
 package engine;
 
-import java.util.Objects;
 import java.util.Set;
 
 public class InstructionValidator {
@@ -12,7 +11,7 @@ public class InstructionValidator {
     );
 
     public static void validateInstruction(SInstruction instr) throws InvalidInstructionException{
-        String name = instr.getName();
+        InstructionName name = instr.getInstructionName();
         String label = instr.getSLabel();
 
         isValidName(name);
@@ -26,19 +25,19 @@ public class InstructionValidator {
         }
 
         switch (name) {
-            case "INCREASE" -> validateIncrease(instr);
-            case "DECREASE" -> validateDecrease(instr);
-            case "JUMP_NOT_ZERO" -> validateJumpNotZero(instr);
-            case "NEUTRAL" -> validateNeutral(instr);
-            case "ZERO_VARIABLE" -> validateZeroVariable(instr);
-            case "GOTO_LABEL" -> validateGotoLabel(instr);
-            case "ASSIGNMENT" -> validateAssignment(instr);
-            case "CONSTANT_ASSIGNMENT" -> validateConstantAssignment(instr);
-            case "JUMP_ZERO" -> validateJumpZero(instr);
-            case "JUMP_EQUAL_CONSTANT" -> validateJumpEqualConstant(instr);
-            case "JUMP_EQUAL_VARIABLE" -> validateJumpEqualVariable(instr);
-            case "QUOTE" -> validateQuote(instr);
-            case "JUMP_EQUAL_FUNCTION" -> validateJumpEqualFunction(instr);
+            case INCREASE -> validateIncrease(instr);
+            case DECREASE -> validateDecrease(instr);
+            case JUMP_NOT_ZERO -> validateJumpNotZero(instr);
+            case NEUTRAL -> validateNeutral(instr);
+            case ZERO_VARIABLE -> validateZeroVariable(instr);
+            case GOTO_LABEL -> validateGotoLabel(instr);
+            case ASSIGNMENT -> validateAssignment(instr);
+            case CONSTANT_ASSIGNMENT -> validateConstantAssignment(instr);
+            case JUMP_ZERO -> validateJumpZero(instr);
+            case JUMP_EQUAL_CONSTANT -> validateJumpEqualConstant(instr);
+            case JUMP_EQUAL_VARIABLE -> validateJumpEqualVariable(instr);
+            case QUOTE -> validateQuote(instr);
+            case JUMP_EQUAL_FUNCTION -> validateJumpEqualFunction(instr);
             default -> throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
         }
     }
@@ -103,16 +102,16 @@ public class InstructionValidator {
 
     // TODO: ADD SUPPORT
     public static void validateQuote(SInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getName()));
+        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     // TODO: ADD SUPPORT
     public static void validateJumpEqualFunction(SInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getName()));
+        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     public static void validateType(SInstruction instr) throws InvalidInstructionException{
-        String name = instr.getName();
+        InstructionName name = instr.getInstructionName();
         String type = instr.getType();
 
         boolean validTypeSyntax = type.equals("basic") || type.equals("synthetic");
@@ -126,26 +125,26 @@ public class InstructionValidator {
         }
     }
 
-    public static boolean isBasicInstruction(String name) {
-        return Objects.equals(name, "INCREASE") ||
-                Objects.equals(name, "DECREASE") ||
-                Objects.equals(name, "JUMP_NOT_ZERO") ||
-                Objects.equals(name, "NEUTRAL");
+    public static boolean isBasicInstruction(InstructionName name) {
+        return name.equals(InstructionName.INCREASE) ||
+                name.equals(InstructionName.DECREASE) ||
+                name.equals(InstructionName.JUMP_NOT_ZERO) ||
+                name.equals(InstructionName.NEUTRAL);
     }
 
-    public static void isValidName(String name) throws InvalidInstructionException{
-        if (!VALID_NAMES.contains(name)) {
-            throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
+    public static void isValidName(InstructionName name) throws InvalidInstructionException{
+        if (name == InstructionName.UNSUPPORTED) {
+            throw new InvalidInstructionException("invalid or unsupported instruction name");
         }
     }
 
 
     public static void validateSVariable(SInstruction instr) throws  InvalidInstructionException{
-        String name = instr.getName();
+        InstructionName name = instr.getInstructionName();
         String svariable = instr.getSVariable();
 
         if(svariable.isEmpty()) {
-            if (!name.equals("GOTO_LABEL")) {
+            if (!name.equals(InstructionName.GOTO_LABEL)) {
                 throw new InvalidInstructionException("S-Variable is required for this instruction");
             }
         }

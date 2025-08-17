@@ -78,7 +78,7 @@ public class SInstruction {
     private SInstructionArguments sInstructionArguments;
     private String sLabel;
     private String type;
-    private String name;
+    private InstructionName name;
 
 
     public SInstruction() {
@@ -86,11 +86,11 @@ public class SInstruction {
         sInstructionArguments = new SInstructionArguments();
         sLabel = "";
         type = "";
-        name = "";
+        name = InstructionName.UNSUPPORTED;
     }
 
     public SInstruction(String name, String variable, String label, HashMap<String, String> arguments){
-        this.name = name;
+        this.name = InstructionName.fromString(name.trim());
         this.sVariable = variable;
         this.sLabel = label;
         setsInstructionArguments(arguments);
@@ -98,36 +98,36 @@ public class SInstruction {
 
     public int getCycles(){
         return switch (name) {
-            case "INCREASE", "DECREASE" -> 1;
-            case "JUMP_NOT_ZERO" -> 2;
-            case "NEUTRAL" -> 0;
-            case "ZERO_VARIABLE" -> 1;
-            case "GOTO_LABEL" -> 1;
-            case "ASSIGNMENT" -> 4;
-            case "CONSTANT_ASSIGNMENT" -> 2;
-            case "JUMP_ZERO" -> 2;
-            case "JUMP_EQUAL_CONSTANT" -> 2;
-            case "JUMP_EQUAL_VARIABLE" -> 2;
-            case "QUOTE" -> 5;
-            case "JUMP_EQUAL_FUNCTION" -> 6;
+            case InstructionName.INCREASE, InstructionName.DECREASE -> 1;
+            case InstructionName.JUMP_NOT_ZERO -> 2;
+            case InstructionName.NEUTRAL -> 0;
+            case InstructionName.ZERO_VARIABLE -> 1;
+            case InstructionName.GOTO_LABEL -> 1;
+            case InstructionName.ASSIGNMENT -> 4;
+            case InstructionName.CONSTANT_ASSIGNMENT -> 2;
+            case InstructionName.JUMP_ZERO -> 2;
+            case InstructionName.JUMP_EQUAL_CONSTANT -> 2;
+            case InstructionName.JUMP_EQUAL_VARIABLE -> 2;
+            case InstructionName.QUOTE -> 5;
+            case InstructionName.JUMP_EQUAL_FUNCTION -> 6;
             default -> throw new IllegalStateException("Invalid instruction name: " + name);
         };
     }
 
     private String getOperationString(String variable) {
         return switch (name) {
-            case "INCREASE" -> String.format("%s <- %s + 1", variable, variable);
-            case "DECREASE" -> String.format("%s <- %s - 1", variable, variable);
-            case "JUMP_NOT_ZERO" -> String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
-            case "NEUTRAL" -> String.format("%s <- %s", variable, variable);
-            case "ZERO_VARIABLE" -> String.format("%s <- 0", variable);
-            case "GOTO_LABEL" -> String.format("GOTO %s", getArgument("gotoLabel"));
-            case "ASSIGNMENT" -> String.format("%s <- %s", variable, getArgument("assignedVariable"));
-            case "CONSTANT_ASSIGNMENT" -> String.format("%s <- %s", variable, getArgument("constantValue"));
-            case "JUMP_ZERO" -> String.format("IF %s = 0 GOTO %s", variable, getArgument("JZLabel"));
-            case "JUMP_EQUAL_CONSTANT" ->
+            case InstructionName.INCREASE -> String.format("%s <- %s + 1", variable, variable);
+            case InstructionName.DECREASE -> String.format("%s <- %s - 1", variable, variable);
+            case InstructionName.JUMP_NOT_ZERO -> String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
+            case InstructionName.NEUTRAL -> String.format("%s <- %s", variable, variable);
+            case InstructionName.ZERO_VARIABLE -> String.format("%s <- 0", variable);
+            case InstructionName.GOTO_LABEL -> String.format("GOTO %s", getArgument("gotoLabel"));
+            case InstructionName.ASSIGNMENT -> String.format("%s <- %s", variable, getArgument("assignedVariable"));
+            case InstructionName.CONSTANT_ASSIGNMENT -> String.format("%s <- %s", variable, getArgument("constantValue"));
+            case InstructionName.JUMP_ZERO -> String.format("IF %s = 0 GOTO %s", variable, getArgument("JZLabel"));
+            case InstructionName.JUMP_EQUAL_CONSTANT ->
                     String.format("IF %s = %s GOTO %s", variable, getArgument("constantValue"), getArgument("JEConstantLabel"));
-            case "JUMP_EQUAL_VARIABLE" ->
+            case InstructionName.JUMP_EQUAL_VARIABLE ->
                     String.format("IF %s = %s GOTO %s", variable, getArgument("variableName"), getArgument("JEVariableLabel"));
             default -> "";
         };
@@ -253,15 +253,27 @@ public class SInstruction {
         this.type = value;
     }
 
-    public String getName() {
-        name = name.trim();
-
+    public InstructionName getInstructionName() {
         return name;
+    }
+
+    // for the stupid jaxb library because it wont work with setter
+    // unless a correct getter exists for some fucking reason (correct == same return type as well)
+    // wtf is the point of jaxb, if you need to manually unpack everything anyway
+    // i'm not jokin, even if the setter exists and its correct, unless a correct getter exists
+    // it does literally nothing
+    public String getName(){
+        return name.toString();
     }
 
     @XmlAttribute(name = "name", required = true)
     public void setName(String value) {
-        this.name = value.trim();
+        try {
+            this.name = InstructionName.valueOf(value.trim());
+        }
+        catch (IllegalArgumentException e) {
+            this.name = InstructionName.UNSUPPORTED;
+        }
     }
 
 }

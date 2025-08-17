@@ -1,7 +1,6 @@
 package engine;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SInterpreter
 {
@@ -81,20 +80,20 @@ public class SInterpreter
     // Runs a single step in execution
     public void step(){
         SInstruction instr = program.getInstruction(pc);
-        switch (instr.getName()) {
-            case "INCREASE" -> stepIncrease(instr);
-            case "DECREASE" -> stepDecrease(instr);
-            case "JUMP_NOT_ZERO" -> stepJumpNotZero(instr);
-            case "NEUTRAL" -> stepNeutral(instr);
-            case "ZERO_VARIABLE" -> stepZeroVariable(instr);
-            case "GOTO_LABEL" -> stepGotoLabel(instr);
-            case "ASSIGNMENT" -> stepAssignment(instr);
-            case "CONSTANT_ASSIGNMENT" -> stepConstAssignment(instr);
-            case "JUMP_ZERO" -> stepJumpZero(instr);
-            case "JUMP_EQUAL_CONSTANT" -> stepJumpEqualConst(instr);
-            case "JUMP_EQUAL_VARIABLE" -> stepJumpEqualVariable(instr);
-            case "QUOTE" -> stepQuote(instr);
-            case "JUMP_EQUAL_FUNCTION" -> stepJumpEqualFunction(instr);
+        switch (instr.getInstructionName()) {
+            case InstructionName.INCREASE -> stepIncrease(instr);
+            case InstructionName.DECREASE -> stepDecrease(instr);
+            case InstructionName.JUMP_NOT_ZERO -> stepJumpNotZero(instr);
+            case InstructionName.NEUTRAL -> stepNeutral(instr);
+            case InstructionName.ZERO_VARIABLE -> stepZeroVariable(instr);
+            case InstructionName.GOTO_LABEL -> stepGotoLabel(instr);
+            case InstructionName.ASSIGNMENT -> stepAssignment(instr);
+            case InstructionName.CONSTANT_ASSIGNMENT -> stepConstAssignment(instr);
+            case InstructionName.JUMP_ZERO -> stepJumpZero(instr);
+            case InstructionName.JUMP_EQUAL_CONSTANT -> stepJumpEqualConst(instr);
+            case InstructionName.JUMP_EQUAL_VARIABLE -> stepJumpEqualVariable(instr);
+            case InstructionName.QUOTE -> stepQuote(instr);
+            case InstructionName.JUMP_EQUAL_FUNCTION -> stepJumpEqualFunction(instr);
         }
     }
 
@@ -252,32 +251,7 @@ public class SInterpreter
     }
 
 
-    public static String convertVariablesToString(HashMap<String, Integer> variables) {
-        StringBuilder sb = new StringBuilder();
 
-        Comparator<String> numericSuffixComparator = Comparator.comparingInt(k -> Integer.parseInt(k.substring(1)));
-
-        // Add y first
-        if (variables.containsKey("y")) {
-            sb.append("y = ").append(variables.get("y")).append("\n");
-        }
-
-        // Helper to append sorted keys with a prefix
-        for (String prefix : Arrays.asList("x", "z")) {
-            List<String> keys = variables.keySet().stream()
-                    .filter(k -> k.startsWith(prefix))
-                    .sorted(numericSuffixComparator)
-                    .toList();
-            for (String k : keys) {
-                sb.append(k).append(" = ").append(variables.get(k)).append("\n");
-            }
-        }
-
-        // Remove trailing newline if exists
-        if (!sb.isEmpty()) sb.setLength(sb.length() - 1);
-
-        return sb.toString();
-    }
 
 
 

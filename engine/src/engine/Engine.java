@@ -9,6 +9,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
+import java.util.HashMap;
 
 
 public class Engine {
@@ -57,6 +58,10 @@ public class Engine {
 
     public boolean isProgramLoaded(){
         return loadedProgram != null;
+    }
+
+    public HashMap<String, Integer> emulateLoadedProgram(HashMap<String, Integer> input){
+        return new SInterpreter(loadedProgram).run(input);
     }
 
 
