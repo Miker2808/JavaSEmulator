@@ -7,13 +7,16 @@
 
 package engine;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import engine.instruction.SInstruction;
+import engine.instruction.SInstructionAdapter;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -43,6 +46,7 @@ import jakarta.xml.bind.annotation.XmlType;
 public class SInstructions {
 
     @XmlElement(name = "S-Instruction", required = true)
+    @XmlJavaTypeAdapter(SInstructionAdapter.class)
     private List<SInstruction> sInstruction;
 
     public SInstructions() {

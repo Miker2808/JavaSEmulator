@@ -5,14 +5,12 @@
 //
 
 
-package engine;
+package engine.instruction;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
+import engine.InstructionValidator;
+import engine.SInstructionArgument;
+import engine.SInstructionArguments;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +91,19 @@ public class SInstruction {
         is_expansion = false;
     }
 
+    // copy constructor, all my homies love copy constructors
+    public SInstruction(SInstruction other){
+        this.sVariable = other.sVariable;
+        this.sInstructionArguments = new SInstructionArguments(other.getSInstructionArguments());
+        this.sLabel = other.sLabel;
+        this.type = other.type;
+        this.name = other.name;
+        this.parent = other.parent;
+        this.degree = other.degree;
+        this.is_expansion = other.is_expansion;
+    }
+
+    /*
     public SInstruction(String name, String variable, String label, HashMap<String, String> arguments) {
         this.name = InstructionName.fromString(name.trim());
         this.sVariable = variable;
@@ -103,25 +114,15 @@ public class SInstruction {
         is_expansion = false;
     }
 
-    public int getCycles() {
-        return switch (name) {
-            case InstructionName.INCREASE, InstructionName.DECREASE -> 1;
-            case InstructionName.JUMP_NOT_ZERO -> 2;
-            case InstructionName.NEUTRAL -> 0;
-            case InstructionName.ZERO_VARIABLE -> 1;
-            case InstructionName.GOTO_LABEL -> 1;
-            case InstructionName.ASSIGNMENT -> 4;
-            case InstructionName.CONSTANT_ASSIGNMENT -> 2;
-            case InstructionName.JUMP_ZERO -> 2;
-            case InstructionName.JUMP_EQUAL_CONSTANT -> 2;
-            case InstructionName.JUMP_EQUAL_VARIABLE -> 2;
-            case InstructionName.QUOTE -> 5;
-            case InstructionName.JUMP_EQUAL_FUNCTION -> 6;
-            default -> throw new IllegalStateException("Invalid instruction name: " + name);
-        };
+     */
+
+
+    public int getCycles(){
+        return 0;
     }
 
-    private String getOperationString(String variable) {
+
+    protected String getOperationString(String variable) {
         return switch (name) {
             case InstructionName.INCREASE -> String.format("%s <- %s + 1", variable, variable);
             case InstructionName.DECREASE -> String.format("%s <- %s - 1", variable, variable);
@@ -142,6 +143,7 @@ public class SInstruction {
         };
     }
 
+    @Override
     public String toString() {
         String phase = (Objects.equals(type, "basic")) ? "B" : "S";
         String operation = getOperationString(sVariable);
@@ -235,8 +237,8 @@ public class SInstruction {
             }
         }
 
-        sInstructionArguments = new SInstructionArguments();
-        sInstructionArguments.sInstructionArgument = argumentList;
+        //sInstructionArguments = new SInstructionArguments();
+        //sInstructionArguments.sInstructionArgument = argumentList;
     }
 
     public String getSLabel() {
@@ -300,6 +302,5 @@ public class SInstruction {
     public boolean isExpansion() {
         return this.is_expansion;
     }
-
 
 } // end of class

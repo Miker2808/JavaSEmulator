@@ -7,6 +7,7 @@
 
 package engine;
 
+import engine.instruction.SInstruction;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -102,19 +103,22 @@ public class SProgram {
         return output;
     }
 
+    /** appends a copy, not a reference */
     public void appendInstruction(SInstruction instruction){
-        sInstructions.getSInstruction().add(instruction);
+        sInstructions.getSInstruction().add(new SInstruction(instruction));
     }
 
     public void removeInstruction(int line_num){
         sInstructions.getSInstruction().remove(line_num - 1);
     }
 
+    /** inserts a copy of the instruction not a reference! */
     public void insertInstruction(int line_num, SInstruction instruction){
-        sInstructions.getSInstruction().add(line_num - 1, instruction);
+        sInstructions.getSInstruction().add(line_num - 1, new SInstruction(instruction));
     }
 
-    public SInstruction getInstruction(int line_num) {
+    /** returns a refence, not a copy! */
+     public SInstruction getInstruction(int line_num) {
         return sInstructions.getSInstruction().get(line_num - 1);
     }
 

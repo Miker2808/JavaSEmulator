@@ -1,5 +1,8 @@
 package engine;
 
+import engine.instruction.InstructionName;
+import engine.instruction.SInstruction;
+
 import java.util.*;
 
 public class SInterpreter

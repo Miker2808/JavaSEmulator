@@ -1,5 +1,8 @@
 package engine;
 
+import engine.instruction.InstructionName;
+import engine.instruction.SInstruction;
+
 public class SProgramExpander {
 
     private SProgram program;
@@ -33,6 +36,30 @@ public class SProgramExpander {
         }
         return max_z_var;
     }
+
+    /*
+    public SProgram returnExpandedProgram(int level){
+        SProgram expandedProgram = new SProgram();
+
+        for(int line = 1; line <= this.program.Size(); line++){
+            SInstruction instr =  this.program.getInstruction(line);
+            InstructionName instrName = instr.getInstructionName();
+
+            switch(instrName){
+                case INCREASE, DECREASE, JUMP_NOT_ZERO, NEUTRAL:{
+                    expandedProgram.appendInstruction(instr);
+                }
+                case
+
+
+            }
+
+        }
+
+    }
+    */
+
+
 
 
 }

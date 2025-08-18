@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class Engine {
     private SInterpreter mainInterpreter;
     private SProgram loadedProgram = null;
+    private SProgramExpander expander = null;
 
     public void loadFromXML(String path) throws Exception {
         SProgram loadedProgramtemp = new SProgram();
@@ -32,13 +33,14 @@ public class Engine {
             loadedProgramtemp = (SProgram) unmarshaller.unmarshal(xmlFile);
 
         } catch (JAXBException e) {
-            //System.err.println("[DEV ERROR (Shouldn't happen)]\n Failed to unmarshal XML: " + e.getMessage());
+            System.err.println("[DEV ERROR (Shouldn't happen)]\n Failed to unmarshal XML: \n" + e.getMessage());
             // TODO: check what went wrong
             throw new Exception("Failed to unmarshal XML file to object, XML file may be invalid schema-wise");
         }
 
         loadedProgramtemp.validateProgram();
         loadedProgram = loadedProgramtemp;
+        expander = new SProgramExpander(loadedProgram);
 
     }
 

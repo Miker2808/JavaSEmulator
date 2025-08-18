@@ -1,4 +1,4 @@
-package engine;
+package engine.instruction;
 
 import jakarta.xml.bind.annotation.XmlEnumValue;
 

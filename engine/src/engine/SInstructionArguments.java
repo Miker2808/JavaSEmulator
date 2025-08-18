@@ -82,6 +82,17 @@ public class SInstructionArguments {
         return this.sInstructionArgument;
     }
 
+    // copy constructor, all my homies love copy constructors
+    public SInstructionArguments(SInstructionArguments other) {
+        this.sInstructionArgument = new ArrayList<>();
+        for (SInstructionArgument arg : other.getSInstructionArgument()) {
+            SInstructionArgument newArg = new SInstructionArgument();
+            newArg.setValue(arg.getValue());
+            newArg.setName(arg.getName());
+            this.sInstructionArgument.add(newArg);
+        }
+    }
+
 
 
 
