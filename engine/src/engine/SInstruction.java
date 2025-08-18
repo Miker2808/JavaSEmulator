@@ -73,13 +73,14 @@ import java.util.Objects;
 @XmlRootElement(name = "S-Instruction")
 public class SInstruction {
 
-
     private String sVariable;
     private SInstructionArguments sInstructionArguments;
     private String sLabel;
     private String type;
     private InstructionName name;
-
+    private SInstruction parent;
+    private int degree;
+    private boolean is_expansion; // tells if command is expanded == parent is null
 
     public SInstruction() {
         sVariable = "";
@@ -87,16 +88,22 @@ public class SInstruction {
         sLabel = "";
         type = "";
         name = InstructionName.UNSUPPORTED;
+        parent = null;
+        degree = 0;
+        is_expansion = false;
     }
 
-    public SInstruction(String name, String variable, String label, HashMap<String, String> arguments){
+    public SInstruction(String name, String variable, String label, HashMap<String, String> arguments) {
         this.name = InstructionName.fromString(name.trim());
         this.sVariable = variable;
         this.sLabel = label;
         setsInstructionArguments(arguments);
+        parent = null;
+        degree = 0;
+        is_expansion = false;
     }
 
-    public int getCycles(){
+    public int getCycles() {
         return switch (name) {
             case InstructionName.INCREASE, InstructionName.DECREASE -> 1;
             case InstructionName.JUMP_NOT_ZERO -> 2;
@@ -118,12 +125,14 @@ public class SInstruction {
         return switch (name) {
             case InstructionName.INCREASE -> String.format("%s <- %s + 1", variable, variable);
             case InstructionName.DECREASE -> String.format("%s <- %s - 1", variable, variable);
-            case InstructionName.JUMP_NOT_ZERO -> String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
+            case InstructionName.JUMP_NOT_ZERO ->
+                    String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
             case InstructionName.NEUTRAL -> String.format("%s <- %s", variable, variable);
             case InstructionName.ZERO_VARIABLE -> String.format("%s <- 0", variable);
             case InstructionName.GOTO_LABEL -> String.format("GOTO %s", getArgument("gotoLabel"));
             case InstructionName.ASSIGNMENT -> String.format("%s <- %s", variable, getArgument("assignedVariable"));
-            case InstructionName.CONSTANT_ASSIGNMENT -> String.format("%s <- %s", variable, getArgument("constantValue"));
+            case InstructionName.CONSTANT_ASSIGNMENT ->
+                    String.format("%s <- %s", variable, getArgument("constantValue"));
             case InstructionName.JUMP_ZERO -> String.format("IF %s = 0 GOTO %s", variable, getArgument("JZLabel"));
             case InstructionName.JUMP_EQUAL_CONSTANT ->
                     String.format("IF %s = %s GOTO %s", variable, getArgument("constantValue"), getArgument("JEConstantLabel"));
@@ -141,7 +150,7 @@ public class SInstruction {
     }
 
     // returns value of argument name, empty string if not found
-    public String getArgument(String name){
+    public String getArgument(String name) {
         List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
         if (args != null) {
             for (SInstructionArgument arg : args) {
@@ -156,13 +165,11 @@ public class SInstruction {
     /**
      * overwrites value of existing argument name
      * if no such name was found, adds a new argument with the value
-     * @param name
-     *      name of the argument {@link String }
-     * @param value
-     *      value of the argument {@link String }
-
+     *
+     * @param name  name of the argument {@link String }
+     * @param value value of the argument {@link String }
      */
-    public void setArgument(String name, String value){
+    public void setArgument(String name, String value) {
         List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
         boolean found = false;
         if (args != null) {
@@ -184,7 +191,7 @@ public class SInstruction {
     // Checks if argument has a label, if yes, return it
     // otherwise returns an empty string
     // NOTE: this is not the sLabel, but label if the instruction does have a label
-    public String getArgumentLabel(){
+    public String getArgumentLabel() {
         List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
         if (args != null) {
             for (SInstructionArgument arg : args) {
@@ -216,7 +223,7 @@ public class SInstruction {
         this.sInstructionArguments = value;
     }
 
-     public void setsInstructionArguments(HashMap<String, String> map) {
+    public void setsInstructionArguments(HashMap<String, String> map) {
         List<SInstructionArgument> argumentList = new ArrayList<>();
 
         if (map != null) {
@@ -249,7 +256,7 @@ public class SInstruction {
     }
 
     @XmlAttribute(name = "type", required = true)
-    public void setType(String value)  {
+    public void setType(String value) {
         this.type = value;
     }
 
@@ -257,12 +264,7 @@ public class SInstruction {
         return name;
     }
 
-    // for the stupid jaxb library because it wont work with setter
-    // unless a correct getter exists for some fucking reason (correct == same return type as well)
-    // wtf is the point of jaxb, if you need to manually unpack everything anyway
-    // i'm not jokin, even if the setter exists and its correct, unless a correct getter exists
-    // it does literally nothing
-    public String getName(){
+    public String getName() {
         return name.toString();
     }
 
@@ -270,10 +272,34 @@ public class SInstruction {
     public void setName(String value) {
         try {
             this.name = InstructionName.valueOf(value.trim());
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             this.name = InstructionName.UNSUPPORTED;
         }
     }
 
-}
+    public void setParent(SInstruction parent) {
+        this.parent = parent;
+    }
+
+    public SInstruction getParent() {
+        return this.parent;
+    }
+
+    public int getDegree() {
+        return this.degree;
+    }
+
+    public void setDegree(int value) {
+        this.degree = value;
+    }
+
+    public void setIsExpansion(boolean val) {
+        this.is_expansion = val;
+    }
+
+    public boolean isExpansion() {
+        return this.is_expansion;
+    }
+
+
+} // end of class
