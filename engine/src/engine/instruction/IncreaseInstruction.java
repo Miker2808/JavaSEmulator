@@ -3,7 +3,16 @@ package engine.instruction;
 public class IncreaseInstruction extends SInstruction {
     public IncreaseInstruction(SInstruction base) {
         super(base);
-        // any additiona initialization
+        // any additional initialization
+        this.setCycles(1);
+    }
+
+    public IncreaseInstruction(InstructionName name, String variable, String label){
+        super();
+        this.setInstructionName(name);
+        this.setSVariable(variable);
+        this.setSLabel(label);
+        this.setCycles(1);
     }
 
     @Override

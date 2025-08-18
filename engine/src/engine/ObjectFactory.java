@@ -9,6 +9,8 @@ package engine;
 
 import javax.xml.namespace.QName;
 
+import engine.arguments.SInstructionArgument;
+import engine.arguments.SInstructionArguments;
 import engine.instruction.SInstruction;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlElementDecl;

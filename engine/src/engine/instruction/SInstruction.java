@@ -7,9 +7,9 @@
 
 package engine.instruction;
 
-import engine.InstructionValidator;
-import engine.SInstructionArgument;
-import engine.SInstructionArguments;
+import engine.validator.InstructionValidator;
+import engine.arguments.SInstructionArgument;
+import engine.arguments.SInstructionArguments;
 import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ public class SInstruction {
     private InstructionName name;
     private SInstruction parent;
     private int degree;
-    private boolean is_expansion; // tells if command is expanded == parent is null
+    private int cycles;
 
     public SInstruction() {
         sVariable = "";
@@ -86,64 +86,42 @@ public class SInstruction {
         sLabel = "";
         type = "";
         name = InstructionName.UNSUPPORTED;
-        parent = null;
         degree = 0;
-        is_expansion = false;
+        cycles = 0;
+
     }
 
     // copy constructor, all my homies love copy constructors
     public SInstruction(SInstruction other){
-        this.sVariable = other.sVariable;
+        this.sVariable = other.getSVariable();
         this.sInstructionArguments = new SInstructionArguments(other.getSInstructionArguments());
-        this.sLabel = other.sLabel;
-        this.type = other.type;
-        this.name = other.name;
-        this.parent = other.parent;
-        this.degree = other.degree;
-        this.is_expansion = other.is_expansion;
+        this.sLabel = other.getSLabel();
+        this.type = other.getType();
+        this.name = other.getInstructionName();
+        this.parent = other.getParent();
+        this.degree = other.getDegree();
     }
-
-    /*
-    public SInstruction(String name, String variable, String label, HashMap<String, String> arguments) {
-        this.name = InstructionName.fromString(name.trim());
-        this.sVariable = variable;
-        this.sLabel = label;
-        setsInstructionArguments(arguments);
-        parent = null;
-        degree = 0;
-        is_expansion = false;
-    }
-
-     */
-
 
     public int getCycles(){
-        return 0;
+        return this.cycles;
     }
 
+    public void setCycles(int value){
+        this.cycles = value;
+    }
+
+    public int getDegree(){
+        return this.degree;
+    }
+
+    public void setDegree(int value){
+        this.degree = value;
+    }
 
     protected String getOperationString(String variable) {
-        return switch (name) {
-            case InstructionName.INCREASE -> String.format("%s <- %s + 1", variable, variable);
-            case InstructionName.DECREASE -> String.format("%s <- %s - 1", variable, variable);
-            case InstructionName.JUMP_NOT_ZERO ->
-                    String.format("IF %s != 0 GOTO %s", variable, getArgument("JNZLabel"));
-            case InstructionName.NEUTRAL -> String.format("%s <- %s", variable, variable);
-            case InstructionName.ZERO_VARIABLE -> String.format("%s <- 0", variable);
-            case InstructionName.GOTO_LABEL -> String.format("GOTO %s", getArgument("gotoLabel"));
-            case InstructionName.ASSIGNMENT -> String.format("%s <- %s", variable, getArgument("assignedVariable"));
-            case InstructionName.CONSTANT_ASSIGNMENT ->
-                    String.format("%s <- %s", variable, getArgument("constantValue"));
-            case InstructionName.JUMP_ZERO -> String.format("IF %s = 0 GOTO %s", variable, getArgument("JZLabel"));
-            case InstructionName.JUMP_EQUAL_CONSTANT ->
-                    String.format("IF %s = %s GOTO %s", variable, getArgument("constantValue"), getArgument("JEConstantLabel"));
-            case InstructionName.JUMP_EQUAL_VARIABLE ->
-                    String.format("IF %s = %s GOTO %s", variable, getArgument("variableName"), getArgument("JEVariableLabel"));
-            default -> "";
-        };
+        return "";
     }
 
-    @Override
     public String toString() {
         String phase = (Objects.equals(type, "basic")) ? "B" : "S";
         String operation = getOperationString(sVariable);
@@ -190,21 +168,34 @@ public class SInstruction {
         }
     }
 
-    // Checks if argument has a label, if yes, return it
-    // otherwise returns an empty string
-    // NOTE: this is not the sLabel, but label if the instruction does have a label
+    // returns argument label, empty string if it doesn't exist
+    // overridden by derived class
     public String getArgumentLabel() {
-        List<SInstructionArgument> args = sInstructionArguments.getSInstructionArgument();
-        if (args != null) {
-            for (SInstructionArgument arg : args) {
-                if (InstructionValidator.isValidLabelFormat(arg.getValue())) {
-                    return arg.getValue();
-                }
-            }
-        }
         return "";
     }
 
+    public String getArgumentVariable(){
+        return "";
+    }
+
+    // return argument const as string format
+    public String getArgumentConst(){
+        return "";
+    }
+
+    // validate generic requirements applicable to all
+    public void validate() throws InvalidInstructionException{
+        // validate instruction applicable to all instructions
+
+
+        // validate extra requirements specific to instruction
+        validateExtra();
+    }
+
+    // to be overridden by instructions as needed
+    protected void validateExtra() throws InvalidInstructionException{
+
+    }
 
     public String getSVariable() {
         this.sVariable = sVariable.trim();
@@ -223,22 +214,6 @@ public class SInstruction {
     @XmlElement(name = "S-Instruction-Arguments")
     public void setSInstructionArguments(SInstructionArguments value) {
         this.sInstructionArguments = value;
-    }
-
-    public void setsInstructionArguments(HashMap<String, String> map) {
-        List<SInstructionArgument> argumentList = new ArrayList<>();
-
-        if (map != null) {
-            for (HashMap.Entry<String, String> entry : map.entrySet()) {
-                SInstructionArgument arg = new SInstructionArgument();
-                arg.setName(entry.getKey());
-                arg.setValue(entry.getValue());
-                argumentList.add(arg);
-            }
-        }
-
-        //sInstructionArguments = new SInstructionArguments();
-        //sInstructionArguments.sInstructionArgument = argumentList;
     }
 
     public String getSLabel() {
@@ -279,28 +254,16 @@ public class SInstruction {
         }
     }
 
+    public void setInstructionName(InstructionName name) {
+        this.name = name;
+    }
+
     public void setParent(SInstruction parent) {
         this.parent = parent;
     }
 
     public SInstruction getParent() {
         return this.parent;
-    }
-
-    public int getDegree() {
-        return this.degree;
-    }
-
-    public void setDegree(int value) {
-        this.degree = value;
-    }
-
-    public void setIsExpansion(boolean val) {
-        this.is_expansion = val;
-    }
-
-    public boolean isExpansion() {
-        return this.is_expansion;
     }
 
 } // end of class

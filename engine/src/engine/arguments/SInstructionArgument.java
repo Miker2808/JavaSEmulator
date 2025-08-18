@@ -5,7 +5,7 @@
 //
 
 
-package engine;
+package engine.arguments;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;

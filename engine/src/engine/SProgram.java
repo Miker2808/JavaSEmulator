@@ -7,7 +7,9 @@
 
 package engine;
 
+import engine.instruction.InvalidInstructionException;
 import engine.instruction.SInstruction;
+import engine.validator.InstructionValidator;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -63,19 +65,15 @@ public class SProgram {
             if(variable.matches("^(x[1-9][0-9]*)$"))
                 output.add(variable);
 
-            // I didn't design the class and members hierarchy, was done through the given xml format
-            List<SInstructionArgument> arguments = instr.getSInstructionArguments().getSInstructionArgument();
+            String argVariable = instr.getArgumentVariable();
 
-            // check if one of the arguments is input variable, append if yes
-            for (SInstructionArgument argument : arguments){
-                if(argument.getValue().matches("^(x[1-9][0-9]*)$"))
-                    output.add(argument.getValue());
+            if(argVariable.matches("^(x[1-9][0-9]*)$")){
+                output.add(argVariable);
             }
 
             // the idea why to check both is because sometimes it might be x1 <- x2,
             // and then you will want to add x1 and x2 to the input variables list
             // (even though x1 is redundant logically)
-
         }
 
         return output;
@@ -126,7 +124,7 @@ public class SProgram {
         return sInstructions.getSInstruction().size(); // number of instructions in the program
     }
 
-    public void validateProgram() throws InvalidInstructionException{
+    public void validateProgram() throws InvalidInstructionException {
         if(this.name == null){
             throw new InvalidInstructionException("S-Program name is required");
         }

@@ -1,5 +1,6 @@
-package engine;
+package engine.validator;
 
+import engine.instruction.InvalidInstructionException;
 import engine.instruction.InstructionName;
 import engine.instruction.SInstruction;
 
@@ -13,7 +14,7 @@ public class InstructionValidator {
             "JUMP_EQUAL_CONSTANT", "JUMP_EQUAL_VARIABLE", "QUOTE", "JUMP_EQUAL_FUNCTION"
     );
 
-    public static void validateInstruction(SInstruction instr) throws InvalidInstructionException{
+    public static void validateInstruction(SInstruction instr) throws InvalidInstructionException {
         InstructionName name = instr.getInstructionName();
         String label = instr.getSLabel();
 
