@@ -1,15 +1,19 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class JumpEqualVariableInstruction extends SInstruction {
     private String variableName;
+    private final String argVarName = "variableName";
     private String JEVariableLabel;
+    private final String argLabelName = "JEVariableLabel";
 
     public JumpEqualVariableInstruction(SInstruction base) {
         super(base);
         this.setCycles(2);
         this.setDegree(3);
-        this.setArgumentVariable(getArgument("variableName"));
-        this.setArgumentLabel(getArgument("JEVariableLabel"));
+        this.setArgumentVariable(getArgument(argVarName));
+        this.setArgumentLabel(getArgument(argLabelName));
 
     }
 
@@ -43,10 +47,22 @@ public class JumpEqualVariableInstruction extends SInstruction {
         return JEVariableLabel;
     }
 
-
     @Override
     protected String getOperationString(String variable) {
         return String.format("IF %s = %s GOTO %s", variable, getArgumentVariable(), getArgumentLabel());
+    }
+
+    public String getArgumentVariableName(){
+        return argVarName;
+    }
+
+    public String getArgumentLabelName(){
+        return argLabelName;
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 }

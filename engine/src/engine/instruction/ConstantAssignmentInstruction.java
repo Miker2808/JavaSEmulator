@@ -1,13 +1,16 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class ConstantAssignmentInstruction extends SInstruction {
     private String constantValue;
+    private final String argName = "constantValue";
 
     public ConstantAssignmentInstruction(SInstruction base) {
         super(base);
         this.setCycles(4);
         this.setDegree(2);
-        this.setArgumentConst(getArgument("constantValue"));
+        this.setArgumentConst(getArgument(argName));
     }
 
     public ConstantAssignmentInstruction(InstructionName name, String variable, String label, int constantValue) {
@@ -32,6 +35,15 @@ public class ConstantAssignmentInstruction extends SInstruction {
     @Override
     protected String getOperationString(String variable) {
         return String.format("%s <- %s", variable, getArgumentConst());
+    }
+
+    public String getArgumentConstName(){
+        return argName;
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 }

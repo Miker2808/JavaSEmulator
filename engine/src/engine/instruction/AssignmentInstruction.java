@@ -1,11 +1,14 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class AssignmentInstruction extends SInstruction {
     private String assignedVariable;
+    private final String argName = "assignedVariable";
 
     public AssignmentInstruction(SInstruction base) {
         super(base);
-        this.setArgumentVariable(getArgument("assignedVariable"));
+        this.setArgumentVariable(getArgument(argName));
         this.setCycles(4);
         this.setDegree(2);
     }
@@ -32,5 +35,14 @@ public class AssignmentInstruction extends SInstruction {
     @Override
     protected String getOperationString(String variable) {
         return String.format("%s <- %s", variable, getArgumentVariable());
+    }
+
+    public String getArgumentVariableName(){
+        return argName;
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 }

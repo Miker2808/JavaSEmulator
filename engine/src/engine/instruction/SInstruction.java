@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import static engine.validator.InstructionValidator.*;
+
 
 /**
  * <p>Java class for anonymous complex type</p>.
@@ -183,20 +185,6 @@ public class SInstruction {
         return "";
     }
 
-    // validate generic requirements applicable to all
-    public void validate() throws InvalidInstructionException{
-        // validate instruction applicable to all instructions
-
-
-        // validate extra requirements specific to instruction
-        validateExtra();
-    }
-
-    // to be overridden by instructions as needed
-    protected void validateExtra() throws InvalidInstructionException{
-
-    }
-
     public String getSVariable() {
         this.sVariable = sVariable.trim();
         return sVariable;
@@ -264,6 +252,10 @@ public class SInstruction {
 
     public SInstruction getParent() {
         return this.parent;
+    }
+
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 } // end of class

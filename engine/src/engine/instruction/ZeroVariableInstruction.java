@@ -1,5 +1,7 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class ZeroVariableInstruction extends  SInstruction {
 
     public ZeroVariableInstruction(SInstruction base) {
@@ -21,6 +23,11 @@ public class ZeroVariableInstruction extends  SInstruction {
     @Override
     protected String getOperationString(String variable) {
         return String.format("%s <- 0", variable);
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 }

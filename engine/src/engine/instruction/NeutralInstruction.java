@@ -1,5 +1,7 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class NeutralInstruction extends SInstruction {
 
     public NeutralInstruction(SInstruction base) {
@@ -18,4 +20,8 @@ public class NeutralInstruction extends SInstruction {
         return String.format("%s <- %s", variable, variable);
     }
 
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
+    }
 }

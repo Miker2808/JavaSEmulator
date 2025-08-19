@@ -73,7 +73,6 @@ public class UserInterface {
                 case 6 -> saveOption();
                 case 7 -> System.exit(0);
                 default -> System.out.println("Invalid option, please choose from the options in the menu");
-
             }
         }
         else{

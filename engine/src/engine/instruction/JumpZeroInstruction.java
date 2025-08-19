@@ -1,7 +1,10 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class JumpZeroInstruction extends SInstruction {
     private String JZLabel;
+    private final String argName = "JZLabel";
 
     public JumpZeroInstruction(SInstruction base) {
         super(base);
@@ -32,6 +35,15 @@ public class JumpZeroInstruction extends SInstruction {
     @Override
     protected String getOperationString(String variable) {
         return String.format("IF %s = 0 GOTO %s", variable, getArgumentLabel());
+    }
+
+    public String getArgumentLabelName(){
+        return argName;
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 }

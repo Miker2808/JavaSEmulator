@@ -1,20 +1,12 @@
 package engine.validator;
 
-import engine.instruction.InvalidInstructionException;
-import engine.instruction.InstructionName;
-import engine.instruction.SInstruction;
+import engine.instruction.*;
 
 import java.util.Set;
 
 public class InstructionValidator {
 
-    private static final Set<String> VALID_NAMES = Set.of(
-            "INCREASE", "DECREASE", "JUMP_NOT_ZERO", "NEUTRAL", "ZERO_VARIABLE",
-            "GOTO_LABEL", "ASSIGNMENT", "CONSTANT_ASSIGNMENT", "JUMP_ZERO",
-            "JUMP_EQUAL_CONSTANT", "JUMP_EQUAL_VARIABLE", "QUOTE", "JUMP_EQUAL_FUNCTION"
-    );
-
-    public static void validateInstruction(SInstruction instr) throws InvalidInstructionException {
+    public void validate(SInstruction instr) throws InvalidInstructionException {
         InstructionName name = instr.getInstructionName();
         String label = instr.getSLabel();
 
@@ -27,91 +19,90 @@ public class InstructionValidator {
         if(!label.isEmpty() && !isValidLabelFormat(label)) {
             throw new  InvalidInstructionException("invalid label format: " + label);
         }
+    }
 
-        switch (name) {
-            case INCREASE -> validateIncrease(instr);
-            case DECREASE -> validateDecrease(instr);
-            case JUMP_NOT_ZERO -> validateJumpNotZero(instr);
-            case NEUTRAL -> validateNeutral(instr);
-            case ZERO_VARIABLE -> validateZeroVariable(instr);
-            case GOTO_LABEL -> validateGotoLabel(instr);
-            case ASSIGNMENT -> validateAssignment(instr);
-            case CONSTANT_ASSIGNMENT -> validateConstantAssignment(instr);
-            case JUMP_ZERO -> validateJumpZero(instr);
-            case JUMP_EQUAL_CONSTANT -> validateJumpEqualConstant(instr);
-            case JUMP_EQUAL_VARIABLE -> validateJumpEqualVariable(instr);
-            case QUOTE -> validateQuote(instr);
-            case JUMP_EQUAL_FUNCTION -> validateJumpEqualFunction(instr);
-            default -> throw new InvalidInstructionException("invalid or unsupported instruction name: " + name);
-        }
+    public void validate(JumpNotZeroInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
+
+        String JNZLabel = instruction.getArgumentLabel();
+        String argName = instruction.getArgumentLabelName();
+        validateArgumentNotEmpty(argName, JNZLabel);
+        validateLabelArgument(argName, JNZLabel);
+    }
+
+    public void validate(GotoLabelInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
+
+        String gotoLabel = instruction.getArgumentLabel();
+        String argName = instruction.getArgumentLabelName();
+        validateLabelArgument(argName, gotoLabel);
+    }
+
+    /** validate AssignmentInstruction */
+    public void validate(AssignmentInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
+
+        String assignedVariable = instruction.getArgumentVariable();
+        String varName = instruction.getArgumentVariableName();
+        validateVariableArgument(varName, assignedVariable);
     }
 
 
-    public static void validateIncrease(SInstruction instruction) throws InvalidInstructionException{
+    public void validate(ConstantAssignmentInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
 
+        String constantValue = instruction.getArgumentConst();
+        String constName = instruction.getArgumentConstName();
+
+        validateConstantValueArgument(constName, constantValue);
     }
 
-    public static void validateDecrease(SInstruction instruction) throws InvalidInstructionException{
+    public void validate(JumpZeroInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
 
+        String JZLabel = instruction.getArgumentLabel();
+        String argName = instruction.getArgumentLabelName();
+
+        validateLabelArgument(argName, JZLabel);
     }
 
-    public static void validateJumpNotZero(SInstruction instruction) throws InvalidInstructionException{
-        String JNZLabel = instruction.getArgument("JNZLabel");
-        validateArgumentNotEmpty("JNZLabel", JNZLabel);
-        validateLabelArgument("JNZLabel", JNZLabel);
+    public void validate(JumpEqualConstantInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
+
+        String JEConstantLabel = instruction.getArgumentLabel();
+        String argLabelName = instruction.getArgumentLabelName();
+        validateArgumentNotEmpty(argLabelName, JEConstantLabel);
+
+        String constantValue = instruction.getArgumentConst();
+        String argConstName = instruction.getArgumentConstName();
+
+        validateConstantValueArgument(argConstName, constantValue);
     }
 
-    public static void validateNeutral(SInstruction instruction) throws InvalidInstructionException{
+    public void validate(JumpEqualVariableInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction);
 
-    }
+        String JEVariableLabel = instruction.getArgumentLabel();
+        String argLabelName = instruction.getArgumentLabelName();
+        validateLabelArgument(argLabelName, JEVariableLabel);
 
-    public static void validateZeroVariable(SInstruction instruction) throws InvalidInstructionException{
-
-    }
-
-    public static void validateGotoLabel(SInstruction instruction) throws InvalidInstructionException{
-        String gotoLabel = instruction.getArgument("gotoLabel");
-        validateLabelArgument("gotoLabel", gotoLabel);
-    }
-
-    public static void validateAssignment(SInstruction instruction) throws InvalidInstructionException{
-        String assignedVariable = instruction.getArgument("assignedVariable");
-        validateVariableArgument("assignedVariable", assignedVariable);
-    }
-
-    public static void validateConstantAssignment(SInstruction instruction) throws InvalidInstructionException{
-        String constantValue = instruction.getArgument("constantValue");
-        validateConstantValueArgument("constantValue", constantValue);
-    }
-
-    public static void validateJumpZero(SInstruction instruction) throws InvalidInstructionException{
-        String JZLabel = instruction.getArgument("JZLabel");
-        validateLabelArgument("JZLabel", JZLabel);
-    }
-
-    public static void validateJumpEqualConstant(SInstruction instruction) throws InvalidInstructionException{
-        String JEConstantLabel = instruction.getArgument("JEConstantLabel");
-        validateLabelArgument("JEConstantLabel", JEConstantLabel);
-
-        String constantValue = instruction.getArgument("constantValue");
-        validateConstantValueArgument("constantValue", constantValue);
-    }
-
-    public static void validateJumpEqualVariable(SInstruction instruction) throws InvalidInstructionException{
-        String JEVariableLabel = instruction.getArgument("JEVariableLabel");
-        validateLabelArgument("JEVariableLabel", JEVariableLabel);
-        String variableName =  instruction.getArgument("variableName");
-        validateVariableArgument("variableName", variableName);
+        String variableName =  instruction.getArgumentVariable();
+        String argVarName = instruction.getArgumentVariableName();
+        validateVariableArgument(argVarName, variableName);
     }
 
     // TODO: ADD SUPPORT
-    public static void validateQuote(SInstruction instruction) throws InvalidInstructionException{
+    public void validate(QuoteInstruction instruction) throws InvalidInstructionException{
         throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     // TODO: ADD SUPPORT
-    public static void validateJumpEqualFunction(SInstruction instruction) throws InvalidInstructionException{
+    public void validate(JumpEqualFunctionInstruction instruction) throws InvalidInstructionException{
         throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+    }
+
+    public void validate(UnsupportedInstruction instruction) throws InvalidInstructionException{
+        validate((SInstruction) instruction); // or just throw immedietly
     }
 
     public static void validateType(SInstruction instr) throws InvalidInstructionException{

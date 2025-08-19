@@ -1,5 +1,7 @@
 package engine.instruction;
 
+import engine.validator.InstructionValidator;
+
 public class DecreaseInstruction extends SInstruction {
     public DecreaseInstruction(SInstruction base) {
         super(base);
@@ -18,6 +20,11 @@ public class DecreaseInstruction extends SInstruction {
     @Override
     protected String getOperationString(String variable) {
         return String.format("%s <- %s - 1", variable, variable);
+    }
+
+    @Override
+    public void validate(InstructionValidator validator) throws InvalidInstructionException {
+        validator.validate(this);
     }
 
 }

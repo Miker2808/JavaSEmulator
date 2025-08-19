@@ -129,9 +129,12 @@ public class SProgram {
             throw new InvalidInstructionException("S-Program name is required");
         }
         // validate program in general
+        InstructionValidator validator = new InstructionValidator();
         for(int line = 1; line <= Size(); line++){
             try {
-                InstructionValidator.validateInstruction(this.getInstruction(line));
+                // validator.validate(this.getInstruction(line)); // old
+                this.getInstruction(line).validate(validator); // new
+
             } catch (InvalidInstructionException e) {
                 throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
             }
