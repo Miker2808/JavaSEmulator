@@ -12,13 +12,13 @@ public class JumpNotZeroInstruction extends SInstruction{
         this.setArgumentLabel(getArgument(argName));
     }
 
-    public JumpNotZeroInstruction(InstructionName name, String variable, String label){
+    public JumpNotZeroInstruction(String variable, String label, String argLabel){
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.JUMP_NOT_ZERO);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
-        this.setArgumentLabel(JNZLabel);
+        this.setArgumentLabel(argLabel);
     }
 
     public void setArgumentLabel(String label){
@@ -43,15 +43,5 @@ public class JumpNotZeroInstruction extends SInstruction{
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
     }
-
-    /*
-    @Override
-    protected void validateExtra() throws InvalidInstructionException {
-        if(this.getArgumentLabel().isEmpty()){
-            throw new InvalidInstructionException(
-                    String.format("required %s argument is empty or missing", argName));
-        }
-    }
-    */
 
 }// end of class

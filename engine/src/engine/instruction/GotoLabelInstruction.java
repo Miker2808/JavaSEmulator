@@ -1,6 +1,10 @@
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GotoLabelInstruction extends SInstruction {
     private String gotoLabel;
@@ -14,10 +18,10 @@ public class GotoLabelInstruction extends SInstruction {
         this.setArgumentLabel(getArgument(argName));
     }
 
-    public GotoLabelInstruction(InstructionName name, String variable, String label, String gotoLabel) {
+    public GotoLabelInstruction( String label, String gotoLabel) {
         super();
-        this.setInstructionName(name);
-        this.setSVariable(variable);
+        this.setInstructionName(InstructionName.GOTO_LABEL);
+        this.setSVariable("");
         this.setSLabel(label);
         this.setArgumentLabel(gotoLabel);
         this.setCycles(1);
@@ -45,5 +49,22 @@ public class GotoLabelInstruction extends SInstruction {
     @Override
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+    @Override
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded = new ArrayList<>();
+        String var = context.freshVar();
+        String label = this.getArgumentLabel();
+
+        expanded.add(new IncreaseInstruction(var, this.getSLabel()));
+        expanded.add(new JumpNotZeroInstruction(var, "", label));
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
+        }
+
+        return expanded;
     }
 }

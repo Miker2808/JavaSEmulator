@@ -1,6 +1,10 @@
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JumpEqualConstantInstruction extends SInstruction {
     private String constantValue;
@@ -16,10 +20,9 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setArgumentLabel(getArgument(argLabelName));
     }
 
-    public JumpEqualConstantInstruction(InstructionName name, String variable,
-                                        String label, String JEConstantLabel, String constantValue) {
+    public JumpEqualConstantInstruction( String variable, String label, String JEConstantLabel, String constantValue) {
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.JUMP_EQUAL_CONSTANT);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(2);
@@ -63,5 +66,32 @@ public class JumpEqualConstantInstruction extends SInstruction {
     @Override
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+    @Override
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded = new ArrayList<>();
+        String V = this.getSVariable();
+        String z1 = context.freshVar();
+        String L1 = context.freshLabel();
+        String L = this.getArgumentLabel();
+        int K = Integer.parseInt(this.getArgumentConst()); // if exception, check validator
+
+        expanded.add(new AssignmentInstruction(z1, this.getSLabel(), V));
+        for(int i =0; i < K; i++){
+            expanded.add(new JumpZeroInstruction(z1, "", L1));
+            expanded.add(new DecreaseInstruction(z1, ""));
+        }
+
+        expanded.add(new JumpNotZeroInstruction(z1, "", L1));
+        expanded.add(new GotoLabelInstruction("", L));
+        expanded.add(new NeutralInstruction("y", L1));
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
+        }
+
+        return expanded;
     }
 }

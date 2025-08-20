@@ -1,6 +1,10 @@
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConstantAssignmentInstruction extends SInstruction {
     private String constantValue;
@@ -13,9 +17,9 @@ public class ConstantAssignmentInstruction extends SInstruction {
         this.setArgumentConst(getArgument(argName));
     }
 
-    public ConstantAssignmentInstruction(InstructionName name, String variable, String label, int constantValue) {
+    public ConstantAssignmentInstruction(String variable, String label, int constantValue) {
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.CONSTANT_ASSIGNMENT);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(4);
@@ -45,5 +49,26 @@ public class ConstantAssignmentInstruction extends SInstruction {
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
     }
+
+    @Override
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        String V = this.getSVariable();
+        int K = Integer.parseInt(this.getArgumentConst()); // if exception, the problem is the validator!
+
+        expanded.add(new IncreaseInstruction(V, this.getSLabel()));
+
+        for(int i = 0; i < (K-1); i++){
+            expanded.add(new IncreaseInstruction(V, ""));
+        }
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
+        }
+
+        return expanded;
+    }
+
 
 }

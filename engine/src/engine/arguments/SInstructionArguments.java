@@ -81,7 +81,7 @@ public class SInstructionArguments {
         return this.sInstructionArgument;
     }
 
-    // copy constructor, all my homies love copy constructors
+    // copy constructor
     public SInstructionArguments(SInstructionArguments other) {
         this.sInstructionArgument = new ArrayList<>();
         for (SInstructionArgument arg : other.getSInstructionArgument()) {

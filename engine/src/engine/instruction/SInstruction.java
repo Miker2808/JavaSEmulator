@@ -7,18 +7,15 @@
 
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 import engine.arguments.SInstructionArgument;
 import engine.arguments.SInstructionArguments;
 import jakarta.xml.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-import static engine.validator.InstructionValidator.*;
-
 
 /**
  * <p>Java class for anonymous complex type</p>.
@@ -78,9 +75,12 @@ public class SInstruction {
     private String sLabel;
     private String type;
     private InstructionName name;
+    private int degree; //
+    private int cycles; // number of cycles for the program
+
+    // parent stuff
+    private int parent_line; // line of instruction in a program
     private SInstruction parent;
-    private int degree;
-    private int cycles;
 
     public SInstruction() {
         sVariable = "";
@@ -90,10 +90,11 @@ public class SInstruction {
         name = InstructionName.UNSUPPORTED;
         degree = 0;
         cycles = 0;
-
+        parent = null;
+        parent_line = 0; // unassigned
     }
 
-    // copy constructor, all my homies love copy constructors
+    // copy constructor
     public SInstruction(SInstruction other){
         this.sVariable = other.getSVariable();
         this.sInstructionArguments = new SInstructionArguments(other.getSInstructionArguments());
@@ -102,6 +103,7 @@ public class SInstruction {
         this.name = other.getInstructionName();
         this.parent = other.getParent();
         this.degree = other.getDegree();
+        this.parent_line = other.getParentLine();
     }
 
     public int getCycles(){
@@ -120,6 +122,7 @@ public class SInstruction {
         this.degree = value;
     }
 
+
     protected String getOperationString(String variable) {
         return "";
     }
@@ -128,7 +131,18 @@ public class SInstruction {
         String phase = (Objects.equals(type, "basic")) ? "B" : "S";
         String operation = getOperationString(sVariable);
 
-        return String.format("(%s) [ %-3s ] %s (%d)", phase, this.sLabel, operation, getCycles());
+        StringBuilder output = new StringBuilder();
+        output.append(String.format("(%s) [ %-3s ] %s (%d)", phase, this.sLabel, operation, getCycles()));
+
+        SInstruction parent = getParent();
+
+        while(parent != null){
+            int parent_line = getParentLine();
+            output.append(String.format(" <<< #%d %s", parent_line, parent));
+            parent = parent.getParent();
+        }
+
+        return output.toString();
     }
 
     // returns value of argument name, empty string if not found
@@ -254,8 +268,21 @@ public class SInstruction {
         return this.parent;
     }
 
+    public int getParentLine(){
+        return this.parent_line;
+    }
+    public void setParentLine(int value){
+        this.parent_line = value;
+    }
+
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded = new ArrayList<>();
+        expanded.add(this);
+        return expanded;
     }
 
 } // end of class

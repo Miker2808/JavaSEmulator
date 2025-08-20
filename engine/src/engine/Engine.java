@@ -1,9 +1,7 @@
 
 package engine;
 
-import engine.XMLValidator;
-import engine.XMLValidator.InvalidXMLException;
-
+import engine.expander.SProgramExpander;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -40,7 +38,6 @@ public class Engine {
 
         loadedProgramtemp.validateProgram();
         loadedProgram = loadedProgramtemp;
-        expander = new SProgramExpander(loadedProgram);
 
     }
 

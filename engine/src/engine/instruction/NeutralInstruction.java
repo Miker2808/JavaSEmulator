@@ -8,9 +8,9 @@ public class NeutralInstruction extends SInstruction {
         super(base);
     }
 
-    public NeutralInstruction(InstructionName name, String variable, String label){
+    public NeutralInstruction(String variable, String label){
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.NEUTRAL);
         this.setSVariable(variable);
         this.setSLabel(label);
     }

@@ -1,6 +1,10 @@
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssignmentInstruction extends SInstruction {
     private String assignedVariable;
@@ -13,9 +17,9 @@ public class AssignmentInstruction extends SInstruction {
         this.setDegree(2);
     }
 
-    public AssignmentInstruction(InstructionName name, String variable, String label, String assignedVariable) {
+    public AssignmentInstruction(String variable, String label, String assignedVariable) {
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.ASSIGNMENT);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setArgumentVariable(assignedVariable);
@@ -45,4 +49,36 @@ public class AssignmentInstruction extends SInstruction {
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
     }
+
+    @Override
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded = new ArrayList<>();
+
+        String z1 = context.freshVar();
+        String L1 = context.freshLabel();
+        String L2 = context.freshLabel();
+        String L3 = context.freshLabel();
+        String v = this.getSVariable();
+        String v_tag = this.getArgumentVariable();
+
+        expanded.add(new ZeroVariableInstruction(v, this.getSLabel()));
+        expanded.add(new JumpNotZeroInstruction(v_tag, "", L1));
+        expanded.add(new GotoLabelInstruction("", L3));
+        expanded.add(new DecreaseInstruction(v_tag, L1));
+        expanded.add(new IncreaseInstruction(z1, ""));
+        expanded.add(new JumpNotZeroInstruction(v_tag, "", L1));
+        expanded.add(new DecreaseInstruction(z1, L2));
+        expanded.add(new IncreaseInstruction(v,""));
+        expanded.add(new IncreaseInstruction(v_tag, ""));
+        expanded.add(new JumpNotZeroInstruction(z1, "", L2));
+        expanded.add(new NeutralInstruction(v, L3));
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
+        }
+
+        return expanded;
+    }
+
 }

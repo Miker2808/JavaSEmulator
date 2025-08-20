@@ -7,6 +7,7 @@
 
 package engine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import engine.instruction.SInstruction;
@@ -50,8 +51,13 @@ public class SInstructions {
     private List<SInstruction> sInstruction;
 
     public SInstructions() {
-
+        this.sInstruction = new ArrayList<>();
     }
+
+    public SInstructions(List<SInstruction> sInstruction) {
+        this.sInstruction = sInstruction;
+    }
+
 
     /**
      * Gets the value of the sInstruction property.
@@ -82,7 +88,5 @@ public class SInstructions {
     public List<SInstruction> getSInstruction() {
         return this.sInstruction;
     }
-
-
 
 }

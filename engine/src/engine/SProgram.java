@@ -52,6 +52,7 @@ public class SProgram {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
+
     // Returns list of input variables used in program in order
     public List<String> getInputVariablesUsed(){
         List<String> output = new ArrayList<>();
@@ -103,7 +104,7 @@ public class SProgram {
 
     /** appends a copy, not a reference */
     public void appendInstruction(SInstruction instruction){
-        sInstructions.getSInstruction().add(new SInstruction(instruction));
+        sInstructions.getSInstruction().add(instruction);
     }
 
     public void removeInstruction(int line_num){
@@ -112,7 +113,7 @@ public class SProgram {
 
     /** inserts a copy of the instruction not a reference! */
     public void insertInstruction(int line_num, SInstruction instruction){
-        sInstructions.getSInstruction().add(line_num - 1, new SInstruction(instruction));
+        sInstructions.getSInstruction().add(line_num - 1, instruction);
     }
 
     /** returns a refence, not a copy! */
@@ -165,6 +166,39 @@ public class SProgram {
         }
 
     }
+
+    public int getMaxUsedLabel(){
+        int max_label_num = 1;
+        for(int line = 1; line <= Size(); line++){
+            String sLabel = getInstruction(line).getSLabel();
+            if(sLabel.startsWith("L")) {
+                int label_num = Integer.parseInt(sLabel.substring(1));
+                if (label_num > max_label_num) {
+                    max_label_num = label_num;
+                }
+            }
+        }
+        return max_label_num;
+    }
+
+    public int getMaxUsedZVariable(){
+        int max_z_var = 1;
+        for(int line = 1; line <= Size(); line++){
+            String sVariable = getInstruction(line).getSVariable();
+            if(sVariable.startsWith("z")) {
+                int var_num = Integer.parseInt(sVariable.substring(1));
+                if (var_num > max_z_var) {
+                    max_z_var = var_num;
+                }
+            }
+        }
+        return max_z_var;
+    }
+
+    public void addAll(List<SInstruction> instructions){
+         sInstructions.getSInstruction().addAll(instructions);
+    }
+
 
 
     /**

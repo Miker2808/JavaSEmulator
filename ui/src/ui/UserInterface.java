@@ -1,6 +1,7 @@
 package ui;
 
 import engine.*;
+import engine.expander.SProgramExpander;
 
 import java.util.*;
 
@@ -120,9 +121,17 @@ public class UserInterface {
     }
 
     public void expandProgramOption(){
-        System.out.println("Not implemented yet");
+        if(engine.isProgramLoaded()) {
+            SProgram loaded = engine.getLoadedProgram();
+            SProgram expanded = SProgramExpander.expand(loaded, 1);
 
-
+            for (int line = 1; line <= expanded.Size(); line++) {
+                System.out.printf("#%d %s\n", line, expanded.getInstruction(line));
+            }
+        }
+        else{
+            System.out.println("Program is not loaded");
+        }
     }
 
     public void executeProgramOption(){

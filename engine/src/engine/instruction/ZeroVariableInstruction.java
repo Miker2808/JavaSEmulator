@@ -1,6 +1,10 @@
 package engine.instruction;
 
+import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ZeroVariableInstruction extends  SInstruction {
 
@@ -11,9 +15,9 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setDegree(1);
     }
 
-    public ZeroVariableInstruction(InstructionName name, String variable, String label){
+    public ZeroVariableInstruction(String variable, String label){
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.ZERO_VARIABLE);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
@@ -28,6 +32,28 @@ public class ZeroVariableInstruction extends  SInstruction {
     @Override
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+     // converts L1 x2 <- 0 to:
+     // L1 x2 <- x2
+     // L2 x2 <- x2
+     //    IF x2 != 0 GOTO L2
+    @Override
+    public List<SInstruction> expand(ExpansionContext context, int line){
+        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        String var = this.getSVariable();
+        String L1 = context.freshLabel();
+
+        expanded.add(new NeutralInstruction(var, this.getSLabel()));
+        expanded.add(new DecreaseInstruction(var, L1));
+        expanded.add(new JumpNotZeroInstruction(var, "", L1));
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
+        }
+
+        return expanded;
     }
 
 }

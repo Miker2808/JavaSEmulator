@@ -8,9 +8,9 @@ public class DecreaseInstruction extends SInstruction {
         this.setCycles(1);
     }
 
-    public DecreaseInstruction(InstructionName name, String variable, String label){
+    public DecreaseInstruction( String variable, String label){
         super();
-        this.setInstructionName(name);
+        this.setInstructionName(InstructionName.DECREASE);
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
