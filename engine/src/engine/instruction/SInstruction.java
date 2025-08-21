@@ -127,18 +127,20 @@ public class SInstruction {
         return "";
     }
 
-    public String toString() {
-        String phase = (Objects.equals(type, "basic")) ? "B" : "S";
+    protected String getCommandString(){
+        String type_short = (Objects.equals(type, "basic")) ? "B" : "S";
         String operation = getOperationString(sVariable);
+        return String.format("(%s) [ %-3s ] %s (%d)", type_short, getSLabel(), operation, getCycles());
+    }
 
+    public String toString() {
         StringBuilder output = new StringBuilder();
-        output.append(String.format("(%s) [ %-3s ] %s (%d)", phase, this.sLabel, operation, getCycles()));
+        output.append(getCommandString());
 
         SInstruction parent = getParent();
-
         while(parent != null){
             int parent_line = getParentLine();
-            output.append(String.format(" <<< #%d %s", parent_line, parent));
+            output.append(String.format(" <<< #%d %s", parent_line, parent.getCommandString()));
             parent = parent.getParent();
         }
 

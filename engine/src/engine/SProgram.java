@@ -199,8 +199,6 @@ public class SProgram {
          sInstructions.getSInstruction().addAll(instructions);
     }
 
-
-
     /**
      * Gets the value of the sInstructions property.
      *
@@ -247,6 +245,17 @@ public class SProgram {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    public int getMaxDegree(){
+        int max_degree = 0;
+        for(int line = 1; line <= Size(); line++){
+            int currDegree = getInstruction(line).getDegree();
+            if(max_degree < currDegree){
+                max_degree = currDegree;
+            }
+        }
+        return max_degree;
     }
 
 }

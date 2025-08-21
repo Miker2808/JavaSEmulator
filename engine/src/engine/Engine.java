@@ -41,14 +41,6 @@ public class Engine {
 
     }
 
-    // returns string of loaded program, if no program loaded throws exception
-    public String getLoadedProgramString() throws Exception{
-        if(loadedProgram == null){
-            throw new Exception("No program has been loaded");
-        }
-        return loadedProgram.toString();
-    }
-
     // returns loaded program,
     // if no program is loaded returns null
     public SProgram getLoadedProgram(){
@@ -61,6 +53,11 @@ public class Engine {
 
     public HashMap<String, Integer> emulateLoadedProgram(HashMap<String, Integer> input){
         return new SInterpreter(loadedProgram).run(input);
+    }
+
+    public SProgram expandProgram(SProgram program, int degree){
+
+        return SProgramExpander.expand(program, degree);
     }
 
 

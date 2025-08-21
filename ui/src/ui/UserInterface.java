@@ -65,9 +65,11 @@ public class UserInterface {
         boolean isProgramLoaded = engine.isProgramLoaded();
 
         if(isProgramLoaded) {
+            SProgram loadedProgram = engine.getLoadedProgram();
+
             switch (option) {
                 case 1 -> loadFile();
-                case 2 -> printProgram();
+                case 2 -> printProgram(loadedProgram);
                 case 3 -> expandProgramOption();
                 case 4 -> executeProgramOption();
                 case 5 -> printHistoryOption();
@@ -85,19 +87,17 @@ public class UserInterface {
         }
     }
 
-    public void printProgram(){
-        SProgram loadedProgram = engine.getLoadedProgram();
-
-        System.out.println("Program name: " + loadedProgram.getName());
+    public void printProgram(SProgram program){
+        System.out.println("Program name: " + program.getName());
 
         System.out.println("Used input variables (in order of appearance):");
-        loadedProgram.getInputVariablesUsed().forEach(System.out::println);
+        program.getInputVariablesUsed().forEach(System.out::println);
         System.out.println("Used labels (in order of appearance):");
-        loadedProgram.getLabelsUsed().forEach(System.out::println);
+        program.getLabelsUsed().forEach(System.out::println);
         System.out.println("Program:");
 
-        for (int line = 1; line <= loadedProgram.Size(); line++){
-            System.out.printf("#%d %s\n", line, loadedProgram.getInstruction(line));
+        for (int line = 1; line <= program.Size(); line++){
+            System.out.printf("#%d %s\n", line, program.getInstruction(line));
         }
 
     }
@@ -120,18 +120,37 @@ public class UserInterface {
 
     }
 
-    public void expandProgramOption(){
-        if(engine.isProgramLoaded()) {
-            SProgram loaded = engine.getLoadedProgram();
-            SProgram expanded = SProgramExpander.expand(loaded, 1);
+    public void expandProgramOption() {
+        if (!engine.isProgramLoaded()) {
+            System.out.println("Error: Program needs to be loaded first.");
+            return;
+        }
 
-            for (int line = 1; line <= expanded.Size(); line++) {
-                System.out.printf("#%d %s\n", line, expanded.getInstruction(line));
+        SProgram loaded = engine.getLoadedProgram();
+        int maxDegree = loaded.getMaxDegree();
+        int chosenDegree = -1;
+
+        while (true) {
+            System.out.printf("Program can be expanded up to degree %d\n", maxDegree);
+            System.out.print("Choose expansion degree: ");
+
+            String input = scanner.nextLine().trim();
+            try {
+                chosenDegree = Integer.parseInt(input);
+                if (chosenDegree >= 0 && chosenDegree <= maxDegree) {
+                    break;
+                } else {
+                    System.out.printf("Invalid degree input, please choose between 0 and %d\n", maxDegree);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input, please enter an integer.");
             }
         }
-        else{
-            System.out.println("Program is not loaded");
-        }
+
+        SProgram expanded = engine.expandProgram(loaded, chosenDegree);
+        System.out.println();
+        printProgram(expanded);
+
     }
 
     public void executeProgramOption(){
