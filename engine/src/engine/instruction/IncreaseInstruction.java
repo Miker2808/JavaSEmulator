@@ -19,7 +19,7 @@ public class IncreaseInstruction extends SInstruction {
 
     @Override
     protected String getOperationString(String variable) {
-        return String.format("%s <- %s - 1", variable, variable);
+        return String.format("%s <- %s + 1", variable, variable);
     }
 
     @Override

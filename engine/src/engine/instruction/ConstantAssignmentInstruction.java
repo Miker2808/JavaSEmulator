@@ -56,9 +56,9 @@ public class ConstantAssignmentInstruction extends SInstruction {
         String V = this.getSVariable();
         int K = Integer.parseInt(this.getArgumentConst()); // if exception, the problem is the validator!
 
-        expanded.add(new IncreaseInstruction(V, this.getSLabel()));
+        expanded.add(new ZeroVariableInstruction(V, this.getSLabel()));
 
-        for(int i = 0; i < (K-1); i++){
+        for(int i = 0; i < K; i++){
             expanded.add(new IncreaseInstruction(V, ""));
         }
 

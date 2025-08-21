@@ -84,7 +84,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
         expanded.add(new AssignmentInstruction(z1, this.getSLabel(), V));
         expanded.add(new AssignmentInstruction(z2, "", V_tag));
         expanded.add(new JumpZeroInstruction(z1, L2, L3));
-        expanded.add(new JumpZeroInstruction(z1, "", L1));
+        expanded.add(new JumpZeroInstruction(z2, "", L1));
         expanded.add(new DecreaseInstruction(z1, ""));
         expanded.add(new DecreaseInstruction(z2, ""));
         expanded.add(new GotoLabelInstruction("", L2));
