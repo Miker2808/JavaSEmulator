@@ -34,7 +34,7 @@ public class GotoLabelInstruction extends SInstruction {
     }
 
     public void setArgumentLabel(String label) {
-        this.gotoLabel = label.trim();
+        this.gotoLabel = label.trim().toUpperCase();
     }
 
     @Override

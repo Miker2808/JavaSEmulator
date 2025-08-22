@@ -41,7 +41,7 @@ public class JumpEqualConstantInstruction extends SInstruction {
     }
 
     public void setArgumentLabel(String label) {
-        this.JEConstantLabel = label.trim();
+        this.JEConstantLabel = label.trim().toUpperCase();
     }
 
     @Override

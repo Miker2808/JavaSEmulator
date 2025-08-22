@@ -28,7 +28,7 @@ public class AssignmentInstruction extends SInstruction {
     }
 
     public void setArgumentVariable(String variable) {
-        this.assignedVariable = variable.trim();
+        this.assignedVariable = variable.trim().toLowerCase();
     }
 
     @Override

@@ -22,7 +22,7 @@ public class JumpNotZeroInstruction extends SInstruction{
     }
 
     public void setArgumentLabel(String label){
-        this.JNZLabel = label.trim();
+        this.JNZLabel = label.trim().toUpperCase();
     }
 
     @Override

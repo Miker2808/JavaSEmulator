@@ -202,13 +202,12 @@ public class SInstruction {
     }
 
     public String getSVariable() {
-        this.sVariable = sVariable.trim();
         return sVariable;
     }
 
     @XmlElement(name = "S-Variable", required = true)
     public void setSVariable(String value) {
-        this.sVariable = value;
+        this.sVariable = value.trim().toLowerCase();
     }
 
     public SInstructionArguments getSInstructionArguments() {
@@ -227,7 +226,7 @@ public class SInstruction {
 
     @XmlElement(name = "S-Label")
     public void setSLabel(String value) {
-        this.sLabel = value.trim();
+        this.sLabel = value.trim().toUpperCase();
     }
 
     public String getType() {
@@ -238,7 +237,7 @@ public class SInstruction {
 
     @XmlAttribute(name = "type", required = true)
     public void setType(String value) {
-        this.type = value;
+        this.type = value.trim().toLowerCase();
     }
 
     public InstructionName getInstructionName() {
