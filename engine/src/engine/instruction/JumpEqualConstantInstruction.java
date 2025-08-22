@@ -1,10 +1,12 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class JumpEqualConstantInstruction extends SInstruction {
     private String constantValue;
@@ -93,5 +95,28 @@ public class JumpEqualConstantInstruction extends SInstruction {
         }
 
         return expanded;
+    }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String var = this.getSVariable();
+        String argLabel = this.getArgumentLabel();
+        int constValue = Integer.parseInt(getArgumentConst());
+        int value = context.getVariables().computeIfAbsent(var, k -> 0);
+
+        if(value == constValue){
+            if(argLabel.equals("EXIT")){
+                context.setExit(true);
+            }
+            else{
+                context.setPC(context.getLabelLine(argLabel));
+            }
+        }
+        else{
+            context.increasePC(1);
+        }
+
+        context.increaseCycles(getCycles());
+
     }
 }

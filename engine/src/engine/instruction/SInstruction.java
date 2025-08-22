@@ -7,6 +7,7 @@
 
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 import engine.arguments.SInstructionArgument;
@@ -122,6 +123,9 @@ public class SInstruction {
         this.degree = value;
     }
 
+    public void execute(ExecutionContext context){
+
+    }
 
     protected String getOperationString(String variable) {
         return "";

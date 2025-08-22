@@ -1,10 +1,12 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GotoLabelInstruction extends SInstruction {
     private String gotoLabel;
@@ -67,4 +69,19 @@ public class GotoLabelInstruction extends SInstruction {
 
         return expanded;
     }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String argLabel = this.getArgumentLabel();
+
+        if(argLabel.equals("EXIT")){
+            context.setExit(true);
+        }
+        else{
+            context.setPC(context.getLabelLine(argLabel));
+        }
+
+        context.increaseCycles(getCycles());
+    }
+
 }

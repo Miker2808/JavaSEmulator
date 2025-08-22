@@ -1,6 +1,9 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.validator.InstructionValidator;
+
+import java.util.Objects;
 
 public class JumpNotZeroInstruction extends SInstruction{
     private String JNZLabel;
@@ -42,6 +45,28 @@ public class JumpNotZeroInstruction extends SInstruction{
     @Override
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String var = this.getSVariable();
+        String argLabel = this.getArgumentLabel();
+        int value = context.getVariables().computeIfAbsent(var, k -> 0);
+
+        if(value != 0){
+            if(argLabel.equals("EXIT")){
+                context.setExit(true);
+            }
+            else{
+                context.setPC(context.getLabelLine(argLabel));
+            }
+        }
+        else{
+            context.increasePC(1);
+        }
+
+        context.increaseCycles(getCycles());
+
     }
 
 }// end of class

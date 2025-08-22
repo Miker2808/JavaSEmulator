@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.validator.InstructionValidator;
 
 public class DecreaseInstruction extends SInstruction {
@@ -25,6 +26,15 @@ public class DecreaseInstruction extends SInstruction {
     @Override
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
+    }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String var = this.getSVariable();
+        int value = context.getVariables().computeIfAbsent(var, k -> 0) - 1;
+        context.getVariables().put(var, value);
+        context.increaseCycles(getCycles());
+        context.increasePC(1);
     }
 
 }

@@ -1,10 +1,12 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class JumpEqualVariableInstruction extends SInstruction {
     private String variableName;
@@ -98,5 +100,30 @@ public class JumpEqualVariableInstruction extends SInstruction {
 
         return expanded;
     }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String var = this.getSVariable();
+        String argLabel = this.getArgumentLabel();
+        String argVar = getArgumentVariable();
+        int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
+        int paramValue = context.getVariables().computeIfAbsent(argVar, k -> 0);
+
+        if(varValue == paramValue){
+            if(argLabel.equals("EXIT")){
+                context.setExit(true);
+            }
+            else{
+                context.setPC(context.getLabelLine(argLabel));
+            }
+        }
+        else{
+            context.increasePC(1);
+        }
+
+        context.increaseCycles(getCycles());
+
+    }
+
 
 }

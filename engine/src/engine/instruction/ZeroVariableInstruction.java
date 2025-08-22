@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
 
@@ -54,6 +55,14 @@ public class ZeroVariableInstruction extends  SInstruction {
         }
 
         return expanded;
+    }
+
+    @Override
+    public void execute(ExecutionContext context){
+        String var = this.getSVariable();
+        context.getVariables().put(var, 0);
+        context.increaseCycles(getCycles());
+        context.increasePC(1);
     }
 
 }
