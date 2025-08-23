@@ -75,6 +75,10 @@ public class ConstantAssignmentInstruction extends SInstruction {
     public void execute(ExecutionContext context){
         String var = this.getSVariable();
         int value = Integer.parseInt(this.getArgumentConst());
+        if(value < 0){
+            value = 0;
+        }
+
         context.getVariables().put(var, value);
         context.increaseCycles(getCycles());
         context.increasePC(1);
