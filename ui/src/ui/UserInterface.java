@@ -2,7 +2,6 @@ package ui;
 
 import engine.*;
 import engine.execution.ExecutionResult;
-import engine.expander.SProgramExpander;
 
 import java.util.*;
 
@@ -10,17 +9,20 @@ public class UserInterface {
     Engine engine;
     Scanner scanner;
 
+
     public static void main(String[] args) {
         UserInterface ui = new UserInterface();
         ui.run();
     }
 
+
     public void run() {
         engine = new Engine();
         scanner = new Scanner(System.in);  // Create a Scanner object to read input from console
 
-        System.out.println("S-Emulator Console Version");
-        System.out.println("------------------------------------");
+        System.out.println(".------------------------------.");
+        System.out.println("|  S-Emulator Console Version  |");
+        System.out.print("'------------------------------'");
 
         int option = 0;
         while (true) {
@@ -31,7 +33,6 @@ public class UserInterface {
             executeOption(option);
 
         }
-
     }
 
     public void printMenu() {
@@ -43,12 +44,16 @@ public class UserInterface {
             System.out.println("[ 3 ] Expand program");
             System.out.println("[ 4 ] Run program");
             System.out.println("[ 5 ] Print execution history");
-            System.out.println("[ 7 ] Save");
         }
 
         System.out.println("[ 6 ] Exit");
 
+        if(engine.isProgramLoaded()) {
+            System.out.println("[ 7 ] Save S-Emulator session");
+        }
+        System.out.println("[ 8 ] Load S-Emulator session");
     }
+
 
     // scans option, and returns number if valid, 0 if invalid
     public int scanOption() {
@@ -62,6 +67,7 @@ public class UserInterface {
         return option;
     }
 
+
     public void executeOption(int option) {
         boolean isProgramLoaded = engine.isProgramLoaded();
 
@@ -73,7 +79,7 @@ public class UserInterface {
                 case 2 -> printProgram(loadedProgram);
                 case 3 -> expandProgramOption();
                 case 4 -> executeProgramOption();
-                case 5 -> printHistoryOption();
+                case 5 -> printHistory();
                 case 6 -> System.exit(0);
                 case 7 -> saveOption();
                 default -> System.out.println("Invalid option, please choose from the options in the menu");
@@ -87,6 +93,7 @@ public class UserInterface {
             }
         }
     }
+
 
     public void printProgram(SProgram program){
         System.out.println("Program name: " + program.getName());
@@ -102,6 +109,7 @@ public class UserInterface {
         }
 
     }
+
 
     public void loadFile(){
         System.out.print("Path to XML file: ");
@@ -119,52 +127,30 @@ public class UserInterface {
 
     }
 
+
     public void expandProgramOption() {
         SProgram loaded = engine.getLoadedProgram();
 
-        SProgram expanded = expandProgram(loaded);
+        int chosenDegree = getMaxDegreeFromUser(loaded);
 
-        System.out.println();
+        SProgram expanded = engine.expandProgram(loaded, chosenDegree);
+
         printProgram(expanded);
 
     }
 
-
-    // expands program from input, handles user input for degree
-    public SProgram expandProgram(SProgram program){
-        int maxDegree = program.getMaxDegree();
-        int chosenDegree = -1;
-
-        while (true) {
-            System.out.printf("Program can be expanded up to degree %d\n", maxDegree);
-            System.out.print("Choose expansion degree: ");
-
-            String input = scanner.nextLine().trim();
-            try {
-                chosenDegree = Integer.parseInt(input);
-                if (chosenDegree >= 0 && chosenDegree <= maxDegree) {
-                    break;
-                } else {
-                    System.out.printf("Invalid degree input, please choose between 0 and %d\n", maxDegree);
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input, please enter an integer.");
-            }
-        }
-
-        return engine.expandProgram(program, chosenDegree);
-    }
-
     public void executeProgramOption(){
 
-        SProgram program = expandProgram(engine.getLoadedProgram());
+        SProgram program = engine.getLoadedProgram();
+
+        int degree = getMaxDegreeFromUser(program);
 
         // print input variables used in the program
         System.out.print("Input variables used in the program:\n");
         program.getInputVariablesUsed().forEach(System.out::println);
 
         // ask for variables from user
-        ArrayList<Integer> input = new ArrayList<>();
+        ArrayList<Integer> input;
         while(true){
             try {
                 input = readPositiveIntegers();
@@ -175,9 +161,9 @@ public class UserInterface {
             }
         }
 
-        printProgram(program);
+        printProgram(engine.expandProgram(program, degree));
 
-        ExecutionResult result = engine.emulateProgram(program, input);
+        ExecutionResult result = engine.runProgram(program, input, degree);
 
         System.out.println("Program finished execution: ");
 
@@ -187,13 +173,11 @@ public class UserInterface {
         System.out.printf("Cycles: " + result.getCycles());
     }
 
-    public void printHistoryOption(){
-        System.out.println("Not implemented yet");
-    }
 
     public void saveOption(){
         System.out.println("Not implemented yet");
     }
+
 
     public static ArrayList<Integer> readPositiveIntegers() {
         Scanner scanner = new Scanner(System.in);
@@ -236,8 +220,54 @@ public class UserInterface {
     }
 
 
+    public int getMaxDegreeFromUser(SProgram program){
+        int maxDegree = program.getMaxDegree();
+        int chosenDegree = -1;
+
+        while (true) {
+            System.out.printf("Program can be expanded up to degree %d\n", maxDegree);
+            System.out.print("Choose expansion degree: ");
+
+            String input = scanner.nextLine().trim();
+            try {
+                chosenDegree = Integer.parseInt(input);
+                if (chosenDegree >= 0 && chosenDegree <= maxDegree) {
+                    break;
+                } else {
+                    System.out.printf("Invalid degree input, please choose between 0 and %d\n", maxDegree);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input, please enter an integer.");
+            }
+        }
+        return chosenDegree;
+    }
+
+    public void printHistory(){
+        List<ExecutionHistory> history = engine.getExecutionHistory();
+
+        if(history.isEmpty()){
+            System.out.println("Execution history is empty");
+            return;
+        }
+
+        System.out.print("Execution history:");
+
+        for(int i=0; i<history.size(); i++){
+            ExecutionHistory eh = history.get(i);
+
+            System.out.printf("\nExecution %d\n", i+1);
+            System.out.printf("Degree: %d\n", eh.getDegree());
+            System.out.println("Input variables:");
+            for(int j=0; j<eh.getVariables().size(); j++){
+                System.out.printf("x%d = %s\n", j+1, eh.getVariables().get(j));
+            }
+            System.out.printf("y = %d\n", eh.getY());
+            System.out.printf("Cycles: %d\n", eh.getCycles());
+        }
 
 
+    }
 
 
 }

@@ -8,9 +8,9 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Engine {
@@ -38,8 +38,10 @@ public class Engine {
         }
 
         loadedProgramtemp.validateProgram();
-        loadedProgram = loadedProgramtemp;
 
+        // happens only if validateProgram was successful (did not raise an exception)
+        loadedProgram = loadedProgramtemp;
+        executionHistory.clear();
     }
 
     // returns loaded program,
@@ -52,17 +54,24 @@ public class Engine {
         return loadedProgram != null;
     }
 
-    public ExecutionResult emulateProgram(SProgram program, ArrayList<Integer> input){
-        return new SInterpreter(program, input).run();
+    public ExecutionResult runProgram(SProgram program, ArrayList<Integer> input, int degree){
+        SProgram expanded = expandProgram(program, degree);
+
+        ExecutionResult result = new SInterpreter(expanded, input).run();
+        executionHistory.add(new ExecutionHistory(degree,
+                input,
+                result.getVariables().get("y"),
+                result.getCycles()));
+
+        return result;
     }
 
     public SProgram expandProgram(SProgram program, int degree){
-
         return SProgramExpander.expand(program, degree);
     }
 
-    public ArrayList<ExecutionHistory> getExecutionHistory(){
-        return executionHistory;
+    public List<ExecutionHistory> getExecutionHistory(){
+        return Collections.unmodifiableList(executionHistory);
     }
 
 
