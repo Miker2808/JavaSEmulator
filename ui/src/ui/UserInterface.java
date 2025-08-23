@@ -1,6 +1,7 @@
 package ui;
 
 import engine.*;
+import engine.execution.ExecutionResult;
 import engine.expander.SProgramExpander;
 
 import java.util.*;
@@ -42,10 +43,10 @@ public class UserInterface {
             System.out.println("[ 3 ] Expand program");
             System.out.println("[ 4 ] Run program");
             System.out.println("[ 5 ] Print execution history");
-            System.out.println("[ 6 ] Save");
+            System.out.println("[ 7 ] Save");
         }
 
-        System.out.println("[ 7 ] Exit");
+        System.out.println("[ 6 ] Exit");
 
     }
 
@@ -73,15 +74,15 @@ public class UserInterface {
                 case 3 -> expandProgramOption();
                 case 4 -> executeProgramOption();
                 case 5 -> printHistoryOption();
-                case 6 -> saveOption();
-                case 7 -> System.exit(0);
+                case 6 -> System.exit(0);
+                case 7 -> saveOption();
                 default -> System.out.println("Invalid option, please choose from the options in the menu");
             }
         }
         else{
             switch (option) {
                 case 1 -> loadFile();
-                case 7 -> System.exit(0);
+                case 6 -> System.exit(0);
                 default -> System.out.println("Invalid option, please load a file first.");
             }
         }
@@ -90,9 +91,9 @@ public class UserInterface {
     public void printProgram(SProgram program){
         System.out.println("Program name: " + program.getName());
 
-        System.out.println("Used input variables (in order of appearance):");
+        System.out.println("Used input variables:");
         program.getInputVariablesUsed().forEach(System.out::println);
-        System.out.println("Used labels (in order of appearance):");
+        System.out.println("Used labels:");
         program.getLabelsUsed().forEach(System.out::println);
         System.out.println("Program:");
 
@@ -110,9 +111,7 @@ public class UserInterface {
             engine.loadFromXML(path);
         }
         catch(Exception e){
-            System.out.print("Failed to load XML file: ");
             System.out.println(e.getMessage());
-            System.out.println();
             return;
         }
 
@@ -121,13 +120,19 @@ public class UserInterface {
     }
 
     public void expandProgramOption() {
-        if (!engine.isProgramLoaded()) {
-            System.out.println("Error: Program needs to be loaded first.");
-            return;
-        }
-
         SProgram loaded = engine.getLoadedProgram();
-        int maxDegree = loaded.getMaxDegree();
+
+        SProgram expanded = expandProgram(loaded);
+
+        System.out.println();
+        printProgram(expanded);
+
+    }
+
+
+    // expands program from input, handles user input for degree
+    public SProgram expandProgram(SProgram program){
+        int maxDegree = program.getMaxDegree();
         int chosenDegree = -1;
 
         while (true) {
@@ -147,21 +152,39 @@ public class UserInterface {
             }
         }
 
-        SProgram expanded = engine.expandProgram(loaded, chosenDegree);
-        System.out.println();
-        printProgram(expanded);
-
+        return engine.expandProgram(program, chosenDegree);
     }
 
     public void executeProgramOption(){
-        HashMap<String, Integer> input = new HashMap<>();
 
-        input.put("x1", 10000);
-        input.put("x2", 8766);
-        HashMap<String, Integer> output = engine.emulateLoadedProgram(input);
+        SProgram program = expandProgram(engine.getLoadedProgram());
+
+        // print input variables used in the program
+        System.out.print("Input variables used in the program:\n");
+        program.getInputVariablesUsed().forEach(System.out::println);
+
+        // ask for variables from user
+        ArrayList<Integer> input = new ArrayList<>();
+        while(true){
+            try {
+                input = readPositiveIntegers();
+                break;
+            }
+            catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+        printProgram(program);
+
+        ExecutionResult result = engine.emulateProgram(program, input);
 
         System.out.println("Program finished execution: ");
-        //System.out.println(convertVariablesToString(output));
+
+        for (Map.Entry<String, Integer> entry : result.getVariables().entrySet()) {
+            System.out.printf("%s = %d\n", entry.getKey(), entry.getValue());
+        }
+        System.out.printf("Cycles: " + result.getCycles());
     }
 
     public void printHistoryOption(){
@@ -170,6 +193,46 @@ public class UserInterface {
 
     public void saveOption(){
         System.out.println("Not implemented yet");
+    }
+
+    public static ArrayList<Integer> readPositiveIntegers() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter positive integers separated by commas (or leave empty): ");
+        String input = scanner.nextLine().trim();
+
+        ArrayList<Integer> numbers = new ArrayList<>();
+
+        // Allow empty input -> return empty list
+        if (input.isEmpty()) {
+            return numbers;
+        }
+
+        String[] tokens = input.split(",");
+
+        for (int i = 0; i < tokens.length; i++) {
+            String token = tokens[i].trim();
+
+            if (token.isEmpty()) {
+                throw new IllegalArgumentException("Empty value at position " + (i + 1));
+            }
+
+            try {
+                int value = Integer.parseInt(token);
+
+                if (value <= 0) {
+                    throw new IllegalArgumentException("Invalid number at position " + (i + 1) +
+                            ": " + value + " (must be positive).");
+                }
+
+                numbers.add(value);
+
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid input at position " + (i + 1) +
+                        ": \"" + token + "\" is not an integer.");
+            }
+        }
+
+        return numbers;
     }
 
 

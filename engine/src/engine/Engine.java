@@ -52,8 +52,8 @@ public class Engine {
         return loadedProgram != null;
     }
 
-    public ExecutionResult emulateLoadedProgram(ArrayList<Integer> input){
-        return new SInterpreter(loadedProgram, input).run();
+    public ExecutionResult emulateProgram(SProgram program, ArrayList<Integer> input){
+        return new SInterpreter(program, input).run();
     }
 
     public SProgram expandProgram(SProgram program, int degree){

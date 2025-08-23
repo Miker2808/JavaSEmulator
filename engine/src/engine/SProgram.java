@@ -17,8 +17,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>Java class for anonymous complex type</p>.
@@ -55,7 +54,7 @@ public class SProgram {
 
     // Returns list of input variables used in program in order
     public List<String> getInputVariablesUsed(){
-        List<String> output = new ArrayList<>();
+        List<String> vars = new ArrayList<>();
 
         for (int line = 1; line <= Size(); line++){
             SInstruction instr = this.getInstruction(line);
@@ -63,13 +62,13 @@ public class SProgram {
             String variable = instr.getSVariable();
 
             // check that the variable itself is input variable, append if yes
-            if(variable.matches("^(x[1-9][0-9]*)$"))
-                output.add(variable);
+            if(variable.matches("^(x[1-9][0-9]*)$") && !vars.contains(variable))
+                vars.add(variable);
 
             String argVariable = instr.getArgumentVariable();
 
-            if(argVariable.matches("^(x[1-9][0-9]*)$")){
-                output.add(argVariable);
+            if(argVariable.matches("^(x[1-9][0-9]*)$") && !vars.contains(argVariable)){
+                vars.add(argVariable);
             }
 
             // the idea why to check both is because sometimes it might be x1 <- x2,
@@ -77,29 +76,33 @@ public class SProgram {
             // (even though x1 is redundant logically)
         }
 
-        return output;
+        vars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
+
+        return vars;
     }
 
     // returns list of labels used in order
     public List<String> getLabelsUsed(){
-        List<String> output = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
         boolean isExitAvailable = false;
 
         for (int line = 1; line <= Size(); line++){
             String label = this.getInstruction(line).getSLabel();
-            if(!label.equals("EXIT") && !label.isEmpty()) {
-                output.add(label);
+            if(!label.equals("EXIT") && !label.isEmpty() && !labels.contains(label)) {
+                labels.add(label);
             }
             else{
                 isExitAvailable = true;
             }
         }
 
+        labels.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
+
         if(isExitAvailable){
-            output.add("EXIT\n");
+            labels.add("EXIT\n");
         }
 
-        return output;
+        return labels;
     }
 
     /** appends a copy, not a reference */

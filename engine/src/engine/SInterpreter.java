@@ -19,7 +19,7 @@ public class SInterpreter
     public ExecutionResult run(){
 
         int num_lines = program.Size();
-        while(!context.getExit() && context.getCycles() <= num_lines){
+        while(!context.getExit() && context.getPC() <= num_lines){
             step();
         }
         return new ExecutionResult(context);
