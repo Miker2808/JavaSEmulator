@@ -7,13 +7,13 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 
-public class Engine {
+public class Engine implements Serializable{
     private SInterpreter mainInterpreter;
     private SProgram loadedProgram = null;
     private ArrayList<ExecutionHistory> executionHistory = new ArrayList<>();
@@ -74,6 +74,43 @@ public class Engine {
         return Collections.unmodifiableList(executionHistory);
     }
 
+    public void saveInstance(String path) throws Exception {
+        if (!path.endsWith(".semulator")) {
+            throw new IllegalArgumentException("Path must end with .semulator");
+        }
+
+        File file = new File(path);
+        File parent = file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            throw new FileNotFoundException("Directory does not exist: " + parent.getAbsolutePath());
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(this);
+        }
+    }
+
+    // loads Engine instance from file
+    public static Engine loadInstance(String path) throws Exception {
+        if (!path.endsWith(".semulator")) {
+            throw new IllegalArgumentException("Path must end with .semulator");
+        }
+
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new FileNotFoundException("File does not exist: " + file.getAbsolutePath());
+        }
+        if (!file.isFile()) {
+            throw new IOException("Path is not a file: " + file.getAbsolutePath());
+        }
+        if (!file.canRead()) {
+            throw new IOException("File cannot be read: " + file.getAbsolutePath());
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (Engine) ois.readObject();
+        }
+    }
 
 
 
