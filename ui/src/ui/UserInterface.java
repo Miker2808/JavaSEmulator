@@ -105,7 +105,7 @@ public class UserInterface {
         System.out.println("Program:");
 
         for (int line = 1; line <= program.Size(); line++){
-            System.out.printf("#%d %s\n", line, program.getInstruction(line));
+            System.out.printf("#%d %s\n", line, program.getInstruction(line).toFullString());
         }
 
     }

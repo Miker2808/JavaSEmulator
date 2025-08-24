@@ -131,25 +131,30 @@ public class SInstruction {
         return "";
     }
 
-    protected String getCommandString(){
+    public String toString() {
         String type_short = (Objects.equals(type, "basic")) ? "B" : "S";
         String operation = getOperationString(sVariable);
         return String.format("(%s) [ %-3s ] %s (%d)", type_short, getSLabel(), operation, getCycles());
     }
 
-    public String toString() {
+
+    public String toFullString(){
         StringBuilder output = new StringBuilder();
-        output.append(getCommandString());
+        output.append(toString());
+
 
         SInstruction parent = getParent();
+        int parent_line = getParentLine();
         while(parent != null){
-            int parent_line = getParentLine();
-            output.append(String.format(" <<< #%d %s", parent_line, parent.getCommandString()));
+
+            output.append(String.format(" <<< #%d %s", parent_line, parent.toString()));
+            parent_line = parent.getParentLine();
             parent = parent.getParent();
         }
 
         return output.toString();
     }
+
 
     // returns value of argument name, empty string if not found
     public String getArgument(String name) {
