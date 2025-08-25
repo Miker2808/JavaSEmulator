@@ -1,7 +1,6 @@
 package engine;
 
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -39,6 +38,11 @@ public class XMLValidator
         String fileName = path.getFileName().toString().toLowerCase();
         if (!fileName.endsWith(".xml")) {
             throw new InvalidXMLException("File is not an XML file (ends with .xml)");
+        }
+
+        // Reject relative paths
+        if (!path.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be an absolute (global) path: " + path);
         }
     }
 
