@@ -1,9 +1,9 @@
 package engine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ExecutionHistory
-{
+public class ExecutionHistory implements Serializable {
     private final int degree;
     private final ArrayList<Integer> inputVariables;
     private final int y;

@@ -81,7 +81,8 @@ public class UserInterface {
                 case 4 -> executeProgramOption();
                 case 5 -> printHistory();
                 case 6 -> System.exit(0);
-                case 7 -> saveOption();
+                case 7 -> saveInstance();
+                case 8 -> loadInstance();
                 default -> System.out.println("Invalid option, please choose from the options in the menu");
             }
         }
@@ -89,6 +90,7 @@ public class UserInterface {
             switch (option) {
                 case 1 -> loadFile();
                 case 6 -> System.exit(0);
+                case 8 -> loadInstance();
                 default -> System.out.println("Invalid option, please load a file first.");
             }
         }
@@ -203,9 +205,9 @@ public class UserInterface {
             try {
                 int value = Integer.parseInt(token);
 
-                if (value <= 0) {
+                if (value < 0) {
                     throw new IllegalArgumentException("Invalid number at position " + (i + 1) +
-                            ": " + value + " (must be positive).");
+                            ": " + value + " (must not be negative).");
                 }
 
                 numbers.add(value);
@@ -266,7 +268,37 @@ public class UserInterface {
             System.out.printf("Cycles: %d\n", eh.getCycles());
         }
 
+    }
 
+    // asks user for path to load instance
+    // if failed, goes back to menu.
+    public void loadInstance(){
+        System.out.print("Path to load file (.semulator): ");
+        String path = scanner.nextLine();
+
+        try {
+            this.engine = Engine.loadInstance(path);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.print("File loaded successfully.");
+    }
+
+    // asks user for path to save instance
+    // if failed prompts to try again
+    public void saveInstance(){
+        while(true) {
+            System.out.print("Path to save file (.semulator): ");
+            String path = scanner.nextLine();
+            try {
+                engine.saveInstance(path);
+                break;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.out.println();
+            }
+        }
+        System.out.print("File saved successfully.");
     }
 
 

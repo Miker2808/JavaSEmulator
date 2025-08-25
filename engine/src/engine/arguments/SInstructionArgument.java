@@ -13,6 +13,8 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.io.Serializable;
+
 
 /**
  * <p>Java class for anonymous complex type</p>.
@@ -35,7 +37,7 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "")
 @XmlRootElement(name = "S-Instruction-Argument")
-public class SInstructionArgument {
+public class SInstructionArgument implements Serializable {
 
 
     private String value;

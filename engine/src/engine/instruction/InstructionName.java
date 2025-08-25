@@ -2,7 +2,9 @@ package engine.instruction;
 
 import jakarta.xml.bind.annotation.XmlEnumValue;
 
-public enum InstructionName {
+import java.io.Serializable;
+
+public enum InstructionName implements Serializable {
     @XmlEnumValue("INCREASE") INCREASE("INCREASE"),
     @XmlEnumValue("DECREASE") DECREASE("DECREASE"),
     @XmlEnumValue("JUMP_NOT_ZERO") JUMP_NOT_ZERO("JUMP_NOT_ZERO"),

@@ -7,6 +7,7 @@
 
 package engine.arguments;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -40,7 +41,7 @@ import jakarta.xml.bind.annotation.XmlType;
     "sInstructionArgument"
 })
 @XmlRootElement(name = "S-Instruction-Arguments")
-public class SInstructionArguments {
+public class SInstructionArguments  implements Serializable {
 
     @XmlElement(name = "S-Instruction-Argument", required = true)
     protected List<SInstructionArgument> sInstructionArgument;

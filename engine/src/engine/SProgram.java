@@ -17,6 +17,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -44,7 +45,7 @@ import java.util.*;
     "sInstructions"
 })
 @XmlRootElement(name = "S-Program")
-public class SProgram {
+public class SProgram implements Serializable {
 
     @XmlElement(name = "S-Instructions", required = true)
     protected SInstructions sInstructions = new SInstructions();

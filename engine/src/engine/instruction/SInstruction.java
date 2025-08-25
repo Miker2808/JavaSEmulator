@@ -14,6 +14,7 @@ import engine.arguments.SInstructionArgument;
 import engine.arguments.SInstructionArguments;
 import jakarta.xml.bind.annotation.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,7 +70,7 @@ import java.util.Objects;
 
 })
 @XmlRootElement(name = "S-Instruction")
-public class SInstruction {
+public class SInstruction implements Serializable {
 
     private String sVariable;
     private SInstructionArguments sInstructionArguments;

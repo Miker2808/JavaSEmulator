@@ -7,6 +7,7 @@
 
 package engine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
     "sInstruction"
 })
 @XmlRootElement(name = "S-Instructions")
-public class SInstructions {
+public class SInstructions implements Serializable {
 
     @XmlElement(name = "S-Instruction", required = true)
     @XmlJavaTypeAdapter(SInstructionAdapter.class)

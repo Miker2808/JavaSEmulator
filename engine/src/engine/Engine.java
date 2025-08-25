@@ -14,7 +14,6 @@ import java.util.List;
 
 
 public class Engine implements Serializable{
-    private SInterpreter mainInterpreter;
     private SProgram loadedProgram = null;
     private ArrayList<ExecutionHistory> executionHistory = new ArrayList<>();
 
@@ -80,6 +79,12 @@ public class Engine implements Serializable{
         }
 
         File file = new File(path);
+
+        // Reject relative paths
+        if (!file.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be an absolute (global) path: " + path);
+        }
+
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
             throw new FileNotFoundException("Directory does not exist: " + parent.getAbsolutePath());
@@ -87,6 +92,9 @@ public class Engine implements Serializable{
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(this);
+        }
+        catch(Exception e) {
+            throw new Exception("Failed to save instance: " + e.getMessage());
         }
     }
 
@@ -107,9 +115,15 @@ public class Engine implements Serializable{
             throw new IOException("File cannot be read: " + file.getAbsolutePath());
         }
 
+        Engine engine;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-            return (Engine) ois.readObject();
+            engine =  (Engine) ois.readObject();
         }
+        catch (Exception e) {
+            throw new Exception("Failed to load instance");
+        }
+
+        return engine;
     }
 
 
