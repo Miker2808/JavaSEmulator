@@ -80,7 +80,7 @@ public class UserInterface {
                 case 3 -> expandProgramOption();
                 case 4 -> executeProgramOption();
                 case 5 -> printHistory();
-                case 6 -> System.exit(0);
+                case 6 -> exitApplication();
                 case 7 -> saveInstance();
                 case 8 -> loadInstance();
                 default -> System.out.println("Invalid option, please choose from the options in the menu");
@@ -89,7 +89,7 @@ public class UserInterface {
         else{
             switch (option) {
                 case 1 -> loadFile();
-                case 6 -> System.exit(0);
+                case 6 -> exitApplication();
                 case 8 -> loadInstance();
                 default -> System.out.println("Invalid option, please load a file first.");
             }
@@ -299,6 +299,11 @@ public class UserInterface {
             }
         }
         System.out.print("File saved successfully.");
+    }
+
+    public void exitApplication(){
+        System.out.println("\nGood Bye");
+        System.exit(0);
     }
 
 
