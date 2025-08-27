@@ -178,6 +178,7 @@ public class UserInterface {
             System.out.printf("%s = %d\n", entry.getKey(), entry.getValue());
         }
         System.out.printf("Cycles: " + result.getCycles());
+        System.out.println();
     }
 
 
@@ -286,7 +287,7 @@ public class UserInterface {
 
         try {
             this.engine = Engine.loadInstance(path);
-            System.out.print("File loaded successfully.");
+            System.out.println("File loaded successfully.");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -302,7 +303,7 @@ public class UserInterface {
             String path = scanner.nextLine();
             try {
                 engine.saveInstance(path);
-                System.out.print("File saved successfully.");
+                System.out.println("File saved successfully.");
                 break;
             }
             catch (Exception e) {
