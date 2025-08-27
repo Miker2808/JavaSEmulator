@@ -111,16 +111,7 @@ public class Engine implements Serializable{
             throw new IllegalArgumentException("Path must end with .semulator");
         }
 
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new FileNotFoundException("File does not exist: " + file.getAbsolutePath());
-        }
-        if (!file.isFile()) {
-            throw new IOException("Path is not a file: " + file.getAbsolutePath());
-        }
-        if (!file.canRead()) {
-            throw new IOException("File cannot be read: " + file.getAbsolutePath());
-        }
+        File file = getFile(path);
 
         Engine engine;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -133,6 +124,23 @@ public class Engine implements Serializable{
         return engine;
     }
 
+    private static File getFile(String path) throws IOException {
+        File file = new File(path);
+
+        if (!file.isAbsolute()) {
+            throw new IllegalArgumentException("Path must be an absolute (global) path: " + path);
+        }
+        if (!file.exists()) {
+            throw new FileNotFoundException("File does not exist: " + file.getAbsolutePath());
+        }
+        if (!file.isFile()) {
+            throw new IOException("Path is not a file: " + file.getAbsolutePath());
+        }
+        if (!file.canRead()) {
+            throw new IOException("File cannot be read: " + file.getAbsolutePath());
+        }
+        return file;
+    }
 
 
 }
