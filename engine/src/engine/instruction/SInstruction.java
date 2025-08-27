@@ -147,7 +147,7 @@ public class SInstruction implements Serializable {
         int parent_line = getParentLine();
         while(parent != null){
 
-            output.append(String.format(" <<< #%d %s", parent_line, parent.toString()));
+            output.append(String.format(" >>> #%d %s", parent_line, parent.toString()));
             parent_line = parent.getParentLine();
             parent = parent.getParent();
         }

@@ -14,6 +14,7 @@ public class ConstantAssignmentInstruction extends SInstruction {
     public ConstantAssignmentInstruction(SInstruction base) {
         super(base);
         this.setCycles(4);
+        this.setType("synthetic");
         this.setDegree(2);
         this.setArgumentConst(getArgument(argName));
     }
@@ -24,6 +25,7 @@ public class ConstantAssignmentInstruction extends SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(4);
+        this.setType("synthetic");
         this.setDegree(2);
         setArgumentConst(String.format("%d",constantValue));
     }

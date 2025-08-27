@@ -16,9 +16,11 @@ public class JumpEqualConstantInstruction extends SInstruction {
     public JumpEqualConstantInstruction(SInstruction base) {
         super(base);
         this.setCycles(2);
+        this.setType("synthetic");
         this.setDegree(3);
         this.setArgumentConst(getArgument(argConstName));
         this.setArgumentLabel(getArgument(argLabelName));
+
     }
 
     public JumpEqualConstantInstruction( String variable, String label, String JEConstantLabel, String constantValue) {
@@ -27,9 +29,11 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(2);
+        this.setType("synthetic");
         this.setDegree(3);
         this.setArgumentConst(constantValue);
         this.setArgumentLabel(JEConstantLabel);
+
     }
 
     public void setArgumentConst(String value) {

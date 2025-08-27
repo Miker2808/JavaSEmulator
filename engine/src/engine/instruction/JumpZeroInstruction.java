@@ -15,6 +15,7 @@ public class JumpZeroInstruction extends SInstruction {
         super(base);
         this.setArgumentLabel(getArgument("JZLabel"));
         this.setCycles(2);
+        this.setType("synthetic");
         this.setDegree(2);
     }
 
@@ -25,6 +26,7 @@ public class JumpZeroInstruction extends SInstruction {
         this.setSLabel(label);
         this.setArgumentLabel(JZLabel);
         this.setCycles(1);
+        this.setType("synthetic");
         this.setDegree(2);
     }
 

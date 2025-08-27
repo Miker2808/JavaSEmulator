@@ -15,6 +15,7 @@ public class GotoLabelInstruction extends SInstruction {
         super(base);
 
         this.setCycles(1);
+        this.setType("synthetic");
         this.setDegree(1);
         this.setArgumentLabel(getArgument(argName));
     }
@@ -26,6 +27,7 @@ public class GotoLabelInstruction extends SInstruction {
         this.setSLabel(label);
         this.setArgumentLabel(gotoLabel);
         this.setCycles(1);
+        this.setType("synthetic");
         this.setDegree(1);
     }
 

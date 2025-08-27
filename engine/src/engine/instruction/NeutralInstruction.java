@@ -7,6 +7,7 @@ public class NeutralInstruction extends SInstruction {
 
     public NeutralInstruction(SInstruction base) {
         super(base);
+        this.setType("basic");
     }
 
     public NeutralInstruction(String variable, String label){
@@ -14,6 +15,7 @@ public class NeutralInstruction extends SInstruction {
         this.setInstructionName(InstructionName.NEUTRAL);
         this.setSVariable(variable);
         this.setSLabel(label);
+        this.setType("basic");
     }
 
     @Override

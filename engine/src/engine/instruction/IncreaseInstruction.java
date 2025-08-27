@@ -8,6 +8,7 @@ public class IncreaseInstruction extends SInstruction {
         super(base);
         // any additional initialization
         this.setCycles(1);
+        this.setType("basic");
     }
 
     public IncreaseInstruction( String variable, String label){
@@ -16,6 +17,7 @@ public class IncreaseInstruction extends SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
+        this.setType("basic");
     }
 
     @Override

@@ -15,6 +15,7 @@ public class AssignmentInstruction extends SInstruction {
         super(base);
         this.setArgumentVariable(getArgument(argName));
         this.setCycles(4);
+        this.setType("synthetic");
         this.setDegree(2);
     }
 
@@ -25,6 +26,7 @@ public class AssignmentInstruction extends SInstruction {
         this.setSLabel(label);
         this.setArgumentVariable(assignedVariable);
         this.setCycles(4);
+        this.setType("synthetic");
         this.setDegree(2);
     }
 

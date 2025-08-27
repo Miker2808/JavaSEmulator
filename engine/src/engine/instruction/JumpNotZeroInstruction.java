@@ -11,6 +11,7 @@ public class JumpNotZeroInstruction extends SInstruction{
         super(base);
         this.setCycles(1);
         this.setArgumentLabel(getArgument(argName));
+        this.setType("basic");
     }
 
     public JumpNotZeroInstruction(String variable, String label, String argLabel){
@@ -20,6 +21,7 @@ public class JumpNotZeroInstruction extends SInstruction{
         this.setSLabel(label);
         this.setCycles(1);
         this.setArgumentLabel(argLabel);
+        this.setType("basic");
     }
 
     public void setArgumentLabel(String label){

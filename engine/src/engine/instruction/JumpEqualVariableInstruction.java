@@ -16,6 +16,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
     public JumpEqualVariableInstruction(SInstruction base) {
         super(base);
         this.setCycles(2);
+        this.setType("synthetic");
         this.setDegree(3);
         this.setArgumentVariable(getArgument(argVarName));
         this.setArgumentLabel(getArgument(argLabelName));
@@ -29,6 +30,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(2);
+        this.setType("synthetic");
         this.setDegree(3);
         this.setArgumentVariable(variableName.trim());
         this.setArgumentLabel(JEVariableLabel.trim());

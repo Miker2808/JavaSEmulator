@@ -7,6 +7,7 @@ public class DecreaseInstruction extends SInstruction {
     public DecreaseInstruction(SInstruction base) {
         super(base);
         this.setCycles(1);
+        this.setType("basic");
     }
 
     public DecreaseInstruction( String variable, String label){
@@ -15,6 +16,7 @@ public class DecreaseInstruction extends SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
+        this.setType("basic");
 
     }
 

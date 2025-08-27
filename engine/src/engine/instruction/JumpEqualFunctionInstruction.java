@@ -5,6 +5,7 @@ import engine.validator.InstructionValidator;
 public class JumpEqualFunctionInstruction extends SInstruction {
     public JumpEqualFunctionInstruction(SInstruction base) {
         super(base);
+        this.setType("synthetic");
     }
 
     @Override

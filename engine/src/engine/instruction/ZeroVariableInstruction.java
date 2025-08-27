@@ -13,6 +13,7 @@ public class ZeroVariableInstruction extends  SInstruction {
         super(base);
         // any additional initialization
         this.setCycles(1);
+        this.setType("synthetic");
         this.setDegree(1);
     }
 
@@ -22,6 +23,7 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setSVariable(variable);
         this.setSLabel(label);
         this.setCycles(1);
+        this.setType("synthetic");
         this.setDegree(1);
     }
 
