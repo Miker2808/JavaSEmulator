@@ -63,7 +63,7 @@ public class SInstructionArgument implements Serializable {
      */
     @XmlAttribute(name = "value", required = true)
     public void setValue(String value) {
-        this.value = value.trim();
+        this.value = value;
     }
 
     /**
@@ -88,7 +88,7 @@ public class SInstructionArgument implements Serializable {
      *     
      */
     public void setName(String value) {
-        this.name = value.trim();
+        this.name = value;
     }
 
 }

@@ -29,7 +29,7 @@ public class JumpZeroInstruction extends SInstruction {
     }
 
     public void setArgumentLabel(String label) {
-        this.JZLabel = label.trim();
+        this.JZLabel = label.trim().toUpperCase();
     }
 
     @Override

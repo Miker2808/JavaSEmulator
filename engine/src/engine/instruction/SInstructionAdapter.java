@@ -3,6 +3,14 @@ package engine.instruction;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class SInstructionAdapter extends XmlAdapter<SInstruction, SInstruction> {
+
+    /**
+     * When JAXB unmarshalls an SInstruction, this function will be called
+     * in between and instantiate a suitable object from base class family of SInstruction
+     * @param v SInstruction
+     * @return derived class from base class family of SInstruction
+     */
+
     @Override
     public SInstruction unmarshal(SInstruction v) {
         if (v == null) return null;

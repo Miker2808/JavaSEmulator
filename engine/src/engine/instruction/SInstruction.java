@@ -143,7 +143,6 @@ public class SInstruction implements Serializable {
         StringBuilder output = new StringBuilder();
         output.append(toString());
 
-
         SInstruction parent = getParent();
         int parent_line = getParentLine();
         while(parent != null){
@@ -230,7 +229,6 @@ public class SInstruction implements Serializable {
     }
 
     public String getSLabel() {
-        this.sLabel = sLabel.trim();
         return sLabel;
     }
 
@@ -240,8 +238,6 @@ public class SInstruction implements Serializable {
     }
 
     public String getType() {
-        this.type = type.trim();
-
         return type;
     }
 
@@ -282,6 +278,7 @@ public class SInstruction implements Serializable {
     public int getParentLine(){
         return this.parent_line;
     }
+
     public void setParentLine(int value){
         this.parent_line = value;
     }

@@ -28,8 +28,8 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setSLabel(label);
         this.setCycles(2);
         this.setDegree(3);
-        this.setArgumentConst(constantValue.trim());
-        this.setArgumentLabel(JEConstantLabel.trim());
+        this.setArgumentConst(constantValue);
+        this.setArgumentLabel(JEConstantLabel);
     }
 
     public void setArgumentConst(String value) {
