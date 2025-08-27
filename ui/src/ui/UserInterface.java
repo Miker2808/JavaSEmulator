@@ -1,9 +1,14 @@
 package ui;
 
-import engine.*;
+import engine.Engine;
+import engine.ExecutionHistory;
+import engine.SProgram;
 import engine.execution.ExecutionResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 public class UserInterface {
     Engine engine;

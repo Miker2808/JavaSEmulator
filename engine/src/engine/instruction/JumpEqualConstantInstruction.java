@@ -6,7 +6,6 @@ import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class JumpEqualConstantInstruction extends SInstruction {
     private String constantValue;

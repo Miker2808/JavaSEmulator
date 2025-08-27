@@ -3,8 +3,6 @@ package engine.instruction;
 import engine.execution.ExecutionContext;
 import engine.validator.InstructionValidator;
 
-import java.util.Objects;
-
 public class JumpNotZeroInstruction extends SInstruction{
     private String JNZLabel;
     private final String argName = "JNZLabel";

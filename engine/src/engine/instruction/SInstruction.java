@@ -7,11 +7,11 @@
 
 package engine.instruction;
 
+import engine.arguments.SInstructionArgument;
+import engine.arguments.SInstructionArguments;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
-import engine.arguments.SInstructionArgument;
-import engine.arguments.SInstructionArguments;
 import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;

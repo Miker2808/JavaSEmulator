@@ -6,7 +6,6 @@ import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class JumpEqualVariableInstruction extends SInstruction {
     private String variableName;

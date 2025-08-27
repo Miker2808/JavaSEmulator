@@ -1,6 +1,5 @@
 package engine.execution;
 
-import engine.ExecutionHistory;
 import engine.SProgram;
 import engine.instruction.SInstruction;
 

@@ -2,8 +2,6 @@ package engine.validator;
 
 import engine.instruction.*;
 
-import java.util.Set;
-
 public class InstructionValidator {
 
     public void validate(SInstruction instr) throws InvalidInstructionException {

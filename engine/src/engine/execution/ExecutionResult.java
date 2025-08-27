@@ -1,6 +1,7 @@
 package engine.execution;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ExecutionResult {
     private LinkedHashMap<String, Integer> variables;
