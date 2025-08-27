@@ -72,7 +72,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
 
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line){
-        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        List<SInstruction> expanded = new ArrayList<>();
         String V = this.getSVariable();
         String V_tag = this.getArgumentVariable();
         String z1 = context.freshVar();
@@ -106,6 +106,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
         String argLabel = this.getArgumentLabel();
         String argVar = getArgumentVariable();
         int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
+        //noinspection DuplicatedCode
         int paramValue = context.getVariables().computeIfAbsent(argVar, k -> 0);
 
         if(varValue == paramValue){

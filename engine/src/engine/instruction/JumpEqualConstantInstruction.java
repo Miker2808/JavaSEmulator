@@ -101,6 +101,7 @@ public class JumpEqualConstantInstruction extends SInstruction {
         String var = this.getSVariable();
         String argLabel = this.getArgumentLabel();
         int constValue = Integer.parseInt(getArgumentConst());
+        //noinspection DuplicatedCode
         int value = context.getVariables().computeIfAbsent(var, k -> 0);
 
         if(value == constValue){

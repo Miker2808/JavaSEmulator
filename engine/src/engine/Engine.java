@@ -20,7 +20,7 @@ public class Engine implements Serializable{
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
     public void loadFromXML(String path) throws Exception {
-        SProgram loadedProgramtemp = new SProgram();
+        SProgram loadedProgramtemp;
 
         // verify path to a file
         XMLValidator.validateXMLFile(path);

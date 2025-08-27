@@ -231,7 +231,7 @@ public class UserInterface {
     // chooses a valid number
     public int getMaxDegreeFromUser(SProgram program){
         int maxDegree = program.getMaxDegree();
-        int chosenDegree = -1;
+        int chosenDegree;
 
         while (true) {
             System.out.printf("Program can be expanded up to degree %d\n", maxDegree);

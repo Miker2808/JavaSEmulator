@@ -41,7 +41,7 @@ public class ZeroVariableInstruction extends  SInstruction {
      //    IF x2 != 0 GOTO L2
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line){
-        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        List<SInstruction> expanded = new ArrayList<>();
         String var = this.getSVariable();
         String L1 = context.freshLabel();
 

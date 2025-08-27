@@ -4,7 +4,7 @@ import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class SInstructionAdapter extends XmlAdapter<SInstruction, SInstruction> {
     @Override
-    public SInstruction unmarshal(SInstruction v) throws Exception {
+    public SInstruction unmarshal(SInstruction v) {
         if (v == null) return null;
 
         InstructionName name = v.getInstructionName();
@@ -31,7 +31,7 @@ public class SInstructionAdapter extends XmlAdapter<SInstruction, SInstruction> 
     }
 
     @Override
-    public SInstruction marshal(SInstruction v) throws Exception {
+    public SInstruction marshal(SInstruction v) {
         return v; // Usually, just return the same object for marshalling
     }
 }

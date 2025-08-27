@@ -53,7 +53,7 @@ public class JumpZeroInstruction extends SInstruction {
 
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line){
-        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        List<SInstruction> expanded = new ArrayList<>();
         String V = this.getSVariable();
         String L1 = context.freshLabel();
         String L = this.getArgumentLabel();

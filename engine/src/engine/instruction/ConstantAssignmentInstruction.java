@@ -53,7 +53,7 @@ public class ConstantAssignmentInstruction extends SInstruction {
 
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line){
-        List<SInstruction> expanded =  new ArrayList<SInstruction>();
+        List<SInstruction> expanded = new ArrayList<>();
         String V = this.getSVariable();
         int K = Integer.parseInt(this.getArgumentConst()); // if exception, the problem is the validator!
 
