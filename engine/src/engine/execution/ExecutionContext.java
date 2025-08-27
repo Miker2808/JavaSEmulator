@@ -40,6 +40,8 @@ public class ExecutionContext {
         return map;
     }
 
+
+    // generates variables map for the variables hashmap from input variables list
     private HashMap<String, Integer> generateVariables(ArrayList<Integer> InputVariables){
         HashMap<String, Integer> map = new HashMap<>();
         int size = InputVariables.size();

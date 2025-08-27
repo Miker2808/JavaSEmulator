@@ -16,6 +16,8 @@ public class SProgramExpander {
                 program.getMaxUsedLabel()
         );
 
+        // expansion is done iteratively (not recursively). each iteration (=degree) expands
+        // on the previous expansion
         for(int i = 0; i < level; i++) {
 
             SProgram expandedProgram = new SProgram();

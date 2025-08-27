@@ -138,7 +138,7 @@ public class SInstruction implements Serializable {
         return String.format("(%s) [ %-3s ] %s (%d)", type_short, getSLabel(), operation, getCycles());
     }
 
-
+    // converts to string with full expansion if present
     public String toFullString(){
         StringBuilder output = new StringBuilder();
         output.append(toString());

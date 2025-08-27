@@ -180,7 +180,7 @@ public class UserInterface {
         System.out.println("Not implemented yet");
     }
 
-
+    // reads integers >= 0, seperated by commas, returns list of integers parased.
     public static ArrayList<Integer> readPositiveIntegers() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter positive integers separated by commas (or leave empty): ");
@@ -221,7 +221,9 @@ public class UserInterface {
         return numbers;
     }
 
-
+    // Shows user max possible expansion degree to program
+    // prompts user to choose, per exercise requirements, will loop until a user
+    // chooses a valid number
     public int getMaxDegreeFromUser(SProgram program){
         int maxDegree = program.getMaxDegree();
         int chosenDegree = -1;
@@ -245,6 +247,7 @@ public class UserInterface {
         return chosenDegree;
     }
 
+    // prints execution history from engine
     public void printHistory(){
         List<ExecutionHistory> history = engine.getExecutionHistory();
 
@@ -278,10 +281,12 @@ public class UserInterface {
 
         try {
             this.engine = Engine.loadInstance(path);
-        } catch (Exception e) {
+            System.out.print("File loaded successfully.");
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        System.out.print("File loaded successfully.");
+
     }
 
     // asks user for path to save instance
@@ -292,13 +297,15 @@ public class UserInterface {
             String path = scanner.nextLine();
             try {
                 engine.saveInstance(path);
+                System.out.print("File saved successfully.");
                 break;
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 System.out.println(e.getMessage());
                 System.out.println();
             }
         }
-        System.out.print("File saved successfully.");
+
     }
 
     public void exitApplication(){

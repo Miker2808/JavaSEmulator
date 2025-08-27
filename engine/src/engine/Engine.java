@@ -17,6 +17,8 @@ public class Engine implements Serializable{
     private SProgram loadedProgram = null;
     private ArrayList<ExecutionHistory> executionHistory = new ArrayList<>();
 
+    // loads XML file for SProgram. raises exception on invalid
+    // overrides current loaded program on successful load
     public void loadFromXML(String path) throws Exception {
         SProgram loadedProgramtemp = new SProgram();
 
@@ -73,6 +75,9 @@ public class Engine implements Serializable{
         return Collections.unmodifiableList(executionHistory);
     }
 
+    // saves instance from engine to specificed path, raises execpetion if
+    // the path is invalid format.
+    // accepts only global (absolute) path and a file ends with .semulator
     public void saveInstance(String path) throws Exception {
         if (!path.endsWith(".semulator")) {
             throw new IllegalArgumentException("Path must end with .semulator");
@@ -98,7 +103,9 @@ public class Engine implements Serializable{
         }
     }
 
-    // loads Engine instance from file
+    // loads Engine instance from file, accepts only files ending with .semulator
+    // raises exception on invalid path format.
+    // returns instance of Engine
     public static Engine loadInstance(String path) throws Exception {
         if (!path.endsWith(".semulator")) {
             throw new IllegalArgumentException("Path must end with .semulator");
