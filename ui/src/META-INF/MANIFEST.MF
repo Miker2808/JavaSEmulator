@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Main-Class: ui.UserInterface
+Main-Class: UserInterface
 Class-Path: engine.jar jaxb\jaxb-core.jar jaxb\jaxb-impl.jar jaxb\jaxb-j
  xc.jar jaxb\jaxb-xjc.jar jaxb\jakarta.xml.bind-api.jar jaxb\jakarta.act
  ivation-api.jar jaxb\angus-activation.jar
