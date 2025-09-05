@@ -31,7 +31,7 @@ public class UserInterface extends Application{
         MainController controller = loader.getController();
 
         // Example: update the UI once it's loaded
-        controller.setLabelText("Hello from UserInterface!");
+        //controller.setLabelText("Hello from UserInterface!");
 
         // Setup the stage
         primaryStage.setTitle("My App");
