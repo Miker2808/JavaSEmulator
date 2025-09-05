@@ -17,7 +17,7 @@ import javafx.scene.Parent;
 
 public class UserInterface extends Application{
     Engine engine;
-    Scanner scanner;
+    Scanner scanner; // Not Used
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -30,11 +30,8 @@ public class UserInterface extends Application{
         // Get the controller (defined in FXML)
         MainController controller = loader.getController();
 
-        // Example: update the UI once it's loaded
-        //controller.setLabelText("Hello from UserInterface!");
-
         // Setup the stage
-        primaryStage.setTitle("My App");
+        primaryStage.setTitle("S-Emulator");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
