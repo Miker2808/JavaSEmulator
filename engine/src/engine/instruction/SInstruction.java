@@ -79,6 +79,7 @@ public class SInstruction implements Serializable {
     private InstructionName name;
     private int degree; //
     private int cycles; // number of cycles for the program
+    private int line;
 
     // parent stuff
     private int parent_line; // line of instruction in a program
@@ -124,21 +125,29 @@ public class SInstruction implements Serializable {
         this.degree = value;
     }
 
+    public void setLine(int value){
+        this.line = value;
+    }
+    public int getLine(){
+        return this.line;
+    }
+
     public void execute(ExecutionContext context){
 
     }
 
-    protected String getOperationString(String variable) {
+    public String getInstructionString(){
         return "";
     }
 
+    // returns basic old string, (Useless)
     public String toString() {
         String type_short = (Objects.equals(type, "basic")) ? "B" : "S";
-        String operation = getOperationString(sVariable);
+        String operation = getInstructionString();
         return String.format("(%s) [ %-3s ] %s (%d)", type_short, getSLabel(), operation, getCycles());
     }
 
-    // converts to string with full expansion if present
+    // converts to string with full expansion if present (Useless now)
     public String toFullString(){
         StringBuilder output = new StringBuilder();
         output.append(toString());

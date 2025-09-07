@@ -28,8 +28,8 @@ public class ZeroVariableInstruction extends  SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("%s <- 0", variable);
+    public String getInstructionString() {
+        return String.format("%s <- 0", getSVariable());
     }
 
     @Override

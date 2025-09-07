@@ -112,11 +112,6 @@ public class SProgram implements Serializable {
         sInstructions.getSInstruction().remove(line_num - 1);
     }
 
-    /** inserts a copy of the instruction not a reference! */
-    public void insertInstruction(int line_num, SInstruction instruction){
-        sInstructions.getSInstruction().add(line_num - 1, instruction);
-    }
-
     /** returns a refence, not a copy! */
      public SInstruction getInstruction(int line_num) {
         return sInstructions.getSInstruction().get(line_num - 1);

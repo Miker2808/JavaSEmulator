@@ -32,7 +32,7 @@ public class GotoLabelInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
+    public String getInstructionString() {
         return String.format("GOTO %s", getArgumentLabel());
     }
 

@@ -55,8 +55,8 @@ public class JumpEqualConstantInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("IF %s = %s GOTO %s", variable,
+    public String getInstructionString() {
+        return String.format("IF %s = %s GOTO %s", getSVariable(),
                 getArgumentConst(), getArgumentLabel());
     }
 

@@ -55,34 +55,14 @@ public class SInstructions implements Serializable {
         this.sInstruction = sInstruction;
     }
 
-
-    /**
-     * Gets the value of the sInstruction property.
-     * 
-     * <p>This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore, any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the sInstruction property.</p>
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * </p>
-     * <pre>
-     * getSInstruction().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SInstruction }
-     * </p>
-     * 
-     * 
-     * @return
-     *     The value of the sInstruction property.
-     */
+    private void updateInstructionsLines(){
+        for(int i = 0; i < sInstruction.size(); i++){
+            sInstruction.get(i).setLine(i+1);
+        }
+    }
 
     public List<SInstruction> getSInstruction() {
+        updateInstructionsLines();
         return this.sInstruction;
     }
 

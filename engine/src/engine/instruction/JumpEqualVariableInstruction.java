@@ -55,8 +55,8 @@ public class JumpEqualVariableInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("IF %s = %s GOTO %s", variable, getArgumentVariable(), getArgumentLabel());
+    public String getInstructionString() {
+        return String.format("IF %s = %s GOTO %s", getSVariable(), getArgumentVariable(), getArgumentLabel());
     }
 
     public String getArgumentVariableName(){

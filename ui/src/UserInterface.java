@@ -40,14 +40,6 @@ public class UserInterface extends Application{
         launch(args);
     }
 
-
-    /*
-    public static void main(String[] args) {
-        UserInterface ui = new UserInterface();
-        ui.run();
-    }
-    */
-
     public void run() {
         engine = new Engine();
         scanner = new Scanner(System.in);  // Create a Scanner object to read input from console

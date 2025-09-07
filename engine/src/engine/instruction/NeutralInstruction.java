@@ -19,8 +19,8 @@ public class NeutralInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("%s <- %s", variable, variable);
+    public String getInstructionString() {
+        return String.format("%s <- %s", getSVariable(), getSVariable());
     }
 
     @Override

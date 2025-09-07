@@ -40,8 +40,8 @@ public class ConstantAssignmentInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("%s <- %s", variable, getArgumentConst());
+    public String getInstructionString() {
+        return String.format("%s <- %s", getSVariable(), getArgumentConst());
     }
 
     public String getArgumentConstName(){

@@ -40,8 +40,8 @@ public class AssignmentInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("%s <- %s", variable, getArgumentVariable());
+    public String getInstructionString() {
+        return String.format("%s <- %s", getSVariable(), getArgumentVariable());
     }
 
     public String getArgumentVariableName(){

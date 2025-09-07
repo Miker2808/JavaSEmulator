@@ -51,7 +51,7 @@
                 <RowConstraints percentHeight="31.66" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <TableView prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+                  <TableView fx:id="expansionTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                     <columns>
                       <TableColumn editable="false" maxWidth="114.0" prefWidth="114.0" text="C1" />
                     </columns>
@@ -65,12 +65,13 @@
                         <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <TableView prefHeight="200.0" prefWidth="200.0">
+                        <TableView fx:id="instructionsTable" prefHeight="200.0" prefWidth="200.0">
                           <columns>
-                            <TableColumn editable="false" minWidth="30.0" prefWidth="30.0" text="#" />
-                            <TableColumn editable="false" minWidth="45.0" prefWidth="45.0" text="Type" />
-                              <TableColumn editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
-                              <TableColumn editable="false" minWidth="300.0" prefWidth="-1.0" text="Instruction" />
+                            <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="30.0" text="#" />
+                            <TableColumn fx:id="typeColumn" editable="false" minWidth="55.0" prefWidth="55.0" text="Type" />
+                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
+                              <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Label" />
+                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="300.0" prefWidth="327.0" text="Instruction" />
                           </columns>
                         </TableView>
                      </children>
@@ -84,7 +85,7 @@
                         <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <TableView prefHeight="200.0" prefWidth="200.0" />
+                        <TableView fx:id="historyTable" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </GridPane>
                   <GridPane hgap="3.0" vgap="3.0" GridPane.columnIndex="1" GridPane.rowSpan="2">
@@ -107,7 +108,7 @@
                             <RowConstraints minHeight="10.0" percentHeight="15.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <TableView prefHeight="200.0" prefWidth="200.0">
+                              <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
                                 <columns>
                                   <TableColumn editable="false" minWidth="70.0" prefWidth="-1.0" resizable="false" text="Variable" />
                                   <TableColumn editable="false" minWidth="70.0" prefWidth="-1.0" text="Value" />
@@ -123,7 +124,7 @@
                         </Label>
                         <TableView editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                           <columns>
-                            <TableColumn minWidth="70.0" prefWidth="70.0" text="Variable" />
+                            <TableColumn editable="false" minWidth="70.0" prefWidth="70.0" text="Variable" />
                             <TableColumn minWidth="70.0" prefWidth="-1.0" text="Input" />
                           </columns>
                         </TableView>
@@ -142,9 +143,9 @@
                     </rowConstraints>
                      <children>
                         <Button alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Program \ function selector" textAlignment="CENTER" GridPane.hgrow="ALWAYS" />
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                        <Label alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
-                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
+                        <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                        <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
+                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
                         <Label alignment="CENTER" text="Highlight selection" GridPane.columnIndex="4">
                            <GridPane.margin>
                               <Insets />

@@ -40,8 +40,8 @@ public class JumpZeroInstruction extends SInstruction {
     }
 
     @Override
-    protected String getOperationString(String variable) {
-        return String.format("IF %s = 0 GOTO %s", variable, getArgumentLabel());
+    public String getInstructionString() {
+        return String.format("IF %s = 0 GOTO %s", getSVariable(), getArgumentLabel());
     }
 
     public String getArgumentLabelName(){
