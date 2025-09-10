@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import engine.Engine;
 import javafx.stage.FileChooser;
@@ -29,8 +32,6 @@ public class MainController {
     private Label degreeLabel;
     @FXML
     private TextField instructionSearchField;
-    @FXML
-    private TableView<?> expansionTable;
     @FXML
     private TableView<?> historyTable;
     @FXML
@@ -54,12 +55,48 @@ public class MainController {
     @FXML
     private TableColumn<SInstruction, String> instructionColumn;
 
-// bunch of variables to make my lazy ass more comfortable
+    @FXML
+    private TableView<SInstruction> expansionTable;
+    @FXML
+    private TableColumn<SInstruction, Number> expansionLine;
+    @FXML
+    private TableColumn<SInstruction, String> expansionType;
+    @FXML
+    private TableColumn<SInstruction, Number> expansionCycles;
+    @FXML
+    private TableColumn<SInstruction, String> expansionLabel;
+    @FXML
+    private TableColumn<SInstruction, String> expansionInstruction;
+
+
+    // bunch of variables to make my lazy ass more comfortable
     private int expansion_selected = 0;
     private Boolean run_debug = false;
 
+
+    // opens an "Alert" window with information.
+    private void showInfoMessage(String title, String message){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
+        alert.setTitle(title);
+        alert.setHeaderText(null); // removes the ugly header
+        alert.showAndWait();
+    }
+
+
+    @FXML
+    public void initialize() {
+        System.out.println("Initializing Main Controller");
+
+        initializeInstructionTable();
+        initializedInstructionSearch();
+        initializedExpansionsTable();
+
+        collapseButton.setDisable(true);
+        expandButton.setDisable(true);
+    }
+
     private void initializeInstructionTable(){
-        // 1️⃣ lineColumn "#" — dynamic row numbering
+        //lineColumn "#" — dynamic row numbering
         lineColumn.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().getLine())
         );
@@ -87,6 +124,52 @@ public class MainController {
 
     }
 
+    private void initializedExpansionsTable(){
+        //  lineColumn "#" — dynamic row numbering
+        expansionLine.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getLine())
+        );
+        // typeColumn — string from getType()
+        expansionType.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getType())
+        );
+        // cyclesColumn — integer from getCycles()
+        expansionCycles.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getCycles())
+        );
+
+        // labelColumn — string from getLabel()
+        expansionLabel.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getSLabel())
+        );
+
+        // instructionColumn — string from getInstructionString()
+        expansionInstruction.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().getInstructionString())
+        );
+
+        // prepare table list
+        expansionTable.setItems(FXCollections.observableArrayList());
+
+        instructionsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            if (newSel == null) {
+                expansionTable.getItems().clear();
+                return;
+            }
+
+            List<SInstruction> chain = new ArrayList<>();
+            SInstruction current = newSel.getParent();  // start from parent, not self
+
+            // walk up to root
+            while (current != null) {
+                chain.add(current);
+                current = current.getParent();
+            }
+
+            expansionTable.getItems().setAll(chain);
+        });
+    }
+
     private void initializedInstructionSearch(){
         instructionSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
             instructionsTable.refresh();
@@ -104,10 +187,11 @@ public class MainController {
                     String search = instructionSearchField.getText();
                     if (search != null && !search.isEmpty()) {
                         String lowerSearch = search.toLowerCase();
-
+                        // if instead of InstructionString I use only variables,
+                        // search can be more strict
                         boolean match =
                                 item.getSLabel().toLowerCase().contains(lowerSearch) ||
-                                item.getInstructionString().toLowerCase().contains(lowerSearch);
+                                        item.getInstructionString().toLowerCase().contains(lowerSearch);
 
                         if (match) {
                             setStyle("-fx-background-color: yellow;");
@@ -123,24 +207,6 @@ public class MainController {
     }
 
 
-    @FXML
-    public void initialize() {
-        System.out.println("Initializing Main Controller");
-
-        initializeInstructionTable();
-        initializedInstructionSearch();
-
-        collapseButton.setDisable(true);
-        expandButton.setDisable(true);
-    }
-
-    // opens an "Alert" window with information.
-    private void showInfoMessage(String title, String message){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null); // removes the ugly header
-        alert.showAndWait();
-    }
 
     @FXML
     void onClickedLoadProgramButton(MouseEvent event) {

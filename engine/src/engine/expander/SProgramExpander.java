@@ -33,7 +33,12 @@ public class SProgramExpander {
                     expandedProgram.appendInstruction(instr);
                 }
             }
+
             currentProgram = expandedProgram;
+        }
+
+        for(int line = 1; line <= currentProgram.Size(); line++) {
+            currentProgram.getInstruction(line).setLine(line);
         }
 
         return currentProgram;

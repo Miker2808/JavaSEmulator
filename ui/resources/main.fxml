@@ -53,7 +53,11 @@
                <children>
                   <TableView fx:id="expansionTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                     <columns>
-                      <TableColumn editable="false" maxWidth="114.0" prefWidth="114.0" text="C1" />
+                      <TableColumn fx:id="expansionLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="30.0" text="#" />
+                        <TableColumn fx:id="expansionType" minWidth="55.0" prefWidth="55.0" text="Type" />
+                        <TableColumn fx:id="expansionCycles" minWidth="45.0" prefWidth="45.0" text="Cycles" />
+                        <TableColumn fx:id="expansionLabel" minWidth="40.0" prefWidth="40.0" text="Label" />
+                        <TableColumn fx:id="expansionInstruction" minWidth="100.0" prefWidth="325.0" text="Instruction" />
                     </columns>
                   </TableView>
                   <GridPane GridPane.rowIndex="1">
@@ -71,7 +75,7 @@
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="55.0" prefWidth="55.0" text="Type" />
                               <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                               <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Label" />
-                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="300.0" prefWidth="327.0" text="Instruction" />
+                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="325.0" text="Instruction" />
                           </columns>
                         </TableView>
                      </children>
