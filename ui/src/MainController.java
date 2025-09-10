@@ -1,5 +1,6 @@
 
 
+import engine.SInstructions;
 import engine.SProgram;
 import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -26,6 +27,8 @@ public class MainController {
     private Button expandButton;
     @FXML
     private Label degreeLabel;
+    @FXML
+    private TextField instructionSearchField;
     @FXML
     private TableView<?> expansionTable;
     @FXML
@@ -84,11 +87,48 @@ public class MainController {
 
     }
 
+    private void initializedInstructionSearch(){
+        instructionSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            instructionsTable.refresh();
+        });
+
+        // Highlight rows based on search
+        instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
+            @Override
+            protected void updateItem(SInstruction item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setStyle("");
+                } else {
+                    String search = instructionSearchField.getText();
+                    if (search != null && !search.isEmpty()) {
+                        String lowerSearch = search.toLowerCase();
+
+                        boolean match =
+                                item.getSLabel().toLowerCase().contains(lowerSearch) ||
+                                item.getInstructionString().toLowerCase().contains(lowerSearch);
+
+                        if (match) {
+                            setStyle("-fx-background-color: yellow;");
+                        } else {
+                            setStyle("");
+                        }
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
+    }
+
+
     @FXML
     public void initialize() {
         System.out.println("Initializing Main Controller");
 
         initializeInstructionTable();
+        initializedInstructionSearch();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);

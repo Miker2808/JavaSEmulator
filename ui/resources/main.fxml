@@ -146,10 +146,7 @@
                         <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                         <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
                         <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
-                        <Label alignment="CENTER" text="Highlight selection" GridPane.columnIndex="4">
-                           <GridPane.margin>
-                              <Insets />
-                           </GridPane.margin></Label>
+                        <TextField fx:id="instructionSearchField" promptText="Search" GridPane.columnIndex="4" />
                      </children>
                   </GridPane>
                </children>
