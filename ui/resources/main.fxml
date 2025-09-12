@@ -40,10 +40,10 @@
             <Insets bottom="10.0" left="15.0" right="15.0" top="15.0" />
          </padding>
          <center>
-            <GridPane hgap="10.0" vgap="10.0" BorderPane.alignment="TOP_LEFT">
+            <GridPane hgap="10.0" minHeight="400.0" minWidth="500.0" vgap="10.0" BorderPane.alignment="TOP_LEFT">
               <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="65.0" />
-                  <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="65.0" />
+                  <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints percentHeight="5.0" vgrow="NEVER" />
@@ -69,7 +69,7 @@
                         <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <TableView fx:id="instructionsTable" prefHeight="200.0" prefWidth="200.0">
+                        <TableView fx:id="instructionsTable" minWidth="200.0" prefHeight="200.0" prefWidth="200.0">
                           <columns>
                             <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="30.0" text="#" />
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="35.0" text="Type" />
@@ -78,6 +78,21 @@
                               <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="325.0" text="Instruction" />
                           </columns>
                         </TableView>
+                        <GridPane GridPane.rowIndex="1">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Label" />
+                              <Label text="Label" GridPane.columnIndex="1" />
+                              <Label text="Label" GridPane.columnIndex="2" />
+                           </children>
+                        </GridPane>
                      </children>
                   </GridPane>
                   <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
@@ -95,43 +110,103 @@
                   <GridPane hgap="3.0" vgap="3.0" GridPane.columnIndex="1" GridPane.rowSpan="2">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="100.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                     </rowConstraints>
                      <children>
-                        <GridPane GridPane.rowIndex="2">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" percentHeight="15.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
-                                <columns>
-                                  <TableColumn editable="false" minWidth="70.0" prefWidth="-1.0" resizable="false" text="Variable" />
-                                  <TableColumn editable="false" minWidth="70.0" prefWidth="-1.0" text="Value" />
-                                </columns>
-                              </TableView>
-                              <Label text="Cycles: 0" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                           </children>
-                        </GridPane>
-                        <Label text="Debugger \ Execution" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER">
+                        <Label text="Debugger \ Execution" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
-                        <TableView editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                          <columns>
-                            <TableColumn editable="false" minWidth="70.0" prefWidth="70.0" text="Variable" />
-                            <TableColumn minWidth="70.0" prefWidth="-1.0" text="Input" />
-                          </columns>
-                        </TableView>
+                        <GridPane GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Button fx:id="newRunButton" alignment="CENTER" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNewRunClicked" prefWidth="120.0" text="New run" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <ToggleButton fx:id="debugModeToggle" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugModeClicked" prefWidth="120.0" text="Debug Mode: OFF" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </ToggleButton>
+                              <Button fx:id="stepOverButton" alignment="CENTER" disable="true" layoutX="46.0" layoutY="25.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStepOverClicked" prefWidth="120.0" text="Step over" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="stopButton" alignment="CENTER" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="runButton" alignment="CENTER" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onRunClicked" prefWidth="120.0" text="Run" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="resumeButton" alignment="CENTER" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
+                        </GridPane>
+                        <GridPane hgap="5.0" GridPane.rowIndex="2">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                           <children>
+                              <TableView fx:id="inputTable" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <columns>
+                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="70.0" prefWidth="70.0" text="Variable" />
+                                  <TableColumn fx:id="inputTableValueColumn" minWidth="70.0" prefWidth="-1.0" text="Input" />
+                                </columns>
+                              </TableView>
+                              <GridPane GridPane.rowIndex="1">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
+                                      <columns>
+                                        <TableColumn fx:id="programVariablesTableVariableColumn" editable="false" minWidth="70.0" prefWidth="-1.0" resizable="false" text="Variable" />
+                                        <TableColumn fx:id="programVariablesTableValueColumn" editable="false" minWidth="70.0" prefWidth="-1.0" text="Value" />
+                                      </columns>
+                                    </TableView>
+                                    <Label fx:id="cyclesMeterLabel" text="Cycles: 0" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding></Label>
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints vgrow="ALWAYS" />
+                           </rowConstraints>
+                        </GridPane>
                      </children>
                   </GridPane>
                   <GridPane alignment="CENTER" hgap="3.0">
@@ -146,7 +221,7 @@
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <ChoiceBox fx:id="programSelectionChoiceBox" prefWidth="150.0" />
+                        <ChoiceBox fx:id="programSelectionChoiceBox" maxWidth="1.7976931348623157E308" GridPane.hgrow="ALWAYS" />
                         <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                         <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
                         <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />

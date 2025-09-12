@@ -16,6 +16,7 @@ import java.util.List;
 public class Engine implements Serializable{
     private SProgram loadedProgram = null;
     private ArrayList<ExecutionHistory> executionHistory = new ArrayList<>();
+    private SInterpreter interpreter;
 
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
@@ -141,6 +142,7 @@ public class Engine implements Serializable{
         }
         return file;
     }
+
 
 
 }

@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 
@@ -24,6 +25,9 @@ import ui.ProgressBarDialog;
 public class MainController {
 
     private final Engine engine = new Engine();
+    // bunch of variables to make my lazy ass more comfortable
+    private int expansion_selected = 0;
+    private Boolean run_debug = false;
 
 
     @FXML
@@ -37,13 +41,9 @@ public class MainController {
     @FXML
     private TextField instructionSearchField;
     @FXML
-    private TableView<?> historyTable;
-    @FXML
     private Button loadProgramButton;
     @FXML
     private TextField loadedFilePathTextField;
-    @FXML
-    private TableView<?> programVariablesTable;
 
 // instructions table
     @FXML
@@ -73,9 +73,44 @@ public class MainController {
     private TableColumn<SInstruction, String> historyChainInstruction;
 
 
-    // bunch of variables to make my lazy ass more comfortable
-    private int expansion_selected = 0;
-    private Boolean run_debug = false;
+    // Debugger / Execution Section
+    // Buttons
+    @FXML
+    private Label cyclesMeterLabel;
+    @FXML
+    private ToggleButton debugModeToggle;
+    @FXML
+    private Button resumeButton;
+    @FXML
+    private Button runButton;
+    @FXML
+    private Button stepOverButton;
+    @FXML
+    private Button stopButton;
+
+    // tables
+    @FXML
+    private TableView<String> inputTable;
+    @FXML
+    private TableColumn<String, String> inputTableValueColumn;
+    @FXML
+    private TableColumn<String, String> inputTableVariableColumn;
+
+    @FXML
+    private TableView<?> programVariablesTable;
+    @FXML
+    private TableColumn<?, ?> programVariablesTableValueColumn;
+
+    @FXML
+    private TableColumn<?, ?> programVariablesTableVariableColumn;
+
+
+    // History
+    @FXML
+    private TableView<?> historyTable;
+
+
+
 
 
     // opens an "Alert" window with information.
@@ -93,7 +128,7 @@ public class MainController {
 
         initializeInstructionTable();
         initializedInstructionSearch();
-        //initializedExpansionsTable();
+        initializedExpansionsTable();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -128,37 +163,36 @@ public class MainController {
 
     }
 
-    /*
     private void initializedExpansionsTable(){
         //  lineColumn "#" — dynamic row numbering
-        expansionLine.setCellValueFactory(cell ->
+        historyChainLine.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().getLine())
         );
         // typeColumn — string from getType()
-        expansionType.setCellValueFactory(cell ->
+        historyChainType.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getType())
         );
         // cyclesColumn — integer from getCycles()
-        expansionCycles.setCellValueFactory(cell ->
+        historyChainCycles.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().getCycles())
         );
 
         // labelColumn — string from getLabel()
-        expansionLabel.setCellValueFactory(cell ->
+        historyChainLabel.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getSLabel())
         );
 
         // instructionColumn — string from getInstructionString()
-        expansionInstruction.setCellValueFactory(cell ->
+        historyChainInstruction.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().getInstructionString())
         );
 
         // prepare table list
-        expansionTable.setItems(FXCollections.observableArrayList());
+        historyChainTable.setItems(FXCollections.observableArrayList());
 
         instructionsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel == null) {
-                expansionTable.getItems().clear();
+                historyChainTable.getItems().clear();
                 return;
             }
 
@@ -171,10 +205,9 @@ public class MainController {
                 current = current.getParent();
             }
 
-            expansionTable.getItems().setAll(chain);
+            historyChainTable.getItems().setAll(chain);
         });
     }
-    */
 
     private void initializedInstructionSearch(){
         instructionSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -269,5 +302,42 @@ public class MainController {
         updateUIOnProgram(expanded);
     }
 
+
+    @FXML
+    void onNewRunClicked(MouseEvent event) {
+        List<String> input_variables = engine.getLoadedProgram().getInputVariablesUsed();
+        inputTableVariableColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue()));
+        inputTable.setItems(FXCollections.observableArrayList(input_variables));
+
+    }
+
+    @FXML
+    void onDebugModeClicked(MouseEvent event) {
+        stepOverButton.setDisable(!debugModeToggle.isSelected());
+        runButton.setDisable(debugModeToggle.isSelected());
+        String on_off = debugModeToggle.isSelected() ? "ON" : "OFF";
+        debugModeToggle.setText("Debug Mode: " + on_off);
+    }
+
+
+    @FXML
+    void onResumeClicked(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onRunClicked(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onStepOverClicked(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onStopClicked(MouseEvent event) {
+
+    }
 
 }
