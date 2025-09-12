@@ -18,6 +18,7 @@ import java.util.List;
 
 import engine.Engine;
 import javafx.stage.FileChooser;
+import ui.ProgressBarDialog;
 
 
 public class MainController {
@@ -56,17 +57,17 @@ public class MainController {
     private TableColumn<SInstruction, String> instructionColumn;
 
     @FXML
-    private TableView<SInstruction> expansionTable;
+    private TableView<SInstruction> historyChainTable;
     @FXML
-    private TableColumn<SInstruction, Number> expansionLine;
+    private TableColumn<SInstruction, Number> historyChainLine;
     @FXML
-    private TableColumn<SInstruction, String> expansionType;
+    private TableColumn<SInstruction, String> historyChainType;
     @FXML
-    private TableColumn<SInstruction, Number> expansionCycles;
+    private TableColumn<SInstruction, Number> historyChainCycles;
     @FXML
-    private TableColumn<SInstruction, String> expansionLabel;
+    private TableColumn<SInstruction, String> historyChainLabel;
     @FXML
-    private TableColumn<SInstruction, String> expansionInstruction;
+    private TableColumn<SInstruction, String> historyChainInstruction;
 
 
     // bunch of variables to make my lazy ass more comfortable
@@ -89,7 +90,7 @@ public class MainController {
 
         initializeInstructionTable();
         initializedInstructionSearch();
-        initializedExpansionsTable();
+        //initializedExpansionsTable();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -102,7 +103,7 @@ public class MainController {
         );
         // typeColumn — string from getType()
         typeColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getType())
+                new SimpleStringProperty(cell.getValue().getTypeShort())
         );
         // cyclesColumn — integer from getCycles()
         cyclesColumn.setCellValueFactory(cell ->
@@ -124,6 +125,7 @@ public class MainController {
 
     }
 
+    /*
     private void initializedExpansionsTable(){
         //  lineColumn "#" — dynamic row numbering
         expansionLine.setCellValueFactory(cell ->
@@ -169,6 +171,7 @@ public class MainController {
             expansionTable.getItems().setAll(chain);
         });
     }
+    */
 
     private void initializedInstructionSearch(){
         instructionSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -214,6 +217,8 @@ public class MainController {
         File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
 
         if (selectedFile != null) {
+            new ProgressBarDialog(1.0f).start();
+
             String path = selectedFile.getAbsolutePath();
             try {
                 engine.loadFromXML(path);
@@ -221,11 +226,8 @@ public class MainController {
                 loadedFilePathTextField.setText(path);
                 expansion_selected = 0;
                 updateUIOnProgram(engine.getLoadedProgram());
-
-
             }
             catch(Exception e){
-                //loadedFilePathTextField.setText(e.getMessage());
                 // add alert window
                 showInfoMessage("Failed to load XML file", e.getMessage());
             }

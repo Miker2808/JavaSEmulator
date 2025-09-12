@@ -250,6 +250,10 @@ public class SInstruction implements Serializable {
         return type;
     }
 
+    public String getTypeShort(){
+        return (Objects.equals(type, "basic")) ? "B" : "S";
+    }
+
     @XmlAttribute(name = "type", required = true)
     public void setType(String value) {
         this.type = value.trim().toLowerCase();
