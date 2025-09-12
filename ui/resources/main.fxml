@@ -146,7 +146,7 @@
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <Button alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Program \ function selector" textAlignment="CENTER" GridPane.hgrow="ALWAYS" />
+                        <ChoiceBox fx:id="programSelectionChoiceBox" prefWidth="150.0" />
                         <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                         <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
                         <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />

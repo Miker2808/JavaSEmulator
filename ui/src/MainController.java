@@ -25,6 +25,9 @@ public class MainController {
 
     private final Engine engine = new Engine();
 
+
+    @FXML
+    private ChoiceBox<String> programSelectionChoiceBox;
     @FXML
     private Button collapseButton;
     @FXML
@@ -217,9 +220,11 @@ public class MainController {
         File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
 
         if (selectedFile != null) {
-            new ProgressBarDialog(1.0f).start();
 
             String path = selectedFile.getAbsolutePath();
+            if(path.endsWith(".xml")) {
+                new ProgressBarDialog(1.0f).start();
+            }
             try {
                 engine.loadFromXML(path);
                 loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
@@ -244,6 +249,10 @@ public class MainController {
             SInstruction instr = program.getInstruction(i);
             instructionsTable.getItems().add(instr);
         }
+
+        // for now, TODO: make it show all functions (The engine needs to supply names)
+        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgram().getName());
+        programSelectionChoiceBox.setValue(engine.getLoadedProgram().getName());
     }
 
     @FXML

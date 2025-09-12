@@ -23,10 +23,11 @@ public class ProgressBarDialog {
         dialog.setTitle("Loading File...");
 
         ProgressBar progressBar = new ProgressBar(0);
+        progressBar.setPrefWidth(400); // longer bar
         VBox box = new VBox(10, new Label("Loading file..."), progressBar);
         box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(10));
-        Scene scene = new Scene(box, 300, 80);
+        box.setPadding(new Insets(20));
+        Scene scene = new Scene(box, 450, 100);
         dialog.setScene(scene);
 
         Task<Void> task = new Task<>() {
