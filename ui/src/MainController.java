@@ -44,7 +44,7 @@ public class MainController {
     @FXML
     private Label degreeLabel;
     @FXML
-    private TextField instructionSearchField;
+    private ChoiceBox<String> highlightChoiceBox;
     @FXML
     private Button loadProgramButton;
     @FXML
@@ -114,10 +114,6 @@ public class MainController {
     @FXML
     private TableView<?> historyTable;
 
-
-
-
-
     // opens an "Alert" window with information.
     private void showInfoMessage(String title, String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
@@ -132,7 +128,7 @@ public class MainController {
         System.out.println("Initializing Main Controller");
 
         initializeInstructionTable();
-        initializedInstructionSearch();
+        initializeHighlightChoiceBox();
         initializedExpansionsTable();
         initializeInputTable();
         initializeProgramVariablesTable();
@@ -216,11 +212,11 @@ public class MainController {
         });
     }
 
-    private void initializedInstructionSearch(){
-        instructionSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+    private void initializeHighlightChoiceBox(){
+        highlightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
             instructionsTable.refresh();
         });
-
         // Highlight rows based on search
         instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
             @Override
@@ -230,15 +226,15 @@ public class MainController {
                 if (empty || item == null) {
                     setStyle("");
                 } else {
-                    String search = instructionSearchField.getText();
-                    if (search != null && !search.isEmpty()) {
-                        String lowerSearch = search.toLowerCase();
+                    String choice = highlightChoiceBox.getValue();
+                    if (choice != null && !choice.isEmpty()) {
+                        choice = choice.toUpperCase().trim();
+
                         // if instead of InstructionString I use only variables,
                         // search can be more strict
                         boolean match =
-                                item.getSLabel().toLowerCase().contains(lowerSearch) ||
-                                        item.getInstructionString().toLowerCase().contains(lowerSearch);
-
+                                item.getSLabel().toUpperCase().contains(choice) ||
+                                        item.getInstructionString().toUpperCase().contains(choice);
                         if (match) {
                             setStyle("-fx-background-color: yellow;");
                         } else {
@@ -252,7 +248,14 @@ public class MainController {
         });
     }
 
-
+    private void resetHighlightChoiceBox(){
+        List<String> used_variables = engine.getLoadedProgram().getVariablesUsed();
+        List<String> used_labels = engine.getLoadedProgram().getLabelsUsed();
+        highlightChoiceBox.getItems().setAll(used_variables);
+        highlightChoiceBox.getItems().addFirst("Highlight Selection");
+        highlightChoiceBox.getItems().addAll(used_labels);
+        highlightChoiceBox.getSelectionModel().selectFirst();
+    }
 
     @FXML
     void onClickedLoadProgramButton(MouseEvent event) {
@@ -294,6 +297,8 @@ public class MainController {
         // for now, TODO: make it show all functions (The engine needs to supply names)
         programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgram().getName());
         programSelectionChoiceBox.setValue(engine.getLoadedProgram().getName());
+
+        resetHighlightChoiceBox();
     }
 
     @FXML

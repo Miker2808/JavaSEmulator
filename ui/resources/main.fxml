@@ -176,8 +176,8 @@
                            <children>
                               <TableView fx:id="inputTable" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <columns>
-                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="60.0" prefWidth="60.0" text="Variable" />
-                                  <TableColumn fx:id="inputTableValueColumn" minWidth="70.0" onEditCommit="#onEditCommitInputColumn" prefWidth="-1.0" text="Input" />
+                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" text="Variable" />
+                                  <TableColumn fx:id="inputTableValueColumn" minWidth="40.0" onEditCommit="#onEditCommitInputColumn" prefWidth="75.0" text="Input" />
                                 </columns>
                               </TableView>
                               <GridPane GridPane.rowIndex="1">
@@ -191,8 +191,8 @@
                                  <children>
                                     <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
                                       <columns>
-                                        <TableColumn fx:id="programVariablesTableVariableColumn" editable="false" minWidth="70.0" prefWidth="-1.0" resizable="false" text="Variable" />
-                                        <TableColumn fx:id="programVariablesTableValueColumn" editable="false" minWidth="70.0" prefWidth="-1.0" text="Value" />
+                                        <TableColumn fx:id="programVariablesTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" resizable="false" text="Variable" />
+                                        <TableColumn fx:id="programVariablesTableValueColumn" editable="false" minWidth="40.0" prefWidth="75.0" text="Value" />
                                       </columns>
                                     </TableView>
                                     <Label fx:id="cyclesMeterLabel" text="Cycles: 0" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
@@ -221,11 +221,11 @@
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <ChoiceBox fx:id="programSelectionChoiceBox" maxWidth="1.7976931348623157E308" GridPane.hgrow="ALWAYS" />
+                        <ChoiceBox fx:id="programSelectionChoiceBox" maxWidth="1.7976931348623157E308" minWidth="50.0" GridPane.hgrow="ALWAYS" />
                         <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
                         <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
                         <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
-                        <TextField fx:id="instructionSearchField" promptText="Search" GridPane.columnIndex="4" />
+                        <ChoiceBox fx:id="highlightChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" />
                      </children>
                   </GridPane>
                </children>
