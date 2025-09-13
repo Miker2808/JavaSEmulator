@@ -101,14 +101,13 @@ public class MainController {
     @FXML
     private TableColumn<VariableRow, String> inputTableVariableColumn;
 
-
+    // program variable state table
     @FXML
-    private TableView<?> programVariablesTable;
+    private TableView<VariableRow> programVariablesTable;
     @FXML
-    private TableColumn<?, ?> programVariablesTableValueColumn;
-
+    private TableColumn<VariableRow, Integer> programVariablesTableValueColumn;
     @FXML
-    private TableColumn<?, ?> programVariablesTableVariableColumn;
+    private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
 
     // History
@@ -136,6 +135,7 @@ public class MainController {
         initializedInstructionSearch();
         initializedExpansionsTable();
         initializeInputTable();
+        initializeProgramVariablesTable();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -322,6 +322,7 @@ public class MainController {
     void onNewRunClicked(MouseEvent event) {
         resetInputTable();
         cyclesMeterLabel.setText("Cycles: 0");
+        programVariablesTable.getItems().clear();
     }
 
     void initializeInputTable(){
@@ -340,6 +341,11 @@ public class MainController {
                 }
             }
         });
+    }
+
+    void initializeProgramVariablesTable(){
+        programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+        programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
     }
 
     @FXML
@@ -382,10 +388,16 @@ public class MainController {
             }
         }
 
+        // run full program
         ExecutionResult result = engine.runProgram(engine.getLoadedProgram(), input_variables, expansion_selected);
-        System.out.println(result.getVariables().toString());
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+        // populate table with result variables (later it'll be the same with execution context
+        programVariablesTable.getItems().setAll(
+            result.getVariables().entrySet().stream()
+                    .map(e -> new VariableRow(e.getKey(), e.getValue()))
+                    .toList()
+        );
 
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
 
     }
 
