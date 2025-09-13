@@ -8,14 +8,14 @@ import java.util.HashMap;
 
 public class ExecutionContext {
 
-    private final HashMap<String, Integer> variables;
+    private final HashMap<String, Integer> variables = new HashMap<>();
     private final HashMap<String, Integer> labelMap;
     private int pc;
     private int cycles;
     private boolean exit;
 
-    public ExecutionContext(SProgram program, ArrayList<Integer> InputVariables){
-        variables = generateVariables(InputVariables);
+    public ExecutionContext(SProgram program, HashMap<String, Integer> InputVariables){
+        variables.putAll(InputVariables);
         labelMap = mapLabels(program);
         exit = false;
         pc = 1;
@@ -35,17 +35,6 @@ public class ExecutionContext {
                     map.put(label, line);
                 }
             }
-        }
-        return map;
-    }
-
-
-    // generates variables map for the variables hashmap from input variables list
-    private HashMap<String, Integer> generateVariables(ArrayList<Integer> InputVariables){
-        HashMap<String, Integer> map = new HashMap<>();
-        int size = InputVariables.size();
-        for (int i=1; i <= size; i++){
-            map.put(String.format("x%d", i), InputVariables.get(i-1));
         }
         return map;
     }

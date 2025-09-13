@@ -176,8 +176,8 @@
                            <children>
                               <TableView fx:id="inputTable" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <columns>
-                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="70.0" prefWidth="70.0" text="Variable" />
-                                  <TableColumn fx:id="inputTableValueColumn" minWidth="70.0" prefWidth="-1.0" text="Input" />
+                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="60.0" prefWidth="60.0" text="Variable" />
+                                  <TableColumn fx:id="inputTableValueColumn" minWidth="70.0" onEditCommit="#onEditCommitInputColumn" prefWidth="-1.0" text="Input" />
                                 </columns>
                               </TableView>
                               <GridPane GridPane.rowIndex="1">

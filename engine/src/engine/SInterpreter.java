@@ -4,6 +4,7 @@ import engine.execution.ExecutionContext;
 import engine.execution.ExecutionResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public class SInterpreter
     private SProgram program;
     private ExecutionContext context;
 
-    public SInterpreter(SProgram program, ArrayList<Integer> inputVariables){
+    public SInterpreter(SProgram program, HashMap<String, Integer> inputVariables){
         this.program = (program == null) ? new SProgram() : program;
         this.context = new ExecutionContext(program, inputVariables);
     }

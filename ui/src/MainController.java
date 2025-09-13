@@ -2,12 +2,14 @@
 
 import engine.SInstructions;
 import engine.SProgram;
+import engine.execution.ExecutionResult;
 import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
@@ -15,11 +17,14 @@ import javafx.scene.layout.ColumnConstraints;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import engine.Engine;
 import javafx.stage.FileChooser;
+import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
+import ui.VariableRow;
 
 
 public class MainController {
@@ -90,11 +95,12 @@ public class MainController {
 
     // tables
     @FXML
-    private TableView<String> inputTable;
+    private TableView<VariableRow> inputTable;
     @FXML
-    private TableColumn<String, String> inputTableValueColumn;
+    private TableColumn<VariableRow, Integer> inputTableValueColumn;
     @FXML
-    private TableColumn<String, String> inputTableVariableColumn;
+    private TableColumn<VariableRow, String> inputTableVariableColumn;
+
 
     @FXML
     private TableView<?> programVariablesTable;
@@ -129,6 +135,7 @@ public class MainController {
         initializeInstructionTable();
         initializedInstructionSearch();
         initializedExpansionsTable();
+        initializeInputTable();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -264,6 +271,7 @@ public class MainController {
                 loadedFilePathTextField.setText(path);
                 expansion_selected = 0;
                 updateUIOnProgram(engine.getLoadedProgram());
+                resetInputTable();
             }
             catch(Exception e){
                 // add alert window
@@ -303,12 +311,35 @@ public class MainController {
     }
 
 
+    void resetInputTable(){
+        List<String> input_variables = engine.getLoadedProgram().getInputVariablesUsed();
+        inputTable.getItems().setAll(
+                input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
+        );
+    }
+
     @FXML
     void onNewRunClicked(MouseEvent event) {
-        List<String> input_variables = engine.getLoadedProgram().getInputVariablesUsed();
-        inputTableVariableColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue()));
-        inputTable.setItems(FXCollections.observableArrayList(input_variables));
+        resetInputTable();
+        cyclesMeterLabel.setText("Cycles: 0");
+    }
 
+    void initializeInputTable(){
+        inputTable.setEditable(true);
+
+        inputTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+
+        inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
+                new IntegerStringConverter()) {
+            @Override
+            public void startEdit() {
+                VariableRow row = getTableRow().getItem();
+                if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
+                    super.startEdit(); // only editable if left column is not empty
+                }
+            }
+        });
     }
 
     @FXML
@@ -319,6 +350,20 @@ public class MainController {
         debugModeToggle.setText("Debug Mode: " + on_off);
     }
 
+    @FXML
+    private void onEditCommitInputColumn(TableColumn.CellEditEvent<VariableRow, Integer> event){
+        Integer newValue = event.getNewValue();
+
+        if (newValue == null) {
+            event.getRowValue().setValue(0);
+        } else if (newValue >= 0) {
+            event.getRowValue().setValue(newValue);
+        } else {
+            event.getTableView().refresh();
+            showInfoMessage("Invalid input variable value","Please enter a non-negative integer.");
+        }
+        event.getTableView().refresh();
+    }
 
     @FXML
     void onResumeClicked(MouseEvent event) {
@@ -327,6 +372,20 @@ public class MainController {
 
     @FXML
     void onRunClicked(MouseEvent event) {
+        HashMap<String, Integer> input_variables = new HashMap<>();
+
+        for (VariableRow row : inputTable.getItems()) {
+            String key = row.getVariable();
+            int value = row.getValue(); // primitive int
+            if (key != null && !key.isEmpty()) { // skip empty keys if needed
+                input_variables.put(key, value);
+            }
+        }
+
+        ExecutionResult result = engine.runProgram(engine.getLoadedProgram(), input_variables, expansion_selected);
+        System.out.println(result.getVariables().toString());
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+
 
     }
 

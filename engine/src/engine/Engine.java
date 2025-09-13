@@ -10,6 +10,7 @@ import jakarta.xml.bind.Unmarshaller;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -56,14 +57,15 @@ public class Engine implements Serializable{
         return loadedProgram != null;
     }
 
-    public ExecutionResult runProgram(SProgram program, ArrayList<Integer> input, int degree){
+    public ExecutionResult runProgram(SProgram program, HashMap<String, Integer> input, int degree){
         SProgram expanded = expandProgram(program, degree);
 
         ExecutionResult result = new SInterpreter(expanded, input).run();
-        executionHistory.add(new ExecutionHistory(degree,
-                input,
-                result.getVariables().get("y"),
-                result.getCycles()));
+        // TODO: Modifiy execution history (it will need changes anyway)
+        //executionHistory.add(new ExecutionHistory(degree,
+        //        input,
+        //        result.getVariables().get("y"),
+        //        result.getCycles()));
 
         return result;
     }
