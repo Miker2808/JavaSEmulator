@@ -12,8 +12,8 @@ public class SProgramExpander {
         SProgram currentProgram = program;
 
         ExpansionContext expansionContext = new ExpansionContext(
-                program.getMaxUsedZVariable(),
-                program.getMaxUsedLabel()
+                program.getSInstructions().getMaxUsedZVariable(),
+                program.getSInstructions().getMaxUsedLabel()
         );
 
         // expansion is done iteratively (not recursively). each iteration (=degree) expands
@@ -27,10 +27,10 @@ public class SProgramExpander {
                 SInstruction instr = currentProgram.getInstruction(line);
                 if(instr.getDegree() > 0) {
                     List<SInstruction> expanded = instr.expand(expansionContext, line);
-                    expandedProgram.addAll(expanded);
+                    expandedProgram.getSInstructions().addAll(expanded);
                 }
                 else{
-                    expandedProgram.appendInstruction(instr);
+                    expandedProgram.getSInstructions().appendInstruction(instr);
                 }
             }
 

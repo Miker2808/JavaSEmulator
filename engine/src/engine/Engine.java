@@ -60,7 +60,7 @@ public class Engine implements Serializable{
     public ExecutionResult runProgram(SProgram program, HashMap<String, Integer> input, int degree){
         SProgram expanded = expandProgram(program, degree);
 
-        ExecutionResult result = new SInterpreter(expanded, input).run();
+        ExecutionResult result = new SInterpreter(expanded.getSInstructions(), input).run();
         // TODO: Modifiy execution history (it will need changes anyway)
         //executionHistory.add(new ExecutionHistory(degree,
         //        input,
@@ -144,6 +144,8 @@ public class Engine implements Serializable{
         }
         return file;
     }
+
+
 
 
 

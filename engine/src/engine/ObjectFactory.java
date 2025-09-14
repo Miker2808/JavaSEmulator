@@ -4,12 +4,15 @@
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 //
 
-
 package engine;
 
 import engine.arguments.SInstructionArgument;
 import engine.arguments.SInstructionArguments;
+import engine.functions.SFunction;
+import engine.functions.SFunctions;
 import engine.instruction.SInstruction;
+
+
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlElementDecl;
 import jakarta.xml.bind.annotation.XmlRegistry;
@@ -43,6 +46,27 @@ public class ObjectFactory {
      */
     public ObjectFactory() {
     }
+
+    /**
+     * Create an instance of {@link SFunctions }
+     *
+     * @return
+     *     the new instance of {@link SFunctions }
+     */
+    public SFunctions createSFunctions() {
+        return new SFunctions();
+    }
+
+    /**
+     * Create an instance of {@link SFunction }
+     *
+     * @return
+     *     the new instance of {@link SFunction }
+     */
+    public SFunction createSFunction() {
+        return new SFunction();
+    }
+
 
     /**
      * Create an instance of {@link SProgram }

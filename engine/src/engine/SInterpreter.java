@@ -10,18 +10,18 @@ import java.util.Map;
 
 public class SInterpreter
 {
-    private SProgram program;
+    private SInstructions sInstructions;
     private ExecutionContext context;
 
-    public SInterpreter(SProgram program, HashMap<String, Integer> inputVariables){
-        this.program = (program == null) ? new SProgram() : program;
-        this.context = new ExecutionContext(program, inputVariables);
+    public SInterpreter(SInstructions sInstructions, HashMap<String, Integer> inputVariables){
+        this.sInstructions = sInstructions;
+        this.context = new ExecutionContext(sInstructions, inputVariables);
     }
 
     // emulates a run on a clean environment
     public ExecutionResult run(){
 
-        int num_lines = program.Size();
+        int num_lines = sInstructions.size();
         while(!context.getExit() && context.getPC() <= num_lines){
             step();
         }
@@ -30,11 +30,15 @@ public class SInterpreter
 
     // Runs a single step in execution
     public void step(){
-        program.getInstruction(context.getPC()).execute(context);
+        sInstructions.getInstruction(context.getPC()).execute(context);
     }
 
     public int getPC(){
         return context.getPC();
+    }
+
+    public boolean getExit(){
+        return context.getExit();
     }
 
     public int getCycles(){

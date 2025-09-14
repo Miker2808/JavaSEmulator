@@ -284,7 +284,7 @@ public class MainController {
     }
 
     void updateUIOnProgram(SProgram program){
-        int max_degree = engine.getLoadedProgram().getMaxDegree();
+        int max_degree = engine.getLoadedProgram().getSInstructions().getMaxDegree();
         degreeLabel.setText(String.format("%d / %d Degree",expansion_selected, max_degree));
         collapseButton.setDisable(expansion_selected == 0);
         expandButton.setDisable(expansion_selected == max_degree);
@@ -317,7 +317,7 @@ public class MainController {
 
 
     void resetInputTable(){
-        List<String> input_variables = engine.getLoadedProgram().getInputVariablesUsed();
+        List<String> input_variables = engine.getLoadedProgram().getSInstructions().getInputVariablesUsed();
         inputTable.getItems().setAll(
                 input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
         );

@@ -7,6 +7,7 @@
 
 package engine;
 
+import engine.functions.SFunctions;
 import engine.instruction.InvalidInstructionException;
 import engine.instruction.SInstruction;
 import engine.validator.InstructionValidator;
@@ -39,45 +40,20 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "sInstructions"
+    "sInstructions",
+    "sFunctions"
 })
 @XmlRootElement(name = "S-Program")
 public class SProgram implements Serializable {
 
     @XmlElement(name = "S-Instructions", required = true)
     protected SInstructions sInstructions = new SInstructions();
+
+    @XmlElement(name = "S-Functions")
+    protected SFunctions sFunctions;
+
     @XmlAttribute(name = "name", required = true)
     protected String name;
-
-
-    // Returns list of input variables used in program in order
-    public List<String> getInputVariablesUsed(){
-        List<String> vars = new ArrayList<>();
-
-        for (int line = 1; line <= Size(); line++){
-            SInstruction instr = this.getInstruction(line);
-
-            String variable = instr.getSVariable();
-
-            // check that the variable itself is input variable, append if yes
-            if(variable.matches("^(x[1-9][0-9]*)$") && !vars.contains(variable))
-                vars.add(variable);
-
-            String argVariable = instr.getArgumentVariable();
-
-            if(argVariable.matches("^(x[1-9][0-9]*)$") && !vars.contains(argVariable)){
-                vars.add(argVariable);
-            }
-
-            // the idea why to check both is because sometimes it might be x1 <- x2,
-            // and then you will want to add x1 and x2 to the input variables list
-            // (even though x1 is redundant logically)
-        }
-
-        vars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
-
-        return vars;
-    }
 
     public List<String> getVariablesUsed(){
         List<String> vars = new ArrayList<>();
@@ -107,13 +83,17 @@ public class SProgram implements Serializable {
         return vars;
     }
 
+    public SInstruction getInstruction(int line_num){
+        return sInstructions.getInstruction(line_num);
+    }
+
     // returns list of labels used in order
     public List<String> getLabelsUsed(){
         List<String> labels = new ArrayList<>();
         boolean isExitAvailable = false;
 
         for (int line = 1; line <= Size(); line++){
-            String label = this.getInstruction(line).getSLabel();
+            String label = getInstruction(line).getSLabel();
             if(!label.equals("EXIT") && !label.isEmpty() && !labels.contains(label)) {
                 labels.add(label);
             }
@@ -131,22 +111,9 @@ public class SProgram implements Serializable {
         return labels;
     }
 
-    /** appends a copy, not a reference */
-    public void appendInstruction(SInstruction instruction){
-        sInstructions.getSInstruction().add(instruction);
-    }
-
-    public void removeInstruction(int line_num){
-        sInstructions.getSInstruction().remove(line_num - 1);
-    }
-
-    /** returns a refence, not a copy! */
-     public SInstruction getInstruction(int line_num) {
-        return sInstructions.getSInstruction().get(line_num - 1);
-    }
 
     public int Size(){
-        return sInstructions.getSInstruction().size(); // number of instructions in the program
+        return sInstructions.size(); // number of instructions in the program
     }
 
     public void validateProgram() throws InvalidInstructionException {
@@ -158,7 +125,7 @@ public class SProgram implements Serializable {
         for(int line = 1; line <= Size(); line++){
             try {
                 // validator.validate(this.getInstruction(line)); // old
-                this.getInstruction(line).validate(validator); // new
+                getInstruction(line).validate(validator); // new
 
             } catch (InvalidInstructionException e) {
                 throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
@@ -166,120 +133,34 @@ public class SProgram implements Serializable {
         }
 
         // find that all labels are used
-        validateLabelsUsed();
+        sInstructions.validateLabelsUsed();
     }
 
-    // validates that all used labels jump to a line
-    private void validateLabelsUsed() throws InvalidInstructionException{
 
-        for(int line = 1; line <= Size(); line++){
-            String argLabel = this.getInstruction(line).getArgumentLabel();
-            if(!argLabel.isEmpty() && !argLabel.equals("EXIT")){
-                boolean found = false;
-                for(int line2 = 1; line2 <= Size(); line2++){
-                    String sLabel = this.getInstruction(line2).getSLabel();
-                    if(sLabel.equals(argLabel)){
-                        found = true;
-                    }
-                }
-                if(!found){
-                    throw new InvalidInstructionException(String.format("Instruction #%d, label %s does not jump anywhere",
-                            line, argLabel));
-                }
-            }
-        }
-
-    }
-
-    public int getMaxUsedLabel(){
-        int max_label_num = 1;
-        for(int line = 1; line <= Size(); line++){
-            String sLabel = getInstruction(line).getSLabel();
-            if(sLabel.startsWith("L")) {
-                int label_num = Integer.parseInt(sLabel.substring(1));
-                if (label_num > max_label_num) {
-                    max_label_num = label_num;
-                }
-            }
-        }
-        return max_label_num;
-    }
-
-    public int getMaxUsedZVariable(){
-        int max_z_var = 1;
-        for(int line = 1; line <= Size(); line++){
-            String sVariable = getInstruction(line).getSVariable();
-            if(sVariable.startsWith("z")) {
-                int var_num = Integer.parseInt(sVariable.substring(1));
-                if (var_num > max_z_var) {
-                    max_z_var = var_num;
-                }
-            }
-        }
-        return max_z_var;
-    }
-
-    public void addAll(List<SInstruction> instructions){
-         sInstructions.getSInstruction().addAll(instructions);
-    }
-
-    /**
-     * Gets the value of the sInstructions property.
-     *
-     * @return
-     *     possible object is
-     *     {@link SInstructions }
-     *
-     */
     public SInstructions getSInstructions() {
+        sInstructions.updateInstructionsLines();
         return sInstructions;
     }
 
-    /**
-     * Sets the value of the sInstructions property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link SInstructions }
-     *
-     */
     public void setSInstructions(SInstructions value) {
         this.sInstructions = value;
     }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
+
     public String getName() {
         return name;
     }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setName(String value) {
         this.name = value;
     }
 
-    public int getMaxDegree(){
-        int max_degree = 0;
-        for(int line = 1; line <= Size(); line++){
-            int currDegree = getInstruction(line).getDegree();
-            if(max_degree < currDegree){
-                max_degree = currDegree;
-            }
-        }
-        return max_degree;
+    public SFunctions getSFunctions() {
+        return sFunctions;
+    }
+
+    public void setSFunctions(SFunctions value) {
+        this.sFunctions = value;
     }
 
 }

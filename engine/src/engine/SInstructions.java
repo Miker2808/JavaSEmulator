@@ -7,6 +7,7 @@
 
 package engine;
 
+import engine.instruction.InvalidInstructionException;
 import engine.instruction.SInstruction;
 import engine.instruction.SInstructionAdapter;
 import jakarta.xml.bind.annotation.*;
@@ -14,6 +15,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -49,21 +51,132 @@ public class SInstructions implements Serializable {
 
     public SInstructions() {
         this.sInstruction = new ArrayList<>();
+        updateInstructionsLines();
     }
 
     public SInstructions(List<SInstruction> sInstruction) {
         this.sInstruction = sInstruction;
+        updateInstructionsLines();
     }
 
-    private void updateInstructionsLines(){
+    protected void updateInstructionsLines(){
         for(int i = 0; i < sInstruction.size(); i++){
             sInstruction.get(i).setLine(i+1);
         }
     }
 
-    public List<SInstruction> getSInstruction() {
-        updateInstructionsLines();
-        return this.sInstruction;
+    public SInstruction getInstruction(int line_num) {
+        return sInstruction.get(line_num - 1);
     }
+
+    public void append(SInstruction instruction){
+        instruction.setLine(sInstruction.size()+1);
+        sInstruction.add(instruction);
+
+    }
+
+    // Returns list of input variables used in program in order
+    public List<String> getInputVariablesUsed(){
+        List<String> vars = new ArrayList<>();
+
+        for (int line = 1; line <= size(); line++){
+            SInstruction instr = getInstruction(line);
+
+            String variable = instr.getSVariable();
+
+            // check that the variable itself is input variable, append if yes
+            if(variable.matches("^(x[1-9][0-9]*)$") && !vars.contains(variable))
+                vars.add(variable);
+
+            String argVariable = instr.getArgumentVariable();
+
+            if(argVariable.matches("^(x[1-9][0-9]*)$") && !vars.contains(argVariable)){
+                vars.add(argVariable);
+            }
+
+            // the idea why to check both is because sometimes it might be x1 <- x2,
+            // and then you will want to add x1 and x2 to the input variables list
+            // (even though x1 is redundant logically)
+        }
+
+        vars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
+
+        return vars;
+    }
+
+    public int getMaxDegree(){
+        int max_degree = 0;
+        for(int line = 1; line <= size(); line++){
+            int currDegree = getInstruction(line).getDegree();
+            if(max_degree < currDegree){
+                max_degree = currDegree;
+            }
+        }
+        return max_degree;
+    }
+
+    // validates that all used labels jump to a line
+    public void validateLabelsUsed() throws InvalidInstructionException {
+
+        for(int line = 1; line <= size(); line++){
+            String argLabel = this.getInstruction(line).getArgumentLabel();
+            if(!argLabel.isEmpty() && !argLabel.equals("EXIT")){
+                boolean found = false;
+                for(int line2 = 1; line2 <= size(); line2++){
+                    String sLabel = this.getInstruction(line2).getSLabel();
+                    if(sLabel.equals(argLabel)){
+                        found = true;
+                    }
+                }
+                if(!found){
+                    throw new InvalidInstructionException(String.format("Instruction #%d, label %s does not jump anywhere",
+                            line, argLabel));
+                }
+            }
+        }
+
+    }
+
+    public int getMaxUsedLabel(){
+        int max_label_num = 1;
+        for(int line = 1; line <= size(); line++){
+            String sLabel = getInstruction(line).getSLabel();
+            if(sLabel.startsWith("L")) {
+                int label_num = Integer.parseInt(sLabel.substring(1));
+                if (label_num > max_label_num) {
+                    max_label_num = label_num;
+                }
+            }
+        }
+        return max_label_num;
+    }
+
+    public int getMaxUsedZVariable(){
+        int max_z_var = 1;
+        for(int line = 1; line <= size(); line++){
+            String sVariable = getInstruction(line).getSVariable();
+            if(sVariable.startsWith("z")) {
+                int var_num = Integer.parseInt(sVariable.substring(1));
+                if (var_num > max_z_var) {
+                    max_z_var = var_num;
+                }
+            }
+        }
+        return max_z_var;
+    }
+
+    public void addAll(List<SInstruction> instructions){
+        sInstruction.addAll(instructions);
+    }
+
+    public void appendInstruction(SInstruction instr){
+        sInstruction.add(instr);
+    }
+
+    public int size(){
+        return sInstruction.size();
+    }
+
+
 
 }

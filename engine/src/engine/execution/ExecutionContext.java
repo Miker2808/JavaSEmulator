@@ -1,5 +1,6 @@
 package engine.execution;
 
+import engine.SInstructions;
 import engine.SProgram;
 import engine.instruction.SInstruction;
 
@@ -14,9 +15,9 @@ public class ExecutionContext {
     private int cycles;
     private boolean exit;
 
-    public ExecutionContext(SProgram program, HashMap<String, Integer> InputVariables){
+    public ExecutionContext(SInstructions sInstructions, HashMap<String, Integer> InputVariables){
         variables.putAll(InputVariables);
-        labelMap = mapLabels(program);
+        labelMap = mapLabels(sInstructions);
         exit = false;
         pc = 1;
         cycles = 0;
@@ -24,11 +25,11 @@ public class ExecutionContext {
 
     // maps labels to line number
     // simply assigns label to map on first encounter each line
-    private HashMap<String, Integer> mapLabels(SProgram program){
+    private HashMap<String, Integer> mapLabels(SInstructions sInstructions){
         HashMap<String, Integer> map = new HashMap<>();
-        int size = program.Size();
+        int size = sInstructions.size();
         for (int line=1; line <= size; line++){
-            SInstruction instr = program.getInstruction(line);
+            SInstruction instr = sInstructions.getInstruction(line);
             String label = instr.getSLabel();
             if(label != null){
                 if(!map.containsKey(label)){
