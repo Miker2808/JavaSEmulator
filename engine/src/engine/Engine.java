@@ -3,15 +3,13 @@ package engine;
 
 import engine.execution.ExecutionResult;
 import engine.expander.SProgramExpander;
+import engine.interpreter.SInterpreter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 
 public class Engine implements Serializable{
@@ -145,6 +143,14 @@ public class Engine implements Serializable{
         return file;
     }
 
+    public void startNewInterpreter(SInstructions instructions, HashMap<String, Integer> input){
+        this.interpreter = new SInterpreter(instructions, input);
+
+    }
+
+    public SInterpreter getInterpreter(){
+        return interpreter;
+    }
 
 
 

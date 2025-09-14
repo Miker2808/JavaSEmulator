@@ -1,12 +1,11 @@
-package engine;
+package engine.interpreter;
 
+import engine.SInstructions;
 import engine.execution.ExecutionContext;
 import engine.execution.ExecutionResult;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SInterpreter
 {
