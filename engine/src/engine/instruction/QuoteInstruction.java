@@ -13,4 +13,9 @@ public class QuoteInstruction extends SInstruction {
         validator.validate(this);
     }
 
+    @Override
+    public QuoteInstruction copy() {
+        return new QuoteInstruction(this);
+    }
+
 }

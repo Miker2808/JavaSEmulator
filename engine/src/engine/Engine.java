@@ -51,6 +51,7 @@ public class Engine implements Serializable{
         return loadedProgram;
     }
 
+
     public boolean isProgramLoaded(){
         return loadedProgram != null;
     }
@@ -141,6 +142,13 @@ public class Engine implements Serializable{
             throw new IOException("File cannot be read: " + file.getAbsolutePath());
         }
         return file;
+    }
+
+
+    public void startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
+        // TODO: give different SInstructions depending on name, for now default on main program
+
+        //this.interpreter = new SInterpreter()
     }
 
     public void startNewInterpreter(SInstructions instructions, HashMap<String, Integer> input){

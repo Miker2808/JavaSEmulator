@@ -30,6 +30,19 @@ public class AssignmentInstruction extends SInstruction {
         this.setDegree(2);
     }
 
+    public AssignmentInstruction(AssignmentInstruction other) {
+        super(other);
+        this.setArgumentVariable(other.getArgumentVariable());
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+    }
+
+    @Override
+    public AssignmentInstruction copy() {
+        return new AssignmentInstruction(this);
+    }
+
     public void setArgumentVariable(String variable) {
         this.assignedVariable = variable.trim().toLowerCase();
     }

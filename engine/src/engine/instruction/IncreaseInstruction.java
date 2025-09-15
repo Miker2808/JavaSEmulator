@@ -20,6 +20,18 @@ public class IncreaseInstruction extends SInstruction {
         this.setType("basic");
     }
 
+    public IncreaseInstruction(IncreaseInstruction other){
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+    }
+
+    @Override
+    public IncreaseInstruction copy() {
+        return new IncreaseInstruction(this);
+    }
+
     @Override
     public String getInstructionString() {
         return String.format("%s <- %s + 1", getSVariable(), getSVariable());

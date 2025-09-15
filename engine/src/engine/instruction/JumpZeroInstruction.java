@@ -19,6 +19,19 @@ public class JumpZeroInstruction extends SInstruction {
         this.setDegree(2);
     }
 
+    public JumpZeroInstruction(JumpZeroInstruction other) {
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+        this.setArgumentLabel(other.getArgumentLabel());
+    }
+
+    @Override
+    public JumpZeroInstruction copy() {
+        return new JumpZeroInstruction(this);
+    }
+
     public JumpZeroInstruction(String variable, String label, String JZLabel) {
         super();
         this.setInstructionName(InstructionName.JUMP_ZERO);

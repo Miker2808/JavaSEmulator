@@ -18,6 +18,18 @@ public class NeutralInstruction extends SInstruction {
         this.setType("basic");
     }
 
+    public NeutralInstruction(NeutralInstruction other) {
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+    }
+
+    @Override
+    public NeutralInstruction copy() {
+        return new NeutralInstruction(this);
+    }
+
     @Override
     public String getInstructionString() {
         return String.format("%s <- %s", getSVariable(), getSVariable());

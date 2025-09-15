@@ -27,6 +27,18 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setDegree(1);
     }
 
+    public ZeroVariableInstruction(ZeroVariableInstruction other){
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+    }
+
+    @Override
+    public ZeroVariableInstruction copy() {
+        return new ZeroVariableInstruction(this);
+    }
+
     @Override
     public String getInstructionString() {
         return String.format("%s <- 0", getSVariable());

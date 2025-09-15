@@ -33,6 +33,7 @@ public class MainController {
     // bunch of variables to make my lazy ass more comfortable
     private int expansion_selected = 0;
     private Boolean run_debug = false;
+    private Boolean new_run = true;
 
 
     @FXML
@@ -80,6 +81,8 @@ public class MainController {
 
     // Debugger / Execution Section
     // Buttons
+    @FXML
+    private Button newRunButton;
     @FXML
     private Label cyclesMeterLabel;
     @FXML
@@ -248,13 +251,51 @@ public class MainController {
         });
     }
 
+    void initializeInputTable(){
+        inputTable.setEditable(true);
+
+        inputTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+
+        inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
+                new IntegerStringConverter()) {
+            @Override
+            public void startEdit() {
+                VariableRow row = getTableRow().getItem();
+                if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
+                    super.startEdit(); // only editable if left column is not empty
+                }
+            }
+        });
+    }
+
+    void initializeProgramVariablesTable(){
+        programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+        programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+    }
+
     private void resetHighlightChoiceBox(){
-        List<String> used_variables = engine.getLoadedProgram().getVariablesUsed();
-        List<String> used_labels = engine.getLoadedProgram().getLabelsUsed();
+        List<String> used_variables = engine.getLoadedProgram().getSInstructions().getVariablesUsed();
+        List<String> used_labels = engine.getLoadedProgram().getSInstructions().getLabelsUsed();
         highlightChoiceBox.getItems().setAll(used_variables);
         highlightChoiceBox.getItems().addFirst("Highlight Selection");
         highlightChoiceBox.getItems().addAll(used_labels);
         highlightChoiceBox.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void onEditCommitInputColumn(TableColumn.CellEditEvent<VariableRow, Integer> event){
+        Integer newValue = event.getNewValue();
+
+        if (newValue == null) {
+            event.getRowValue().setValue(0);
+        } else if (newValue >= 0) {
+            event.getRowValue().setValue(newValue);
+        } else {
+            event.getTableView().refresh();
+            showInfoMessage("Invalid input variable value","Please enter a non-negative integer.");
+        }
+        event.getTableView().refresh();
     }
 
     @FXML
@@ -275,6 +316,7 @@ public class MainController {
                 expansion_selected = 0;
                 updateUIOnProgram(engine.getLoadedProgram());
                 resetInputTable();
+                updateExecutionButtons();
             }
             catch(Exception e){
                 // add alert window
@@ -323,61 +365,45 @@ public class MainController {
         );
     }
 
+    void updateExecutionButtons(){
+        boolean not_loaded = !engine.isProgramLoaded();
+        boolean debug = debugModeToggle.isSelected();
+        debugModeToggle.setDisable(not_loaded);
+        newRunButton.setDisable(!new_run && not_loaded);
+        runButton.setDisable(debug || not_loaded);
+        stopButton.setDisable(new_run || not_loaded);
+        stepOverButton.setDisable(!debug || not_loaded);
+        resumeButton.setDisable(!debug || new_run);
+        stopButton.setDisable( new_run);
+    }
+
     @FXML
     void onNewRunClicked(MouseEvent event) {
         resetInputTable();
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
-    }
-
-    void initializeInputTable(){
-        inputTable.setEditable(true);
-
-        inputTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
-
-        inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-        inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
-                new IntegerStringConverter()) {
-            @Override
-            public void startEdit() {
-                VariableRow row = getTableRow().getItem();
-                if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
-                    super.startEdit(); // only editable if left column is not empty
-                }
-            }
-        });
-    }
-
-    void initializeProgramVariablesTable(){
-        programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
-        programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        new_run = true;
     }
 
     @FXML
     void onDebugModeClicked(MouseEvent event) {
-        stepOverButton.setDisable(!debugModeToggle.isSelected());
-        runButton.setDisable(debugModeToggle.isSelected());
+        updateExecutionButtons();
         String on_off = debugModeToggle.isSelected() ? "ON" : "OFF";
         debugModeToggle.setText("Debug Mode: " + on_off);
     }
 
     @FXML
-    private void onEditCommitInputColumn(TableColumn.CellEditEvent<VariableRow, Integer> event){
-        Integer newValue = event.getNewValue();
+    void onResumeClicked(MouseEvent event) {
 
-        if (newValue == null) {
-            event.getRowValue().setValue(0);
-        } else if (newValue >= 0) {
-            event.getRowValue().setValue(newValue);
-        } else {
-            event.getTableView().refresh();
-            showInfoMessage("Invalid input variable value","Please enter a non-negative integer.");
-        }
-        event.getTableView().refresh();
     }
 
     @FXML
-    void onResumeClicked(MouseEvent event) {
+    void onStepOverClicked(MouseEvent event) {
+
+    }
+
+    @FXML
+    void onStopClicked(MouseEvent event) {
 
     }
 
@@ -406,14 +432,6 @@ public class MainController {
 
     }
 
-    @FXML
-    void onStepOverClicked(MouseEvent event) {
 
-    }
-
-    @FXML
-    void onStopClicked(MouseEvent event) {
-
-    }
 
 }

@@ -20,6 +20,18 @@ public class DecreaseInstruction extends SInstruction {
 
     }
 
+    public DecreaseInstruction(DecreaseInstruction other){
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+    }
+
+    @Override
+    public DecreaseInstruction copy() {
+        return new DecreaseInstruction(this);
+    }
+
     @Override
     public String getInstructionString() {
         return String.format("%s <- %s - 1", getSVariable(), getSVariable());

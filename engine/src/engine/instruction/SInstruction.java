@@ -109,6 +109,11 @@ public class SInstruction implements Serializable {
         this.parent_line = other.getParentLine();
     }
 
+    public SInstruction copy(){
+        return new SInstruction(this);
+
+    }
+
     public int getCycles(){
         return this.cycles;
     }

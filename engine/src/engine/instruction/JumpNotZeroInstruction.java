@@ -24,6 +24,18 @@ public class JumpNotZeroInstruction extends SInstruction{
         this.setType("basic");
     }
 
+    public JumpNotZeroInstruction(JumpNotZeroInstruction other){
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setArgumentLabel(other.getArgumentLabel());
+        this.setType(other.getType());
+    }
+
+    @Override
+    public JumpNotZeroInstruction copy() {
+        return new JumpNotZeroInstruction(this);
+    }
+
     public void setArgumentLabel(String label){
         this.JNZLabel = label.trim().toUpperCase();
     }

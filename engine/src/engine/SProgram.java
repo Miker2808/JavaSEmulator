@@ -55,61 +55,13 @@ public class SProgram implements Serializable {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    public List<String> getVariablesUsed(){
-        List<String> vars = new ArrayList<>();
 
-        for (int line = 1; line <= Size(); line++){
-            SInstruction instr = this.getInstruction(line);
-
-            String variable = instr.getSVariable();
-
-            // check that the variable itself is input variable, append if yes
-            if(variable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(variable))
-                vars.add(variable);
-
-            String argVariable = instr.getArgumentVariable();
-
-            if(argVariable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(argVariable)){
-                vars.add(argVariable);
-            }
-
-        }
-
-        vars.sort(Comparator
-                .comparingInt((String v) -> v.equals("y") ? 0 : 1) // y first
-                .thenComparing(v -> v.charAt(0)) // x before z
-                .thenComparingInt(v -> v.equals("y") ? 0 : Integer.parseInt(v.substring(1))) // numeric
-        );
-        return vars;
-    }
 
     public SInstruction getInstruction(int line_num){
         return sInstructions.getInstruction(line_num);
     }
 
-    // returns list of labels used in order
-    public List<String> getLabelsUsed(){
-        List<String> labels = new ArrayList<>();
-        boolean isExitAvailable = false;
 
-        for (int line = 1; line <= Size(); line++){
-            String label = getInstruction(line).getSLabel();
-            if(!label.equals("EXIT") && !label.isEmpty() && !labels.contains(label)) {
-                labels.add(label);
-            }
-            else{
-                isExitAvailable = true;
-            }
-        }
-
-        labels.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
-
-        if(isExitAvailable){
-            labels.add("EXIT\n");
-        }
-
-        return labels;
-    }
 
 
     public int Size(){

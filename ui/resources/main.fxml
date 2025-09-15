@@ -133,12 +133,12 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Button fx:id="newRunButton" alignment="CENTER" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNewRunClicked" prefWidth="120.0" text="New run" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                              <Button fx:id="newRunButton" alignment="CENTER" disable="true" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNewRunClicked" prefWidth="120.0" text="New run" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <ToggleButton fx:id="debugModeToggle" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugModeClicked" prefWidth="120.0" text="Debug Mode: OFF" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                              <ToggleButton fx:id="debugModeToggle" disable="true" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugModeClicked" prefWidth="120.0" text="Debug Mode: OFF" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -148,17 +148,17 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stopButton" alignment="CENTER" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="runButton" alignment="CENTER" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onRunClicked" prefWidth="120.0" text="Run" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                              <Button fx:id="runButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onRunClicked" prefWidth="120.0" text="Run" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="resumeButton" alignment="CENTER" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                              <Button fx:id="resumeButton" alignment="CENTER" disable="true" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>

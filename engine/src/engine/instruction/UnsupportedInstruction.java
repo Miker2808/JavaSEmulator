@@ -11,4 +11,9 @@ public class UnsupportedInstruction extends SInstruction {
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
     }
+
+    @Override
+    public UnsupportedInstruction copy() {
+        return new UnsupportedInstruction(this);
+    }
 }

@@ -31,6 +31,19 @@ public class GotoLabelInstruction extends SInstruction {
         this.setDegree(1);
     }
 
+    public GotoLabelInstruction(GotoLabelInstruction other){
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+        this.setArgumentLabel(other.getArgumentLabel());
+    }
+
+    @Override
+    public GotoLabelInstruction copy() {
+        return new GotoLabelInstruction(this);
+    }
+
     @Override
     public String getInstructionString() {
         return String.format("GOTO %s", getArgumentLabel());

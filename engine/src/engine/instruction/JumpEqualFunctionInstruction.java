@@ -12,4 +12,9 @@ public class JumpEqualFunctionInstruction extends SInstruction {
     public void validate(InstructionValidator validator) throws InvalidInstructionException {
         validator.validate(this);
     }
+
+    @Override
+    public JumpEqualFunctionInstruction copy() {
+        return new JumpEqualFunctionInstruction(this);
+    }
 }

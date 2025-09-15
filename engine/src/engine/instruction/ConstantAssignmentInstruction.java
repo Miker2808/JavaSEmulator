@@ -30,6 +30,19 @@ public class ConstantAssignmentInstruction extends SInstruction {
         setArgumentConst(String.format("%d",constantValue));
     }
 
+    public ConstantAssignmentInstruction(ConstantAssignmentInstruction other) {
+        super(other);
+        this.setCycles(other.getCycles());
+        this.setType(other.getType());
+        this.setDegree(other.getDegree());
+        this.setArgumentConst(other.getArgumentConst());
+    }
+
+    @Override
+    public ConstantAssignmentInstruction copy() {
+        return new ConstantAssignmentInstruction(this);
+    }
+
     public void setArgumentConst(String value) {
         this.constantValue = value.trim();
     }
