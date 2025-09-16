@@ -2,7 +2,6 @@
 package engine;
 
 import engine.execution.ExecutionContext;
-import engine.execution.ExecutionResult;
 import engine.expander.SProgramExpander;
 import engine.interpreter.SInterpreter;
 import jakarta.xml.bind.JAXBContext;
@@ -78,7 +77,7 @@ public class Engine implements Serializable{
 
 
     // TODO: Make work both for Function and SProgram
-    public ExecutionResult runProgram(String program_name, HashMap<String, Integer> input, int degree){
+    public ExecutionContext runProgram(String program_name, HashMap<String, Integer> input, int degree){
         // TODO: loop Functions
 
         // default main program

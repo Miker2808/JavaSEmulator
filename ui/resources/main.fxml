@@ -191,7 +191,7 @@
                                  <children>
                                     <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
                                       <columns>
-                                        <TableColumn fx:id="programVariablesTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" resizable="false" text="Variable" />
+                                        <TableColumn fx:id="programVariablesTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" text="Variable" />
                                         <TableColumn fx:id="programVariablesTableValueColumn" editable="false" minWidth="40.0" prefWidth="75.0" text="Value" />
                                       </columns>
                                     </TableView>

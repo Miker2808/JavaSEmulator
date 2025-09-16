@@ -4,8 +4,7 @@ import engine.SInstructions;
 import engine.SProgram;
 import engine.instruction.SInstruction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class ExecutionContext {
 
@@ -17,6 +16,10 @@ public class ExecutionContext {
 
     public ExecutionContext(SInstructions sInstructions, HashMap<String, Integer> InputVariables){
         variables.putAll(InputVariables);
+        List<String> used_variables = sInstructions.getVariablesUsed();
+        for(String variable : used_variables){
+            variables.putIfAbsent(variable, 0);
+        }
         labelMap = mapLabels(sInstructions);
         exit = false;
         pc = 1;
@@ -38,6 +41,30 @@ public class ExecutionContext {
             }
         }
         return map;
+    }
+
+    // converts hashmap of variables into ordered hash map in order of exercise requirements
+    private static LinkedHashMap<String, Integer> buildOrderedMap(Map<String, Integer> source) {
+        LinkedHashMap<String, Integer> result = new LinkedHashMap<>();
+
+        // Always put "y" (default to 0 if missing)
+        result.putIfAbsent("y", source.getOrDefault("y", 0));
+
+        // Add x1, x2, x3... in numeric order if present
+        int xIndex = 1;
+        while (source.containsKey("x" + xIndex)) {
+            result.putIfAbsent("x" + xIndex, source.get("x" + xIndex));
+            xIndex++;
+        }
+
+        // Add z1, z2, z3... in numeric order if present
+        int zIndex = 1;
+        while (source.containsKey("z" + zIndex)) {
+            result.putIfAbsent("z" + zIndex, source.get("z" + zIndex));
+            zIndex++;
+        }
+
+        return result;
     }
 
     public boolean getExit(){
@@ -65,6 +92,10 @@ public class ExecutionContext {
 
     public HashMap<String, Integer> getVariables(){
         return variables;
+    }
+
+    public LinkedHashMap<String, Integer> getOrderedVariables(){
+        return buildOrderedMap(variables);
     }
 
     public void increaseCycles(int cycles){

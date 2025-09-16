@@ -2,7 +2,6 @@ package engine.interpreter;
 
 import engine.SInstructions;
 import engine.execution.ExecutionContext;
-import engine.execution.ExecutionResult;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,13 +17,13 @@ public class SInterpreter
     }
 
     // emulates a run on a clean environment
-    public ExecutionResult run(){
+    public ExecutionContext run(){
 
         int num_lines = sInstructions.size();
         while(!context.getExit() && context.getPC() <= num_lines){
             step();
         }
-        return new ExecutionResult(context);
+        return context;
     }
 
     // Runs a single step in execution

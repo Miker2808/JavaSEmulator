@@ -1,7 +1,7 @@
 
 
 import engine.*;
-import engine.execution.ExecutionResult;
+import engine.execution.ExecutionContext;
 import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -416,6 +416,7 @@ public class MainController {
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
         new_run = true;
+        updateExecutionButtons();
     }
 
     @FXML
@@ -453,16 +454,17 @@ public class MainController {
         }
 
         // run full program
-        ExecutionResult result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
+        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
         // populate table with result variables (later it'll be the same with execution context
         programVariablesTable.getItems().setAll(
-            result.getVariables().entrySet().stream()
+            result.getOrderedVariables().entrySet().stream()
                     .map(e -> new VariableRow(e.getKey(), e.getValue()))
                     .toList()
         );
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-
+        runButton.setDisable(true);
+        new_run = false;
     }
 
 
