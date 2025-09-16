@@ -3,6 +3,7 @@ package engine.expander;
 
 import engine.SInstructions;
 import engine.SProgram;
+import engine.functions.SFunction;
 import engine.instruction.SInstruction;
 
 import java.util.List;
@@ -54,6 +55,17 @@ public class SProgramExpander {
         expandedProgram.setSInstructions(expanded_instructions);
 
         return expandedProgram;
+    }
+
+    static public SFunction expand(SFunction program, int level){
+        SFunction expandedFunction = new SFunction();
+        expandedFunction.setName(program.getName());
+
+        SInstructions expanded_instructions = expand(program.getSInstructions(), level);
+
+        expandedFunction.setSInstructions(expanded_instructions);
+
+        return expandedFunction;
     }
 
 }

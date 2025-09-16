@@ -43,7 +43,7 @@ import java.util.List;
     "sInstruction"
 })
 @XmlRootElement(name = "S-Instructions")
-public class SInstructions implements Serializable {
+public class SInstructions implements Serializable, SInstructionsView {
 
     @XmlElement(name = "S-Instruction", required = true)
     @XmlJavaTypeAdapter(SInstructionAdapter.class)
@@ -65,6 +65,7 @@ public class SInstructions implements Serializable {
         }
     }
 
+    @Override
     public SInstruction getInstruction(int line_num) {
         return sInstruction.get(line_num - 1);
     }
@@ -76,6 +77,7 @@ public class SInstructions implements Serializable {
     }
 
     // Returns list of input variables used in program in order
+    @Override
     public List<String> getInputVariablesUsed(){
         List<String> vars = new ArrayList<>();
 
@@ -104,6 +106,7 @@ public class SInstructions implements Serializable {
         return vars;
     }
 
+    @Override
     public int getMaxDegree(){
         int max_degree = 0;
         for(int line = 1; line <= size(); line++){
@@ -116,6 +119,7 @@ public class SInstructions implements Serializable {
     }
 
     // validates that all used labels jump to a line
+    @Override
     public void validateLabelsUsed() throws InvalidInstructionException {
 
         for(int line = 1; line <= size(); line++){
@@ -137,6 +141,7 @@ public class SInstructions implements Serializable {
 
     }
 
+    @Override
     public int getMaxUsedLabel(){
         int max_label_num = 1;
         for(int line = 1; line <= size(); line++){
@@ -151,6 +156,7 @@ public class SInstructions implements Serializable {
         return max_label_num;
     }
 
+    @Override
     public int getMaxUsedZVariable(){
         int max_z_var = 1;
         for(int line = 1; line <= size(); line++){
@@ -166,6 +172,7 @@ public class SInstructions implements Serializable {
     }
 
     // returns list of labels used in order
+    @Override
     public List<String> getLabelsUsed(){
         List<String> labels = new ArrayList<>();
         boolean isExitAvailable = false;
@@ -189,6 +196,7 @@ public class SInstructions implements Serializable {
         return labels;
     }
 
+    @Override
     public List<String> getVariablesUsed(){
         List<String> vars = new ArrayList<>();
 
@@ -224,10 +232,10 @@ public class SInstructions implements Serializable {
         sInstruction.add(instr);
     }
 
+    @Override
     public int size(){
         return sInstruction.size();
     }
-
 
 
 }

@@ -1,7 +1,6 @@
 
 
-import engine.SInstructions;
-import engine.SProgram;
+import engine.*;
 import engine.execution.ExecutionResult;
 import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -12,15 +11,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import engine.Engine;
 import javafx.stage.FileChooser;
 import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
@@ -31,9 +27,11 @@ public class MainController {
 
     private final Engine engine = new Engine();
     // bunch of variables to make my lazy ass more comfortable
-    private int expansion_selected = 0;
+    private int degree_selected = 0;
     private Boolean run_debug = false;
     private Boolean new_run = true;
+
+    SProgramView selectedProgramView = null;
 
 
     @FXML
@@ -43,13 +41,15 @@ public class MainController {
     @FXML
     private Button expandButton;
     @FXML
-    private Label degreeLabel;
+    private Label maxDegreeLabel;
     @FXML
     private ChoiceBox<String> highlightChoiceBox;
     @FXML
     private Button loadProgramButton;
     @FXML
     private TextField loadedFilePathTextField;
+    @FXML
+    private TextField chooseDegreeTextField;
 
 // instructions table
     @FXML
@@ -138,6 +138,41 @@ public class MainController {
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
+
+        initializeChooseDegreeTextField();
+    }
+
+    @FXML
+    void onClickedLoadProgramButton(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
+
+        if (selectedFile != null) {
+
+            String path = selectedFile.getAbsolutePath();
+            if(path.endsWith(".xml")) {
+                new ProgressBarDialog(1.0f).start();
+            }
+            try {
+                engine.loadFromXML(path);
+                initOnLoad(path);
+            }
+            catch(Exception e){
+                // add alert window
+                showInfoMessage("Failed to load XML file", e.getMessage());
+            }
+        }
+    }
+
+    private void initOnLoad(String path){
+        loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
+        loadedFilePathTextField.setText(path);
+        degree_selected = 0;
+        selectedProgramView = engine.getSelectedProgram("");
+        updateInstructionsUI(selectedProgramView);
+        updateUIOnExpansion();
+        resetInputTable();
+        updateExecutionButtons();
     }
 
     private void initializeInstructionTable(){
@@ -176,7 +211,7 @@ public class MainController {
         );
         // typeColumn — string from getType()
         historyChainType.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getType())
+                new SimpleStringProperty(cell.getValue().getTypeShort())
         );
         // cyclesColumn — integer from getCycles()
         historyChainCycles.setCellValueFactory(cell ->
@@ -274,9 +309,18 @@ public class MainController {
         programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
     }
 
-    private void resetHighlightChoiceBox(){
-        List<String> used_variables = engine.getLoadedProgram().getSInstructions().getVariablesUsed();
-        List<String> used_labels = engine.getLoadedProgram().getSInstructions().getLabelsUsed();
+    void initializeChooseDegreeTextField(){
+        chooseDegreeTextField.setTextFormatter(new TextFormatter<Integer>(c -> {
+            if (c.getControlNewText().matches("\\d*")) {
+                return c; // allow digits only
+            }
+            return null; // block everything else
+        }));
+    }
+
+    private void resetHighlightChoiceBox(SProgramView programView){
+        List<String> used_variables = programView.getInstructionsView().getVariablesUsed();
+        List<String> used_labels = programView.getInstructionsView().getLabelsUsed();
         highlightChoiceBox.getItems().setAll(used_variables);
         highlightChoiceBox.getItems().addFirst("Highlight Selection");
         highlightChoiceBox.getItems().addAll(used_labels);
@@ -298,68 +342,56 @@ public class MainController {
         event.getTableView().refresh();
     }
 
-    @FXML
-    void onClickedLoadProgramButton(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
+    // updates instructions UI with highlight selection
+    void updateInstructionsUI(SProgramView programView){
 
-        if (selectedFile != null) {
-
-            String path = selectedFile.getAbsolutePath();
-            if(path.endsWith(".xml")) {
-                new ProgressBarDialog(1.0f).start();
-            }
-            try {
-                engine.loadFromXML(path);
-                loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
-                loadedFilePathTextField.setText(path);
-                expansion_selected = 0;
-                updateUIOnProgram(engine.getLoadedProgram());
-                resetInputTable();
-                updateExecutionButtons();
-            }
-            catch(Exception e){
-                // add alert window
-                showInfoMessage("Failed to load XML file", e.getMessage());
-            }
-        }
-    }
-
-    void updateUIOnProgram(SProgram program){
-        int max_degree = engine.getLoadedProgram().getSInstructions().getMaxDegree();
-        degreeLabel.setText(String.format("%d / %d Degree",expansion_selected, max_degree));
-        collapseButton.setDisable(expansion_selected == 0);
-        expandButton.setDisable(expansion_selected == max_degree);
         instructionsTable.getItems().clear();
-        for(int i=1; i <= program.Size(); i++){
-            SInstruction instr = program.getInstruction(i);
+        for(int i=1; i <= programView.getInstructionsView().size(); i++){
+            SInstruction instr = programView.getInstructionsView().getInstruction(i);
             instructionsTable.getItems().add(instr);
         }
 
         // for now, TODO: make it show all functions (The engine needs to supply names)
-        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgram().getName());
-        programSelectionChoiceBox.setValue(engine.getLoadedProgram().getName());
-
-        resetHighlightChoiceBox();
+        programSelectionChoiceBox.getItems().setAll(selectedProgramView.getName());
+        programSelectionChoiceBox.setValue(selectedProgramView.getName());
+        chooseDegreeTextField.setText("" + degree_selected);
+        resetHighlightChoiceBox(programView);
     }
 
     @FXML
     void onCollapseButtonClicked(MouseEvent event) {
-        expansion_selected = expansion_selected - 1;
-        SProgram expanded = engine.expandProgram(engine.getLoadedProgram(), expansion_selected);
-        updateUIOnProgram(expanded);
+        degree_selected = degree_selected - 1;
+        updateUIOnExpansion();
     }
 
     @FXML
     void onExpandButtonClicked(MouseEvent event) {
-        expansion_selected = expansion_selected + 1;
-        SProgram expanded = engine.expandProgram(engine.getLoadedProgram(), expansion_selected);
-        updateUIOnProgram(expanded);
+        degree_selected = degree_selected + 1;
+        updateUIOnExpansion();
+    }
+
+    @FXML
+    void onDegreeTextFieldAction() {
+        String text = chooseDegreeTextField.getText();
+        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();
+        int text_deg = Integer.parseInt(text.trim());
+        this.degree_selected = Math.min(text_deg, max_degree);
+
+        updateUIOnExpansion();
+
+    }
+
+    void updateUIOnExpansion(){
+        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
+        maxDegreeLabel.setText(String.format("%d", max_degree));
+        collapseButton.setDisable(degree_selected == 0);
+        expandButton.setDisable(degree_selected == max_degree);
+        updateInstructionsUI(engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected));
     }
 
 
     void resetInputTable(){
-        List<String> input_variables = engine.getLoadedProgram().getSInstructions().getInputVariablesUsed();
+        List<String> input_variables = selectedProgramView.getInstructionsView().getInputVariablesUsed();
         inputTable.getItems().setAll(
                 input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
         );
@@ -375,6 +407,7 @@ public class MainController {
         stepOverButton.setDisable(!debug || not_loaded);
         resumeButton.setDisable(!debug || new_run);
         stopButton.setDisable( new_run);
+        chooseDegreeTextField.setDisable(not_loaded);
     }
 
     @FXML
@@ -420,7 +453,7 @@ public class MainController {
         }
 
         // run full program
-        ExecutionResult result = engine.runProgram(engine.getLoadedProgram(), input_variables, expansion_selected);
+        ExecutionResult result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
         // populate table with result variables (later it'll be the same with execution context
         programVariablesTable.getItems().setAll(
             result.getVariables().entrySet().stream()

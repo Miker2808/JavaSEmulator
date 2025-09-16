@@ -28,8 +28,11 @@ public class SInterpreter
     }
 
     // Runs a single step in execution
-    public void step(){
-        sInstructions.getInstruction(context.getPC()).execute(context);
+    public ExecutionContext step(){
+        if(!context.getExit()) {
+            sInstructions.getInstruction(context.getPC()).execute(context);
+        }
+        return context;
     }
 
     public int getPC(){

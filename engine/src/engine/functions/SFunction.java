@@ -7,13 +7,19 @@
 
 package engine.functions;
 
+import engine.SInstructionsView;
+import engine.SProgramView;
 import engine.SInstructions;
+import engine.instruction.SInstruction;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+
+import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -42,7 +48,7 @@ import jakarta.xml.bind.annotation.XmlType;
     "sInstructions"
 })
 @XmlRootElement(name = "S-Function")
-public class SFunction {
+public class SFunction implements Serializable, SProgramView {
 
     @XmlElement(name = "S-Instructions", required = true)
     protected SInstructions sInstructions;
@@ -75,6 +81,8 @@ public class SFunction {
         this.sInstructions = value;
     }
 
+
+
     /**
      * Gets the value of the userString property.
      * 
@@ -83,6 +91,7 @@ public class SFunction {
      *     {@link String }
      *     
      */
+    @Override
     public String getUserString() {
         return userString;
     }
@@ -111,6 +120,11 @@ public class SFunction {
         return name;
     }
 
+    @Override
+    public SInstructionsView getInstructionsView() {
+        return sInstructions;
+    }
+
     /**
      * Sets the value of the name property.
      * 
@@ -123,4 +137,8 @@ public class SFunction {
         this.name = value;
     }
 
+    @Override
+    public ProgramType getBlockType() {
+        return ProgramType.FUNCTION;
+    }
 }

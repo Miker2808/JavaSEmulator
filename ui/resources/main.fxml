@@ -54,10 +54,10 @@
                   <TableView fx:id="historyChainTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
                     <columns>
                       <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="30.0" text="#" />
-                        <TableColumn fx:id="historyChainType" minWidth="55.0" prefWidth="55.0" text="Type" />
-                        <TableColumn fx:id="historyChainCycles" minWidth="45.0" prefWidth="45.0" text="Cycles" />
+                        <TableColumn fx:id="historyChainType" minWidth="35.0" prefWidth="35.0" text="Type" />
                         <TableColumn fx:id="historyChainLabel" minWidth="40.0" prefWidth="40.0" text="Label" />
                         <TableColumn fx:id="historyChainInstruction" minWidth="100.0" prefWidth="325.0" text="Instruction" />
+                        <TableColumn fx:id="historyChainCycles" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                     </columns>
                   </TableView>
                   <GridPane GridPane.rowIndex="1">
@@ -73,9 +73,9 @@
                           <columns>
                             <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="30.0" text="#" />
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="35.0" text="Type" />
-                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                               <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Label" />
                               <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="325.0" text="Instruction" />
+                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                           </columns>
                         </TableView>
                         <GridPane GridPane.rowIndex="1">
@@ -213,7 +213,9 @@
                     <columnConstraints>
                       <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                       <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
-                        <ColumnConstraints hgrow="NEVER" maxWidth="70.0" minWidth="70.0" />
+                        <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
+                        <ColumnConstraints hgrow="NEVER" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
+                        <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
                         <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                     </columnConstraints>
@@ -223,9 +225,15 @@
                      <children>
                         <ChoiceBox fx:id="programSelectionChoiceBox" maxWidth="1.7976931348623157E308" minWidth="50.0" GridPane.hgrow="ALWAYS" />
                         <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                        <Label fx:id="degreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0 / 0 Degree" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
-                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="3" GridPane.hgrow="NEVER" />
-                        <ChoiceBox fx:id="highlightChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="4" GridPane.hgrow="ALWAYS" />
+                        <Label fx:id="maxDegreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
+                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="5" GridPane.hgrow="NEVER" />
+                        <ChoiceBox fx:id="highlightChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.hgrow="ALWAYS" />
+                        <Label fx:id="degreeLabel1" alignment="CENTER" contentDisplay="CENTER" layoutX="327.0" layoutY="15.0" text="/" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="2" />
                      </children>
                   </GridPane>
                </children>
