@@ -13,9 +13,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import javafx.stage.FileChooser;
 import javafx.util.converter.IntegerStringConverter;
@@ -28,11 +26,12 @@ public class MainController {
     private final Engine engine = new Engine();
     // bunch of variables to make my lazy ass more comfortable
     private int degree_selected = 0;
-    private Boolean run_debug = false;
-    private Boolean new_run = true;
+    private Boolean debug_run = false;
+    private final Set<Integer> searchHighlightedLines = new HashSet<>();
+    private Integer lineHighlighted = null; // only one line at a time
+
 
     SProgramView selectedProgramView = null;
-
 
     @FXML
     private ChoiceBox<String> programSelectionChoiceBox;
@@ -86,7 +85,7 @@ public class MainController {
     @FXML
     private Label cyclesMeterLabel;
     @FXML
-    private ToggleButton debugModeToggle;
+    private Button debugButton;
     @FXML
     private Button resumeButton;
     @FXML
@@ -399,15 +398,16 @@ public class MainController {
 
     void updateExecutionButtons(){
         boolean not_loaded = !engine.isProgramLoaded();
-        boolean debug = debugModeToggle.isSelected();
-        debugModeToggle.setDisable(not_loaded);
-        newRunButton.setDisable(!new_run && not_loaded);
-        runButton.setDisable(debug || not_loaded);
-        stopButton.setDisable(new_run || not_loaded);
-        stepOverButton.setDisable(!debug || not_loaded);
-        resumeButton.setDisable(!debug || new_run);
-        stopButton.setDisable( new_run);
+        debugButton.setDisable(debug_run);
+        newRunButton.setDisable(not_loaded);
+        runButton.setDisable(debug_run || not_loaded);
+        stopButton.setDisable(debug_run || not_loaded);
+        stepOverButton.setDisable(!debug_run || not_loaded);
+        resumeButton.setDisable(!debug_run || not_loaded);
         chooseDegreeTextField.setDisable(not_loaded);
+        expandButton.setDisable(not_loaded || debug_run);
+        collapseButton.setDisable(not_loaded || debug_run);
+        chooseDegreeTextField.setDisable(not_loaded || debug_run);
     }
 
     @FXML
@@ -415,15 +415,16 @@ public class MainController {
         resetInputTable();
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
-        new_run = true;
+        debug_run = false;
         updateExecutionButtons();
     }
 
     @FXML
-    void onDebugModeClicked(MouseEvent event) {
+    void onDebugButtonClicked(MouseEvent event) {
         updateExecutionButtons();
-        String on_off = debugModeToggle.isSelected() ? "ON" : "OFF";
-        debugModeToggle.setText("Debug Mode: " + on_off);
+        engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
+        debug_run = true;
+
     }
 
     @FXML
@@ -438,11 +439,11 @@ public class MainController {
 
     @FXML
     void onStopClicked(MouseEvent event) {
-
+        debug_run = false;
+        updateExecutionButtons();
     }
 
-    @FXML
-    void onRunClicked(MouseEvent event) {
+    HashMap<String, Integer> getInputVariablesFromUI(){
         HashMap<String, Integer> input_variables = new HashMap<>();
 
         for (VariableRow row : inputTable.getItems()) {
@@ -452,6 +453,12 @@ public class MainController {
                 input_variables.put(key, value);
             }
         }
+        return input_variables;
+    }
+
+    @FXML
+    void onRunClicked(MouseEvent event) {
+        HashMap<String, Integer> input_variables = getInputVariablesFromUI();
 
         // run full program
         ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
@@ -464,7 +471,6 @@ public class MainController {
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
         runButton.setDisable(true);
-        new_run = false;
     }
 
 

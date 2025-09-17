@@ -3,55 +3,32 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefViewportHeight="600.0" prefViewportWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefViewportHeight="800.0" prefViewportWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="MainController">
    <content>
       <BorderPane>
-         <top>
-            <HBox alignment="CENTER_LEFT" nodeOrientation="LEFT_TO_RIGHT" spacing="10.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Button fx:id="loadProgramButton" accessibleHelp="Load S-Emulator program file (.xml)" mnemonicParsing="false" onMouseClicked="#onClickedLoadProgramButton" prefHeight="25.0" prefWidth="120.0" text="Load Program File">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </Button>
-                  <TextField fx:id="loadedFilePathTextField" editable="false" text="No file loaded" HBox.hgrow="ALWAYS">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </TextField>
-               </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets bottom="10.0" />
-               </padding>
-            </HBox>
-         </top>
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
          <padding>
-            <Insets bottom="10.0" left="15.0" right="15.0" top="15.0" />
+            <Insets bottom="10.0" left="10.0" right="10.0" />
          </padding>
          <center>
-            <GridPane hgap="10.0" minHeight="400.0" minWidth="500.0" vgap="10.0" BorderPane.alignment="TOP_LEFT">
+            <GridPane hgap="5.0" minHeight="400.0" minWidth="500.0" vgap="5.0" BorderPane.alignment="TOP_LEFT">
               <columnConstraints>
                 <ColumnConstraints hgrow="ALWAYS" percentWidth="65.0" />
                   <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints percentHeight="5.0" vgrow="NEVER" />
-                <RowConstraints percentHeight="63.33" vgrow="ALWAYS" />
-                <RowConstraints percentHeight="31.66" vgrow="ALWAYS" />
+                  <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                <RowConstraints vgrow="ALWAYS" />
+                <RowConstraints percentHeight="30.0" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <TableView fx:id="historyChainTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+                  <TableView fx:id="historyChainTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                     <columns>
                       <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="30.0" text="#" />
                         <TableColumn fx:id="historyChainType" minWidth="35.0" prefWidth="35.0" text="Type" />
@@ -60,7 +37,7 @@
                         <TableColumn fx:id="historyChainCycles" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                     </columns>
                   </TableView>
-                  <GridPane GridPane.rowIndex="1">
+                  <GridPane GridPane.rowIndex="2">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
@@ -95,7 +72,7 @@
                         </GridPane>
                      </children>
                   </GridPane>
-                  <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
@@ -107,13 +84,13 @@
                         <TableView fx:id="historyTable" prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </GridPane>
-                  <GridPane hgap="3.0" vgap="3.0" GridPane.columnIndex="1" GridPane.rowSpan="2">
+                  <GridPane hgap="3.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="100.0" prefHeight="100.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="100.0" />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                     </rowConstraints>
                      <children>
@@ -122,43 +99,46 @@
                               <Font name="System Bold" size="14.0" />
                            </font>
                         </Label>
-                        <GridPane GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                        <GridPane hgap="5.0" vgap="3.0" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
                           <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
+                            <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.33" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="3.0" minHeight="3.0" prefHeight="3.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <Button fx:id="newRunButton" alignment="CENTER" disable="true" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNewRunClicked" prefWidth="120.0" text="New run" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+                              <Button fx:id="newRunButton" alignment="CENTER" disable="true" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNewRunClicked" text="New run" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.vgrow="NEVER">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <ToggleButton fx:id="debugModeToggle" disable="true" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugModeClicked" prefWidth="120.0" text="Debug Mode: OFF" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </ToggleButton>
-                              <Button fx:id="stepOverButton" alignment="CENTER" disable="true" layoutX="46.0" layoutY="25.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStepOverClicked" prefWidth="120.0" text="Step over" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                              <Button fx:id="stepOverButton" alignment="CENTER" disable="true" layoutX="46.0" layoutY="25.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStepOverClicked" prefWidth="120.0" text="Step over" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="runButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onRunClicked" prefWidth="120.0" text="Run" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                              <Button fx:id="runButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onRunClicked" text="Normal Run" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="resumeButton" alignment="CENTER" disable="true" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                              <Button fx:id="resumeButton" alignment="CENTER" disable="true" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="debugButton" alignment="CENTER" disable="true" layoutX="10.0" layoutY="46.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugButtonClicked" text="Debug Run" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -209,7 +189,7 @@
                         </GridPane>
                      </children>
                   </GridPane>
-                  <GridPane alignment="CENTER" hgap="3.0">
+                  <GridPane alignment="CENTER" hgap="3.0" GridPane.rowIndex="1">
                     <columnConstraints>
                       <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                       <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
@@ -236,9 +216,52 @@
                         <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="2" />
                      </children>
                   </GridPane>
+                  <HBox alignment="CENTER_LEFT" nodeOrientation="LEFT_TO_RIGHT" spacing="10.0" GridPane.columnSpan="2147483647">
+                     <children>
+                        <Button fx:id="loadProgramButton" accessibleHelp="Load S-Emulator program file (.xml)" mnemonicParsing="false" onMouseClicked="#onClickedLoadProgramButton" prefHeight="25.0" prefWidth="120.0" text="Load Program File">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Button>
+                        <TextField fx:id="loadedFilePathTextField" editable="false" text="No file loaded" HBox.hgrow="ALWAYS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </HBox>
                </children>
             </GridPane>
          </center>
+         <top>
+            <Label text="S-Emulator" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="0.35545023696682465">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="1.0" green="0.4100719392299652" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color red="1.0" green="1.0" blue="1.0" />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+            </Label>
+         </top>
       </BorderPane>
    </content>
 </ScrollPane>
