@@ -98,6 +98,7 @@ public class ExecutionContext {
         return buildOrderedMap(variables);
     }
 
+
     public void increaseCycles(int cycles){
         this.cycles += cycles;
     }

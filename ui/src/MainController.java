@@ -27,7 +27,7 @@ public class MainController {
     // bunch of variables to make my lazy ass more comfortable
     private int degree_selected = 0;
     private Boolean debug_run = false;
-    private Boolean normal_run = false;
+    private Boolean run_ended = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     private String highlightedVariable = null;
@@ -203,6 +203,32 @@ public class MainController {
         // prepare table list
         instructionsTable.setItems(FXCollections.observableArrayList());
 
+        instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
+            @Override
+            protected void updateItem(SInstruction item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setStyle("");
+                    return;
+                }
+
+                List<String> styles = new ArrayList<>();
+
+                // Search highlight
+                if (searchHighlightedLines.contains(item.getLine())) {
+                    styles.add("-fx-background-color: yellow;");
+                }
+
+                // Line highlight
+                if (lineHighlighted != null && item.getLine() == lineHighlighted) {
+                    styles.add("-fx-background-color: lightgreen;"); // stronger color
+                }
+
+                setStyle(String.join("", styles));
+            }
+        });
+
     }
 
     private void initializedExpansionsTable(){
@@ -256,32 +282,6 @@ public class MainController {
             updateSearchHighlights(newV);
             instructionsTable.refresh();
         });
-
-        instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
-            @Override
-            protected void updateItem(SInstruction item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setStyle("");
-                    return;
-                }
-
-                List<String> styles = new ArrayList<>();
-
-                // Search highlight
-                if (searchHighlightedLines.contains(item.getLine())) {
-                    styles.add("-fx-background-color: yellow;");
-                }
-
-                // Line highlight
-                if (lineHighlighted != null && item.getLine() == lineHighlighted) {
-                    styles.add("-fx-background-color: lightgreen;"); // stronger color
-                }
-
-                setStyle(String.join("", styles));
-            }
-        });
     }
 
     // Called when search filter changes
@@ -300,13 +300,13 @@ public class MainController {
         }
     }
 
-    // Your method to highlight a specific line by its "lineColumn" value
+    // highlight a specific line by its "lineColumn" value
     public void highLightInstructionTableLine(int lineNumber) {
         lineHighlighted = lineNumber;
         instructionsTable.refresh();
     }
 
-    // Your method to clear the line highlight (restores search highlights)
+    // clear the line highlight (restores search highlights)
     public void clearInstructionTableHighlight() {
         lineHighlighted = null;
         instructionsTable.refresh();
@@ -328,6 +328,12 @@ public class MainController {
                 }
             }
         });
+    }
+
+    // clear highliight
+    public void clearVariableHighlight() {
+        highlightedVariable = null;
+        inputTable.refresh();
     }
 
     void initializeProgramVariablesTable(){
@@ -427,13 +433,13 @@ public class MainController {
         boolean not_loaded = !engine.isProgramLoaded();
         newRunButton.setDisable(not_loaded);
         runButton.setDisable(debug_run || not_loaded);
-        stopButton.setDisable(debug_run || not_loaded || normal_run);
-        stepOverButton.setDisable(!debug_run || not_loaded || normal_run);
-        resumeButton.setDisable(!debug_run || not_loaded || normal_run);
+        stopButton.setDisable(debug_run || not_loaded || run_ended);
+        stepOverButton.setDisable(!debug_run || not_loaded || run_ended);
+        resumeButton.setDisable(!debug_run || not_loaded || run_ended);
         expandButton.setDisable(not_loaded || debug_run);
         collapseButton.setDisable(not_loaded || debug_run);
         chooseDegreeTextField.setDisable(not_loaded || debug_run);
-        debugButton.setDisable(not_loaded || debug_run || normal_run);
+        debugButton.setDisable(not_loaded || debug_run || run_ended);
         inputTable.setDisable(debug_run);
     }
 
@@ -443,7 +449,7 @@ public class MainController {
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
         debug_run = false;
-        normal_run = false;
+        run_ended = false;
         updateInputControllers();
         clearInstructionTableHighlight();
     }
@@ -475,6 +481,7 @@ public class MainController {
         highLightInstructionTableLine(result.getPC());
 
         debug_run = false;
+        run_ended = true;
         updateInputControllers();
 
     }
@@ -495,6 +502,7 @@ public class MainController {
         highLightInstructionTableLine(result.getPC());
         if(result.getExit()){
             debug_run = false;
+            run_ended = true;
             updateInputControllers();
         }
 
@@ -503,6 +511,7 @@ public class MainController {
     @FXML
     void onStopClicked(MouseEvent event) {
         debug_run = false;
+        run_ended = true;
         updateInputControllers();
         clearInstructionTableHighlight();
 
@@ -535,8 +544,10 @@ public class MainController {
         );
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        normal_run = true;
+        run_ended = true;
     }
+
+
 
 
 
