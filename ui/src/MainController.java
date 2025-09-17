@@ -14,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 import javafx.util.converter.IntegerStringConverter;
@@ -152,7 +153,7 @@ public class MainController {
 
             String path = selectedFile.getAbsolutePath();
             if(path.endsWith(".xml")) {
-                new ProgressBarDialog(1.0f).start();
+                new ProgressBarDialog(.3f).start();
             }
             try {
                 engine.loadFromXML(path);
@@ -330,7 +331,7 @@ public class MainController {
         });
     }
 
-    // clear highliight
+    // clear highli
     public void clearVariableHighlight() {
         highlightedVariable = null;
         inputTable.refresh();
@@ -432,8 +433,8 @@ public class MainController {
     void updateInputControllers(){
         boolean not_loaded = !engine.isProgramLoaded();
         newRunButton.setDisable(not_loaded);
-        runButton.setDisable(debug_run || not_loaded);
-        stopButton.setDisable(debug_run || not_loaded || run_ended);
+        runButton.setDisable(debug_run || not_loaded || run_ended);
+        stopButton.setDisable(!debug_run || not_loaded || run_ended);
         stepOverButton.setDisable(!debug_run || not_loaded || run_ended);
         resumeButton.setDisable(!debug_run || not_loaded || run_ended);
         expandButton.setDisable(not_loaded || debug_run);
@@ -450,8 +451,23 @@ public class MainController {
         programVariablesTable.getItems().clear();
         debug_run = false;
         run_ended = false;
-        updateInputControllers();
         clearInstructionTableHighlight();
+        updateInputControllers();
+    }
+
+    @FXML
+    void onNormalRunClicked(MouseEvent event) {
+        HashMap<String, Integer> input_variables = getInputVariablesFromUI();
+
+        // run full program
+        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
+        // populate table with result variables (later it'll be the same with execution context
+
+        updateProgramVariablesTable(result.getOrderedVariables(), false);
+
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+        run_ended = true;
+        updateInputControllers();
     }
 
     @FXML
@@ -471,11 +487,7 @@ public class MainController {
         // execute single step
         ExecutionContext result = engine.resumeLoadedRun();
         // populate table with result variables (later it'll be the same with execution context
-        programVariablesTable.getItems().setAll(
-                result.getOrderedVariables().entrySet().stream()
-                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
-                        .toList()
-        );
+        updateProgramVariablesTable(result.getOrderedVariables(), true);
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
         highLightInstructionTableLine(result.getPC());
@@ -483,7 +495,6 @@ public class MainController {
         debug_run = false;
         run_ended = true;
         updateInputControllers();
-
     }
 
     @FXML
@@ -492,11 +503,8 @@ public class MainController {
         // execute single step
         ExecutionContext result = engine.stepLoadedRun();
         // populate table with result variables (later it'll be the same with execution context
-        programVariablesTable.getItems().setAll(
-                result.getOrderedVariables().entrySet().stream()
-                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
-                        .toList()
-        );
+
+        updateProgramVariablesTable(result.getOrderedVariables(), true);
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
         highLightInstructionTableLine(result.getPC());
@@ -512,8 +520,8 @@ public class MainController {
     void onStopClicked(MouseEvent event) {
         debug_run = false;
         run_ended = true;
-        updateInputControllers();
         clearInstructionTableHighlight();
+        updateInputControllers();
 
     }
 
@@ -530,21 +538,35 @@ public class MainController {
         return input_variables;
     }
 
-    @FXML
-    void onNormalRunClicked(MouseEvent event) {
-        HashMap<String, Integer> input_variables = getInputVariablesFromUI();
 
-        // run full program
-        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
-        // populate table with result variables (later it'll be the same with execution context
+
+    public void updateProgramVariablesTable(LinkedHashMap<String, Integer> result, boolean highlight) {
+        Map<String, Integer> oldValues = programVariablesTable.getItems().stream()
+                .collect(Collectors.toMap(VariableRow::getVariable, VariableRow::getValue));
+
         programVariablesTable.getItems().setAll(
-            result.getOrderedVariables().entrySet().stream()
-                    .map(e -> new VariableRow(e.getKey(), e.getValue()))
-                    .toList()
+                result.entrySet().stream()
+                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
+                        .toList()
         );
 
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        run_ended = true;
+        programVariablesTable.refresh();
+
+        programVariablesTable.setRowFactory(tv -> {
+            TableRow<VariableRow> row = new TableRow<>();
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                row.setStyle("");
+                if(highlight) {
+                    if (newItem != null && newItem.getVariable() != null &&
+                            !Objects.equals(oldValues.get(newItem.getVariable()), newItem.getValue())) {
+                        row.setStyle("-fx-background-color: orange;");
+                    }
+                }
+            });
+            return row;
+        });
+
+
     }
 
 

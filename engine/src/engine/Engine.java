@@ -107,7 +107,7 @@ public class Engine implements Serializable{
     }
 
     public void startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
-        this.interpreter = new SInterpreter(loadedProgram.sInstructions, input);
+        this.interpreter = new SInterpreter(SProgramExpander.expand(loadedProgram.sInstructions,degree), input);
         running = true;
     }
 
