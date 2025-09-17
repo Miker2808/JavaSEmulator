@@ -27,8 +27,10 @@ public class MainController {
     // bunch of variables to make my lazy ass more comfortable
     private int degree_selected = 0;
     private Boolean debug_run = false;
+    private Boolean normal_run = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
+    private String highlightedVariable = null;
 
 
     SProgramView selectedProgramView = null;
@@ -171,7 +173,7 @@ public class MainController {
         updateInstructionsUI(selectedProgramView);
         updateUIOnExpansion();
         resetInputTable();
-        updateExecutionButtons();
+        updateInputControllers();
     }
 
     private void initializeInstructionTable(){
@@ -249,12 +251,12 @@ public class MainController {
         });
     }
 
-
-    private void initializeHighlightChoiceBox(){
+    private void initializeHighlightChoiceBox() {
         highlightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            updateSearchHighlights(newV);
             instructionsTable.refresh();
         });
-        // Highlight rows based on search
+
         instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
             @Override
             protected void updateItem(SInstruction item, boolean empty) {
@@ -262,27 +264,52 @@ public class MainController {
 
                 if (empty || item == null) {
                     setStyle("");
-                } else {
-                    String choice = highlightChoiceBox.getValue();
-                    if (choice != null && !choice.isEmpty()) {
-                        choice = choice.toUpperCase().trim();
-
-                        // if instead of InstructionString I use only variables,
-                        // search can be more strict
-                        boolean match =
-                                item.getSLabel().toUpperCase().contains(choice) ||
-                                        item.getInstructionString().toUpperCase().contains(choice);
-                        if (match) {
-                            setStyle("-fx-background-color: yellow;");
-                        } else {
-                            setStyle("");
-                        }
-                    } else {
-                        setStyle("");
-                    }
+                    return;
                 }
+
+                List<String> styles = new ArrayList<>();
+
+                // Search highlight
+                if (searchHighlightedLines.contains(item.getLine())) {
+                    styles.add("-fx-background-color: yellow;");
+                }
+
+                // Line highlight
+                if (lineHighlighted != null && item.getLine() == lineHighlighted) {
+                    styles.add("-fx-background-color: lightgreen;"); // stronger color
+                }
+
+                setStyle(String.join("", styles));
             }
         });
+    }
+
+    // Called when search filter changes
+    private void updateSearchHighlights(String choice) {
+        searchHighlightedLines.clear();
+        if (choice != null && !choice.trim().isEmpty()) {
+            String query = choice.toUpperCase().trim();
+            for (SInstruction instr : instructionsTable.getItems()) {
+                boolean match =
+                        instr.getSLabel().toUpperCase().contains(query) ||
+                                instr.getInstructionString().toUpperCase().contains(query);
+                if (match) {
+                    searchHighlightedLines.add(instr.getLine());
+                }
+            }
+        }
+    }
+
+    // Your method to highlight a specific line by its "lineColumn" value
+    public void highLightInstructionTableLine(int lineNumber) {
+        lineHighlighted = lineNumber;
+        instructionsTable.refresh();
+    }
+
+    // Your method to clear the line highlight (restores search highlights)
+    public void clearInstructionTableHighlight() {
+        lineHighlighted = null;
+        instructionsTable.refresh();
     }
 
     void initializeInputTable(){
@@ -396,18 +423,18 @@ public class MainController {
         );
     }
 
-    void updateExecutionButtons(){
+    void updateInputControllers(){
         boolean not_loaded = !engine.isProgramLoaded();
-        debugButton.setDisable(debug_run);
         newRunButton.setDisable(not_loaded);
         runButton.setDisable(debug_run || not_loaded);
-        stopButton.setDisable(debug_run || not_loaded);
-        stepOverButton.setDisable(!debug_run || not_loaded);
-        resumeButton.setDisable(!debug_run || not_loaded);
-        chooseDegreeTextField.setDisable(not_loaded);
+        stopButton.setDisable(debug_run || not_loaded || normal_run);
+        stepOverButton.setDisable(!debug_run || not_loaded || normal_run);
+        resumeButton.setDisable(!debug_run || not_loaded || normal_run);
         expandButton.setDisable(not_loaded || debug_run);
         collapseButton.setDisable(not_loaded || debug_run);
         chooseDegreeTextField.setDisable(not_loaded || debug_run);
+        debugButton.setDisable(not_loaded || debug_run || normal_run);
+        inputTable.setDisable(debug_run);
     }
 
     @FXML
@@ -416,31 +443,69 @@ public class MainController {
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
         debug_run = false;
-        updateExecutionButtons();
+        normal_run = false;
+        updateInputControllers();
+        clearInstructionTableHighlight();
     }
 
     @FXML
     void onDebugButtonClicked(MouseEvent event) {
-        updateExecutionButtons();
+
         engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
         debug_run = true;
+
+        highLightInstructionTableLine(1);
+        updateInputControllers();
 
     }
 
     @FXML
     void onResumeClicked(MouseEvent event) {
 
+        // execute single step
+        ExecutionContext result = engine.resumeLoadedRun();
+        // populate table with result variables (later it'll be the same with execution context
+        programVariablesTable.getItems().setAll(
+                result.getOrderedVariables().entrySet().stream()
+                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
+                        .toList()
+        );
+
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+        highLightInstructionTableLine(result.getPC());
+
+        debug_run = false;
+        updateInputControllers();
+
     }
 
     @FXML
     void onStepOverClicked(MouseEvent event) {
+
+        // execute single step
+        ExecutionContext result = engine.stepLoadedRun();
+        // populate table with result variables (later it'll be the same with execution context
+        programVariablesTable.getItems().setAll(
+                result.getOrderedVariables().entrySet().stream()
+                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
+                        .toList()
+        );
+
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+        highLightInstructionTableLine(result.getPC());
+        if(result.getExit()){
+            debug_run = false;
+            updateInputControllers();
+        }
 
     }
 
     @FXML
     void onStopClicked(MouseEvent event) {
         debug_run = false;
-        updateExecutionButtons();
+        updateInputControllers();
+        clearInstructionTableHighlight();
+
     }
 
     HashMap<String, Integer> getInputVariablesFromUI(){
@@ -457,7 +522,7 @@ public class MainController {
     }
 
     @FXML
-    void onRunClicked(MouseEvent event) {
+    void onNormalRunClicked(MouseEvent event) {
         HashMap<String, Integer> input_variables = getInputVariablesFromUI();
 
         // run full program
@@ -470,7 +535,7 @@ public class MainController {
         );
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        runButton.setDisable(true);
+        normal_run = true;
     }
 
 

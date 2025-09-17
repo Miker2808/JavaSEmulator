@@ -112,11 +112,21 @@ public class Engine implements Serializable{
     }
 
     public ExecutionContext stepLoadedRun(){
-        if(!running){
-            return null;
+        ExecutionContext context = this.interpreter.step();
+        if(context.getExit()){
+            running = false;
         }
+        return context;
+    }
 
-        return this.interpreter.step();
+    public ExecutionContext resumeLoadedRun(){
+
+        ExecutionContext context = this.interpreter.step();
+        while(!context.getExit()){
+            context = this.interpreter.step();
+        }
+        running = false;
+        return context;
     }
 
 
