@@ -35,7 +35,7 @@ public class JumpEqualConstantInstruction extends SInstruction {
 
     }
 
-    public JumpEqualConstantInstruction(JumpEqualVariableInstruction other) {
+    public JumpEqualConstantInstruction(JumpEqualConstantInstruction other) {
         super(other);
         this.setCycles(other.getCycles());
         this.setType(other.getType());

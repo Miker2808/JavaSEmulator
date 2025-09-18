@@ -7,6 +7,7 @@
 
 package engine.instruction;
 
+import engine.SProgramView;
 import engine.arguments.SInstructionArgument;
 import engine.arguments.SInstructionArguments;
 import engine.execution.ExecutionContext;
@@ -72,6 +73,8 @@ import java.util.Objects;
 @XmlRootElement(name = "S-Instruction")
 public class SInstruction implements Serializable {
 
+    protected static ArrayList<SProgramView> programViews;
+
     private String sVariable;
     private SInstructionArguments sInstructionArguments;
     private String sLabel;
@@ -84,6 +87,10 @@ public class SInstruction implements Serializable {
     // parent stuff
     private int parent_line; // line of instruction in a program
     private SInstruction parent;
+
+    public static void setProgramViews(ArrayList<SProgramView> programViews) {
+        SInstruction.programViews = programViews;
+    }
 
     public SInstruction() {
         sVariable = "";

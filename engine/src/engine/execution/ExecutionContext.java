@@ -7,14 +7,14 @@ import engine.instruction.SInstruction;
 import java.util.*;
 
 public class ExecutionContext {
-
+    private final SProgram mainProgram;
     private final HashMap<String, Integer> variables = new HashMap<>();
     private final HashMap<String, Integer> labelMap;
     private int pc;
     private int cycles;
     private boolean exit;
 
-    public ExecutionContext(SInstructions sInstructions, HashMap<String, Integer> InputVariables){
+    public ExecutionContext(SInstructions sInstructions, HashMap<String, Integer> InputVariables, SProgram mainProgram){
         variables.putAll(InputVariables);
         List<String> used_variables = sInstructions.getVariablesUsed();
         for(String variable : used_variables){
@@ -24,6 +24,7 @@ public class ExecutionContext {
         exit = false;
         pc = 1;
         cycles = 0;
+        this.mainProgram = mainProgram;
     }
 
     // maps labels to line number

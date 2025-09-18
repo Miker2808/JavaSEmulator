@@ -3,6 +3,9 @@ package engine;
 
 import engine.execution.ExecutionContext;
 import engine.expander.SProgramExpander;
+import engine.functions.SFunction;
+import engine.functions.SFunctions;
+import engine.instruction.SInstruction;
 import engine.interpreter.SInterpreter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -21,7 +24,7 @@ public class Engine implements Serializable{
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
     public void loadFromXML(String path) throws Exception {
-        SProgram loadedProgramtemp;
+        SProgram loadedProgramTemp;
 
         // verify path to a file
         XMLValidator.validateXMLFile(path);
@@ -33,23 +36,25 @@ public class Engine implements Serializable{
             File xmlFile = new File(path);
 
             // This will throw JAXBException if XML is invalid or doesn't match class
-            loadedProgramtemp = (SProgram) unmarshaller.unmarshal(xmlFile);
+            loadedProgramTemp = (SProgram) unmarshaller.unmarshal(xmlFile);
 
         } catch (JAXBException e) {
             throw new Exception("Failed to load XML: XML file may be invalid schema-wise");
         }
 
-        loadedProgramtemp.validateProgram();
-
+        loadedProgramTemp.validateProgram();
+        updateProgramViews(loadedProgramTemp);
         // happens only if validateProgram was successful (did not raise an exception)
-        loadedProgram = loadedProgramtemp;
+        loadedProgram = loadedProgramTemp;
         executionHistory.clear();
     }
 
-    // returns loaded program,
-    // if no program is loaded returns null
-    protected SProgram getLoadedProgram(){
-        return loadedProgram;
+    // populates Quote instruction with references to functions and main program
+    private void updateProgramViews(SProgram program) {
+        ArrayList<SProgramView> programViews = new ArrayList<>();
+        programViews.add(program);
+        programViews.addAll(program.getSFunctions().getSFunction());
+        SInstruction.setProgramViews(programViews);
     }
 
     public boolean isProgramLoaded(){
@@ -64,50 +69,61 @@ public class Engine implements Serializable{
      **/
     public SProgramView getExpandedProgram(String program_name, int degree){
         // TODO: Loop functions
+        SFunctions functions = loadedProgram.getSFunctions();
+        for( SFunction func : functions.getSFunction()){
+            if(func.getName().equals(program_name)){
+                return SProgramExpander.expand(func, degree);
+            }
+        }
 
         // Default to main program
         return SProgramExpander.expand(loadedProgram, degree);
     }
 
-    // get in 0 degree same shit as above
+    // get in 0 degree same shit as above, default loadedProgram
     public SProgramView getSelectedProgram(String program_name){
+        // TODO: Loop functions
+
+        SFunctions functions = loadedProgram.getSFunctions();
+        for( SFunction func : functions.getSFunction()){
+            if(func.getName().equals(program_name)){
+                return func;
+            }
+        }
 
         return loadedProgram;
     }
 
+    // get names of possible programs
+    public ArrayList<String> getProgramNames(){
+        ArrayList<String> programNames = new ArrayList<>();
+        programNames.add(loadedProgram.getName());
+        SFunctions functions = loadedProgram.getSFunctions();
+        for(SFunction func : functions.getSFunction()){
+            programNames.add(func.getName());
+        }
+        return programNames;
+    }
 
     // TODO: Make work both for Function and SProgram
     public ExecutionContext runProgram(String program_name, HashMap<String, Integer> input, int degree){
         // TODO: loop Functions
+        // TODO: add history
 
         // default main program
-        return new SInterpreter(SProgramExpander.expand(loadedProgram, degree).getSInstructions(), input).run();
+        return new SInterpreter(SProgramExpander.expand(loadedProgram, degree).getSInstructions(), input, loadedProgram).run();
     }
 
     public List<ExecutionHistory> getExecutionHistory(){
         return Collections.unmodifiableList(executionHistory);
     }
 
-    private static File getFile(String path) throws IOException {
-        File file = new File(path);
-
-        if (!file.isAbsolute()) {
-            throw new IllegalArgumentException("Path must be an absolute (global) path: " + path);
-        }
-        if (!file.exists()) {
-            throw new FileNotFoundException("File does not exist: " + file.getAbsolutePath());
-        }
-        if (!file.isFile()) {
-            throw new IOException("Path is not a file: " + file.getAbsolutePath());
-        }
-        if (!file.canRead()) {
-            throw new IOException("File cannot be read: " + file.getAbsolutePath());
-        }
-        return file;
-    }
 
     public void startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
-        this.interpreter = new SInterpreter(SProgramExpander.expand(loadedProgram.sInstructions,degree), input);
+        // TODO: start based on program_name
+
+
+        this.interpreter = new SInterpreter(SProgramExpander.expand(loadedProgram.sInstructions,degree), input, loadedProgram);
         running = true;
     }
 
@@ -115,6 +131,7 @@ public class Engine implements Serializable{
         ExecutionContext context = this.interpreter.step();
         if(context.getExit()){
             running = false;
+            // TODO: add history
         }
         return context;
     }
@@ -126,6 +143,7 @@ public class Engine implements Serializable{
             context = this.interpreter.step();
         }
         running = false;
+        // TODO: add history
         return context;
     }
 

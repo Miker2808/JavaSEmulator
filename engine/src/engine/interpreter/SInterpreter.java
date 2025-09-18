@@ -1,6 +1,8 @@
 package engine.interpreter;
 
 import engine.SInstructions;
+import engine.SProgram;
+import engine.SProgramView;
 import engine.execution.ExecutionContext;
 
 import java.util.HashMap;
@@ -11,9 +13,9 @@ public class SInterpreter
     private SInstructions sInstructions;
     private ExecutionContext context;
 
-    public SInterpreter(SInstructions sInstructions, HashMap<String, Integer> inputVariables){
+    public SInterpreter(SInstructions sInstructions, HashMap<String, Integer> inputVariables, SProgram mainProgram){
         this.sInstructions = sInstructions;
-        this.context = new ExecutionContext(sInstructions, inputVariables);
+        this.context = new ExecutionContext(sInstructions, inputVariables, mainProgram);
     }
 
     // emulates a run on a clean environment
@@ -34,9 +36,6 @@ public class SInterpreter
         return context;
     }
 
-    public int getPC(){
-        return context.getPC();
-    }
 
     public boolean getExit(){
         return context.getExit();

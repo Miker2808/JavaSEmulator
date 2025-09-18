@@ -3,6 +3,7 @@ package engine.expander;
 
 import engine.SInstructions;
 import engine.SProgram;
+import engine.SProgramView;
 import engine.functions.SFunction;
 import engine.instruction.SInstruction;
 
