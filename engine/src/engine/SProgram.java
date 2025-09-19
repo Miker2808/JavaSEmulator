@@ -25,11 +25,6 @@ public class SProgram implements Serializable, SProgramView {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    public SInstruction getInstruction(int line_num){
-        return sInstructions.getInstruction(line_num);
-    }
-
-
     public int Size(){
         return sInstructions.size(); // number of instructions in the program
     }
@@ -43,7 +38,7 @@ public class SProgram implements Serializable, SProgramView {
         for(int line = 1; line <= Size(); line++){
             try {
                 // validator.validate(this.getInstruction(line)); // old
-                getInstruction(line).validate(validator); // new
+                getSInstructions().getInstruction(line).validate(validator); // new
 
             } catch (InvalidInstructionException e) {
                 throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
@@ -54,7 +49,6 @@ public class SProgram implements Serializable, SProgramView {
         sInstructions.validateLabelsUsed();
     }
 
-
     public SInstructions getSInstructions() {
         sInstructions.updateInstructionsLines();
         return sInstructions;
@@ -62,13 +56,13 @@ public class SProgram implements Serializable, SProgramView {
 
     @Override
     public SInstructionsView getInstructionsView(){
+        sInstructions.updateInstructionsLines();
         return sInstructions;
     }
 
     public void setSInstructions(SInstructions value) {
         this.sInstructions = value;
     }
-
 
     public String getName() {
         return name;
@@ -82,12 +76,8 @@ public class SProgram implements Serializable, SProgramView {
         return sFunctions;
     }
 
-    public void setSFunctions(SFunctions value) {
-        this.sFunctions = value;
-    }
-
     @Override
-    public ProgramType getBlockType() {
+    public ProgramType getProgramType() {
         return ProgramType.PROGRAM;
     }
 

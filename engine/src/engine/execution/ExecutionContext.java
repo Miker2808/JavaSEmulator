@@ -1,20 +1,20 @@
 package engine.execution;
 
 import engine.SInstructions;
+import engine.SInstructionsView;
 import engine.SProgram;
 import engine.instruction.SInstruction;
 
 import java.util.*;
 
 public class ExecutionContext {
-    private final SProgram mainProgram;
     private final HashMap<String, Integer> variables = new HashMap<>();
     private final HashMap<String, Integer> labelMap;
     private int pc;
     private int cycles;
     private boolean exit;
 
-    public ExecutionContext(SInstructions sInstructions, HashMap<String, Integer> InputVariables, SProgram mainProgram){
+    public ExecutionContext(SInstructionsView sInstructions, HashMap<String, Integer> InputVariables){
         variables.putAll(InputVariables);
         List<String> used_variables = sInstructions.getVariablesUsed();
         for(String variable : used_variables){
@@ -24,12 +24,11 @@ public class ExecutionContext {
         exit = false;
         pc = 1;
         cycles = 0;
-        this.mainProgram = mainProgram;
     }
 
     // maps labels to line number
     // simply assigns label to map on first encounter each line
-    private HashMap<String, Integer> mapLabels(SInstructions sInstructions){
+    private HashMap<String, Integer> mapLabels(SInstructionsView sInstructions){
         HashMap<String, Integer> map = new HashMap<>();
         int size = sInstructions.size();
         for (int line=1; line <= size; line++){

@@ -61,14 +61,13 @@ public class Engine implements Serializable{
         return loadedProgram != null;
     }
 
-
     /**
      Checks program_name and returns suitable function or main program if name fits
      Defaults to main program on no find
      Returns version expanded to degree
      **/
     public SProgramView getExpandedProgram(String program_name, int degree){
-        // TODO: Loop functions
+
         SFunctions functions = loadedProgram.getSFunctions();
         for( SFunction func : functions.getSFunction()){
             if(func.getName().equals(program_name)){
@@ -82,7 +81,6 @@ public class Engine implements Serializable{
 
     // get in 0 degree same shit as above, default loadedProgram
     public SProgramView getSelectedProgram(String program_name){
-        // TODO: Loop functions
 
         SFunctions functions = loadedProgram.getSFunctions();
         for( SFunction func : functions.getSFunction()){
@@ -105,13 +103,10 @@ public class Engine implements Serializable{
         return programNames;
     }
 
-    // TODO: Make work both for Function and SProgram
     public ExecutionContext runProgram(String program_name, HashMap<String, Integer> input, int degree){
-        // TODO: loop Functions
-        // TODO: add history
-
         // default main program
-        return new SInterpreter(SProgramExpander.expand(loadedProgram, degree).getSInstructions(), input, loadedProgram).run();
+        SProgramView expanded = getExpandedProgram(program_name, degree);
+        return SInterpreter.staticRun(expanded.getInstructionsView(), input);
     }
 
     public List<ExecutionHistory> getExecutionHistory(){
@@ -120,10 +115,8 @@ public class Engine implements Serializable{
 
 
     public void startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
-        // TODO: start based on program_name
-
-
-        this.interpreter = new SInterpreter(SProgramExpander.expand(loadedProgram.sInstructions,degree), input, loadedProgram);
+        SProgramView expanded = getExpandedProgram(program_name, degree);
+        this.interpreter = new SInterpreter(expanded.getInstructionsView(), input);
         running = true;
     }
 

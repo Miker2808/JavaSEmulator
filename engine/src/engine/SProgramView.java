@@ -1,10 +1,7 @@
 package engine;
 
-import engine.instruction.SInstruction;
-import java.util.List;
-
 public interface SProgramView {
-    ProgramType getBlockType();
+    ProgramType getProgramType();
 
     String getName();
     SInstructionsView getInstructionsView();

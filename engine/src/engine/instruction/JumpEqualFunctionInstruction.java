@@ -6,13 +6,9 @@ import engine.validator.InstructionValidator;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class JumpEqualFunctionInstruction extends SInstruction {
-    private final String argumentLabelName = "JEFunctionLabel";
-    private final String argFunctionName = "functionName";
-    private final String argFunctionArgumentsName = "functionArguments";
-    private String functionName;
-    private String functionArguments;
-    private String JEFunctionLabel;
+public class JumpEqualFunctionInstruction extends QuoteInstruction {
+    protected final String argumentLabelName = "JEFunctionLabel";
+    protected String JEFunctionLabel;
 
     public JumpEqualFunctionInstruction(SInstruction base) {
         super(base);
@@ -49,47 +45,7 @@ public class JumpEqualFunctionInstruction extends SInstruction {
 
     @Override
     public String getInstructionString() {
-        return String.format("IF %s = %S GOTO %s", getSVariable(), "PLACEHOLDER", getArgumentLabel());
-    }
-
-    private int calcDegree(){
-        int degree = 0;
-
-        // TODO: implement
-
-        return degree;
-    }
-
-    private int calcCycles(){
-        int cycles = 0;
-
-        // TODO: implement
-
-        return cycles + 5;
-    }
-
-    public String getFunctionName() {
-        return functionName;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName.trim();
-    }
-
-    public String getFunctionArguments(){
-        return functionArguments;
-    }
-
-    public void setFunctionArguments(String functionArguments) {
-        this.functionArguments = functionArguments.trim();
-    }
-
-    public ArrayList<String> getArgumentsList(){
-        ArrayList<String> arguments = new ArrayList<>();
-        if(!functionArguments.isBlank()){
-            arguments = new ArrayList<>(Arrays.asList(functionArguments.split(",")));
-        }
-        return arguments;
+        return String.format("IF %s = %s(%s) GOTO %s", getSVariable(), getFunctionName(), getFunctionArguments(), getArgumentLabel());
     }
 
     public void setArgumentLabel(String label) {

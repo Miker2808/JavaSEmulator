@@ -91,12 +91,12 @@ public class InstructionValidator {
 
     // TODO: ADD SUPPORT
     public void validate(QuoteInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+        //throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     // TODO: ADD SUPPORT
     public void validate(JumpEqualFunctionInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+        //throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     public void validate(UnsupportedInstruction instruction) throws InvalidInstructionException{

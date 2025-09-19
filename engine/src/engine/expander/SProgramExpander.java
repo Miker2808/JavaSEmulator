@@ -61,12 +61,22 @@ public class SProgramExpander {
     static public SFunction expand(SFunction program, int level){
         SFunction expandedFunction = new SFunction();
         expandedFunction.setName(program.getName());
+        expandedFunction.setUserString(program.getUserString());
 
         SInstructions expanded_instructions = expand(program.getSInstructions(), level);
 
         expandedFunction.setSInstructions(expanded_instructions);
 
         return expandedFunction;
+    }
+
+    static public SProgramView expand(SProgramView program, int level){
+        if(program.getProgramType().equals(SProgramView.ProgramType.PROGRAM)){
+            return expand((SProgram)program, level);
+        }
+        else{
+            return expand((SFunction)program, level);
+        }
     }
 
 }

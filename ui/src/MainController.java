@@ -31,9 +31,6 @@ public class MainController {
     private Boolean run_ended = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
-    private String highlightedVariable = null;
-
-
     SProgramView selectedProgramView = null;
 
     @FXML
@@ -130,13 +127,12 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        System.out.println("Initializing Main Controller");
-
         initializeInstructionTable();
         initializeHighlightChoiceBox();
         initializedExpansionsTable();
         initializeInputTable();
         initializeProgramVariablesTable();
+        initializeProgramSelectionChoiceBox();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -169,12 +165,23 @@ public class MainController {
     private void initOnLoad(String path){
         loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
         loadedFilePathTextField.setText(path);
+        programSelectionChoiceBox.getItems().setAll(engine.getProgramNames());
+        programSelectionChoiceBox.getSelectionModel().selectFirst();
+        reloadSelectedProgram();
+    }
+
+    private void reloadSelectedProgram(){
         degree_selected = 0;
-        selectedProgramView = engine.getSelectedProgram("");
+        run_ended = false;
+        debug_run = false;
+
+        String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
+        selectedProgramView = engine.getSelectedProgram(selected_program);
         updateInstructionsUI(selectedProgramView);
         updateUIOnExpansion();
         resetInputTable();
         updateInputControllers();
+        resetHighlightChoiceBox(selectedProgramView);
     }
 
     private void initializeInstructionTable(){
@@ -285,6 +292,16 @@ public class MainController {
         });
     }
 
+    private void initializeProgramSelectionChoiceBox(){
+        programSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            onProgramSelection();
+        });
+    }
+
+    private void onProgramSelection(){
+        reloadSelectedProgram();
+    }
+
     // Called when search filter changes
     private void updateSearchHighlights(String choice) {
         searchHighlightedLines.clear();
@@ -331,9 +348,8 @@ public class MainController {
         });
     }
 
-    // clear highli
+    // clear highlight
     public void clearVariableHighlight() {
-        highlightedVariable = null;
         inputTable.refresh();
     }
 
@@ -383,10 +399,6 @@ public class MainController {
             SInstruction instr = programView.getInstructionsView().getInstruction(i);
             instructionsTable.getItems().add(instr);
         }
-
-        // for now, TODO: make it show all functions (The engine needs to supply names)
-        programSelectionChoiceBox.getItems().setAll(selectedProgramView.getName());
-        programSelectionChoiceBox.setValue(selectedProgramView.getName());
         chooseDegreeTextField.setText("" + degree_selected);
         resetHighlightChoiceBox(programView);
     }
@@ -442,6 +454,7 @@ public class MainController {
         chooseDegreeTextField.setDisable(not_loaded || debug_run);
         debugButton.setDisable(not_loaded || debug_run || run_ended);
         inputTable.setDisable(debug_run);
+        programSelectionChoiceBox.setDisable(debug_run || not_loaded);
     }
 
     @FXML
@@ -538,8 +551,6 @@ public class MainController {
         return input_variables;
     }
 
-
-
     public void updateProgramVariablesTable(LinkedHashMap<String, Integer> result, boolean highlight) {
         Map<String, Integer> oldValues = programVariablesTable.getItems().stream()
                 .collect(Collectors.toMap(VariableRow::getVariable, VariableRow::getValue));
@@ -565,8 +576,6 @@ public class MainController {
             });
             return row;
         });
-
-
     }
 
 

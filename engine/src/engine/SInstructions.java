@@ -7,9 +7,7 @@
 
 package engine;
 
-import engine.instruction.InvalidInstructionException;
-import engine.instruction.SInstruction;
-import engine.instruction.SInstructionAdapter;
+import engine.instruction.*;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -19,25 +17,6 @@ import java.util.Comparator;
 import java.util.List;
 
 
-/**
- * <p>Java class for anonymous complex type</p>.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.</p>
- * 
- * <pre>{@code
- * <complexType>
- *   <complexContent>
- *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       <sequence>
- *         <element ref="{}S-Instruction" maxOccurs="unbounded"/>
- *       </sequence>
- *     </restriction>
- *   </complexContent>
- * </complexType>
- * }</pre>
- * 
- * 
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "sInstruction"
@@ -59,7 +38,7 @@ public class SInstructions implements Serializable, SInstructionsView {
         updateInstructionsLines();
     }
 
-    protected void updateInstructionsLines(){
+    public void updateInstructionsLines(){
         for(int i = 0; i < sInstruction.size(); i++){
             sInstruction.get(i).setLine(i+1);
         }
@@ -213,6 +192,11 @@ public class SInstructions implements Serializable, SInstructionsView {
 
             if(argVariable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(argVariable)){
                 vars.add(argVariable);
+            }
+
+            if(instr.getInstructionName() == InstructionName.QUOTE){
+                QuoteInstruction quote_instruction = (QuoteInstruction) instr;
+                vars.addAll(quote_instruction.getInputVariablesFromArguments());
             }
         }
 

@@ -22,27 +22,6 @@ import java.io.Serializable;
 import java.util.List;
 
 
-/**
- * <p>Java class for anonymous complex type</p>.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.</p>
- * 
- * <pre>{@code
- * <complexType>
- *   <complexContent>
- *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       <sequence>
- *         <element ref="{}S-Instructions"/>
- *       </sequence>
- *       <attribute name="user-string" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       <attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     </restriction>
- *   </complexContent>
- * </complexType>
- * }</pre>
- * 
- * 
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "sInstructions"
@@ -57,88 +36,41 @@ public class SFunction implements Serializable, SProgramView {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    /**
-     * Gets the value of the sInstructions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SInstructions }
-     *     
-     */
+
     public SInstructions getSInstructions() {
+        sInstructions.updateInstructionsLines();
         return sInstructions;
     }
 
-    /**
-     * Sets the value of the sInstructions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SInstructions }
-     *     
-     */
     public void setSInstructions(SInstructions value) {
         this.sInstructions = value;
     }
 
-
-
-    /**
-     * Gets the value of the userString property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     @Override
     public String getUserString() {
         return userString;
     }
 
-    /**
-     * Sets the value of the userString property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setUserString(String value) {
         this.userString = value;
     }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
     public String getName() {
         return name;
     }
 
     @Override
     public SInstructionsView getInstructionsView() {
+        sInstructions.updateInstructionsLines();
         return sInstructions;
     }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
     public void setName(String value) {
         this.name = value;
     }
 
     @Override
-    public ProgramType getBlockType() {
+    public ProgramType getProgramType() {
         return ProgramType.FUNCTION;
     }
 }
