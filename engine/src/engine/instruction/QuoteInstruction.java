@@ -6,12 +6,14 @@ import engine.SProgramView;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.interpreter.SInterpreter;
+import engine.validator.FunctionArgumentsValidator;
 import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 public class QuoteInstruction extends SInstruction {
 
@@ -59,12 +61,8 @@ public class QuoteInstruction extends SInstruction {
         this.functionArguments = functionArguments.trim();
     }
 
-    public ArrayList<String> getArgumentsList(){
-        ArrayList<String> arguments = new ArrayList<>();
-        if(!functionArguments.isBlank()){
-            arguments = new ArrayList<>(Arrays.asList(functionArguments.split(",")));
-        }
-        return arguments;
+    public List<String> getArgumentsList(){
+        return FunctionArgumentsValidator.splitTopLevel(getFunctionArguments());
     }
 
     @Override
@@ -121,7 +119,7 @@ public class QuoteInstruction extends SInstruction {
     protected int getFunctionMaxDegree(String functionName, String functionArguments){
         int maxDegree = 0;
 
-        ArrayList<String> arguments = getArgumentsList();
+        List<String> arguments = getArgumentsList();
         for(int i=0; i<arguments.size(); i++){
 
             if(isEnclosedInParenthesis(arguments.get(i))){
@@ -147,21 +145,21 @@ public class QuoteInstruction extends SInstruction {
     protected int getFunctionCycles(String functionName, String functionArguments){
         int cycles = 0;
 
-        /*
-        ArrayList<String> arguments = getArgumentsList();
-        for(int i=0; i<arguments.size(); i++){
-
-            if(isEnclosedInParenthesis(arguments.get(i))){
-                String inner = arguments.get(i).substring(1, arguments.get(i).length() - 1);
-                int firstComma = inner.indexOf(',');
-                String innerName = inner.substring(0, firstComma);
-                String innerArgs = inner.substring(firstComma + 1);
-
+        List<String> arguments = FunctionArgumentsValidator.splitTopLevel(functionArguments);
+        for (String arg : arguments) {
+            // if of type "(Func1)"
+            if (FunctionArgumentsValidator.functionNoArgs(arg)) {
                 // Get cycles of composition calls.
-                cycles += getFunctionCycles(innerName, innerArgs);
+                String func = arg.substring(1, arg.length()-1);
+                cycles += getFunctionCycles(func, "");
+            }
+            // if of type "(Func1,x1,x2)"
+            else if (FunctionArgumentsValidator.enclosedInParenthesis(arg)) {
+                String func = FunctionArgumentsValidator.getFunctionName(arg);
+                String sub_args = FunctionArgumentsValidator.getArguments(arg);
+                cycles += getFunctionCycles(func, sub_args);
             }
         }
-         */
 
         SProgramView program = getProgramView(functionName);
 
@@ -178,7 +176,7 @@ public class QuoteInstruction extends SInstruction {
 
     protected ExecutionContext runFunction(String functionName, String functionArguments, ExecutionContext context){
 
-        ArrayList<String> arguments = getArgumentsList();
+        List<String> arguments = getArgumentsList();
         HashMap<String, Integer> input = new HashMap<>();
         for(int i=0; i<arguments.size(); i++){
             if(isVariable(arguments.get(i))){

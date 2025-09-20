@@ -35,6 +35,10 @@ public class FunctionArgumentsValidator {
     }
 
     public void validateArguments(String str) throws InvalidFunctionException{
+        if(str.isEmpty()){
+            return;
+        }
+
         List<String> argsList = splitTopLevel(str);
 
         for(String arg : argsList){
@@ -70,12 +74,12 @@ public class FunctionArgumentsValidator {
         }
     }
 
-    private static String getFunctionName(String input) {
+    public static String getFunctionName(String input) {
         int openParen = input.indexOf(',');
         return input.substring(1, openParen).trim();
     }
 
-    private static String getArguments(String input) {
+    public static String getArguments(String input) {
         int openParen = input.indexOf(',');
         int closeParen = input.lastIndexOf(')');
 
@@ -109,6 +113,7 @@ public class FunctionArgumentsValidator {
     public static void main(String[] args) {
         List<String> validFunctions = new ArrayList<>(List.of("Func1", "Func2", "Func3", "Func4"));
         String input = "(Func1,z1,x2),(Func2,(Func3,x3,y,(Func4,z2))),z5,(Func2)";
+
 
         FunctionArgumentsValidator funcValidator = new FunctionArgumentsValidator(validFunctions);
         try {

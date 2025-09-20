@@ -178,10 +178,10 @@ public class MainController {
         String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
         selectedProgramView = engine.getSelectedProgram(selected_program);
         updateInstructionsUI(selectedProgramView);
-        updateUIOnExpansion();
         resetInputTable();
         updateInputControllers();
         resetHighlightChoiceBox(selectedProgramView);
+        updateUIOnExpansion();
     }
 
     private void initializeInstructionTable(){
@@ -405,13 +405,13 @@ public class MainController {
 
     @FXML
     void onCollapseButtonClicked(MouseEvent event) {
-        degree_selected = degree_selected - 1;
+        degree_selected -= 1;
         updateUIOnExpansion();
     }
 
     @FXML
     void onExpandButtonClicked(MouseEvent event) {
-        degree_selected = degree_selected + 1;
+        degree_selected += 1;
         updateUIOnExpansion();
     }
 
