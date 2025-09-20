@@ -78,6 +78,11 @@ public class SInstructions implements Serializable, SInstructionsView {
             // the idea why to check both is because sometimes it might be x1 <- x2,
             // and then you will want to add x1 and x2 to the input variables list
             // (even though x1 is redundant logically)
+
+            if(instr.getInstructionName() == InstructionName.QUOTE){
+                QuoteInstruction quote_instruction = (QuoteInstruction) instr;
+                vars.addAll(quote_instruction.getInputVariablesFromArguments());
+            }
         }
 
         vars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
@@ -192,11 +197,6 @@ public class SInstructions implements Serializable, SInstructionsView {
 
             if(argVariable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(argVariable)){
                 vars.add(argVariable);
-            }
-
-            if(instr.getInstructionName() == InstructionName.QUOTE){
-                QuoteInstruction quote_instruction = (QuoteInstruction) instr;
-                vars.addAll(quote_instruction.getInputVariablesFromArguments());
             }
         }
 

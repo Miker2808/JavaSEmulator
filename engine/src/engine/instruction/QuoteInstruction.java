@@ -119,27 +119,33 @@ public class QuoteInstruction extends SInstruction {
     protected int getFunctionMaxDegree(String functionName, String functionArguments){
         int maxDegree = 0;
 
-        List<String> arguments = getArgumentsList();
-        for(int i=0; i<arguments.size(); i++){
-
-            if(isEnclosedInParenthesis(arguments.get(i))){
-                String inner = arguments.get(i).substring(1, arguments.get(i).length() - 1);
-                int firstComma = inner.indexOf(',');
-                String innerName = inner.substring(0, firstComma);
-                String innerArgs = inner.substring(firstComma + 1);
-
+        List<String> arguments = FunctionArgumentsValidator.splitTopLevel(functionArguments);
+        for (String arg : arguments) {
+            // if of type "(Func1)"
+            if (FunctionArgumentsValidator.functionNoArgs(arg)) {
                 // Get cycles of composition calls.
-                maxDegree = Math.max(getFunctionMaxDegree(innerName, innerArgs), maxDegree);
+                String func = arg.substring(1, arg.length()-1);
+                maxDegree = Math.max(getFunctionMaxDegree(func, ""), maxDegree);
+            }
+            // if of type "(Func1,x1,x2)"
+            else if (FunctionArgumentsValidator.enclosedInParenthesis(arg)) {
+                String func = FunctionArgumentsValidator.getFunctionName(arg);
+                String sub_args = FunctionArgumentsValidator.getArguments(arg);
+                maxDegree = Math.max(getFunctionMaxDegree(func, sub_args), maxDegree);
             }
         }
 
         SProgramView program = getProgramView(functionName);
 
         for(int line=1; line<=program.getInstructionsView().size(); line++){
-            maxDegree = Math.max(program.getInstructionsView().getInstruction(line).getCycles(), maxDegree);
+            maxDegree = Math.max(program.getInstructionsView().getInstruction(line).getDegree(), maxDegree);
         }
 
         return maxDegree + 1;
+    }
+
+    public int getDegree(){
+        return getFunctionMaxDegree(getFunctionName(), getFunctionArguments());
     }
 
     protected int getFunctionCycles(String functionName, String functionArguments){
@@ -176,22 +182,30 @@ public class QuoteInstruction extends SInstruction {
 
     protected ExecutionContext runFunction(String functionName, String functionArguments, ExecutionContext context){
 
-        List<String> arguments = getArgumentsList();
+        List<String> arguments = FunctionArgumentsValidator.splitTopLevel(functionArguments);
         HashMap<String, Integer> input = new HashMap<>();
         for(int i=0; i<arguments.size(); i++){
-            if(isVariable(arguments.get(i))){
-                String variable = arguments.get(i);
-                Integer value = context.getVariables().get(variable);
-                input.putIfAbsent("x" + i, value);
+            String arg = arguments.get(i).trim();
+
+            if(isVariable(arg)){
+                Integer value = context.getVariables().get(arg);
+                input.put("x" + (i+1), value);
             }
-            else{
-                String inner = arguments.get(i).substring(1, arguments.get(i).length() - 1);
-                int firstComma = inner.indexOf(',');
-                String innerName = inner.substring(0, firstComma);
-                String innerArgs = inner.substring(firstComma + 1);
-                ExecutionContext result = runFunction(innerName, innerArgs, context);
+            else if(!arg.isEmpty()){
+                String func;
+                String sub_args = "";
+
+                if(FunctionArgumentsValidator.functionNoArgs(arg)){
+                    func = arg.substring(1, arg.length() - 1);
+                }
+                else{
+                    func = FunctionArgumentsValidator.getFunctionName(arg);
+                    sub_args = FunctionArgumentsValidator.getArguments(arg);
+                }
+
+                ExecutionContext result = runFunction(func, sub_args, context);
                 Integer value = result.getVariables().get("y");
-                input.putIfAbsent("x" + i, value);
+                input.put("x" + (i+1), value);
             }
         }
 
@@ -203,12 +217,12 @@ public class QuoteInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        ExecutionContext result = runFunction(functionName, functionArguments, context);
+        ExecutionContext result = runFunction(getFunctionName(), getFunctionArguments(), context);
 
         String var = this.getSVariable();
-        int value =  context.getVariables().get("y");
+        int value = result.getVariables().get("y");
         context.getVariables().put(var, value);
-        context.increaseCycles(getCycles());
+        context.increaseCycles(result.getCycles() + 5);
         context.increasePC(1);
 
     }

@@ -75,6 +75,10 @@ public class FunctionArgumentsValidator {
     }
 
     public static String getFunctionName(String input) {
+        if(functionNoArgs(input)){
+            return input.substring(1, input.length()-1);
+        }
+
         int openParen = input.indexOf(',');
         return input.substring(1, openParen).trim();
     }
@@ -82,7 +86,6 @@ public class FunctionArgumentsValidator {
     public static String getArguments(String input) {
         int openParen = input.indexOf(',');
         int closeParen = input.lastIndexOf(')');
-
         return input.substring(openParen + 1, closeParen).trim();
     }
 
