@@ -1,12 +1,17 @@
 package engine;
 
+import engine.functions.SFunction;
 import engine.functions.SFunctions;
+import engine.instruction.InstructionName;
 import engine.instruction.InvalidInstructionException;
-import engine.instruction.SInstruction;
+import engine.instruction.QuoteInstruction;
+import engine.validator.FunctionArgumentsValidator;
 import engine.validator.InstructionValidator;
+import engine.validator.InvalidFunctionException;
 import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -25,20 +30,36 @@ public class SProgram implements Serializable, SProgramView {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    public int Size(){
-        return sInstructions.size(); // number of instructions in the program
-    }
-
-    public void validateProgram() throws InvalidInstructionException {
-        if(this.name == null){
+    public void validateProgram() throws Exception {
+        if(getName() == null || getName().isEmpty()){
             throw new InvalidInstructionException("S-Program name is required");
         }
-        // validate program in general
-        InstructionValidator validator = new InstructionValidator();
-        for(int line = 1; line <= Size(); line++){
+        validateInstructions(getSInstructions());
+        for(SFunction function : getSFunctions().getSFunction()){
+            if(function.getName() == null || function.getName().isEmpty()){
+                throw new InvalidFunctionException("S-Function name is required");
+            }
+            validateInstructions(function.getSInstructions());
+        }
+    }
+
+    public ArrayList<String> getProgramNames(){
+        ArrayList<String> programNames = new ArrayList<>();
+        programNames.add(getName());
+        SFunctions functions = getSFunctions();
+        for(SFunction func : functions.getSFunction()){
+            programNames.add(func.getName());
+        }
+        return programNames;
+    }
+
+    protected void validateInstructions(SInstructions instructions) throws InvalidInstructionException {
+        // validate instructions in general
+        InstructionValidator validator = new InstructionValidator(getProgramNames());
+        for(int line = 1; line <= instructions.size(); line++){
             try {
-                // validator.validate(this.getInstruction(line)); // old
-                getSInstructions().getInstruction(line).validate(validator); // new
+
+                instructions.getInstruction(line).validate(validator);
 
             } catch (InvalidInstructionException e) {
                 throw new InvalidInstructionException(String.format("Instruction #%d, %s\n", line, e.getMessage()));
@@ -46,8 +67,10 @@ public class SProgram implements Serializable, SProgramView {
         }
 
         // find that all labels are used
-        sInstructions.validateLabelsUsed();
+        instructions.validateLabelsUsed();
     }
+
+
 
     public SInstructions getSInstructions() {
         sInstructions.updateInstructionsLines();

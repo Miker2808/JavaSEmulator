@@ -43,18 +43,22 @@ public class Engine implements Serializable{
         }
 
         loadedProgramTemp.validateProgram();
-        updateProgramViews(loadedProgramTemp);
+        SInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
+
         // happens only if validateProgram was successful (did not raise an exception)
         loadedProgram = loadedProgramTemp;
         executionHistory.clear();
     }
 
     // populates Quote instruction with references to functions and main program
-    private void updateProgramViews(SProgram program) {
+    private ArrayList<SProgramView> getProgramViews(SProgram program) {
         ArrayList<SProgramView> programViews = new ArrayList<>();
-        programViews.add(program);
-        programViews.addAll(program.getSFunctions().getSFunction());
-        SInstruction.setProgramViews(programViews);
+        try {
+            programViews.add(program);
+            programViews.addAll(program.getSFunctions().getSFunction());
+        }catch (Exception ignored){}
+
+        return programViews;
     }
 
     public boolean isProgramLoaded(){
@@ -93,14 +97,8 @@ public class Engine implements Serializable{
     }
 
     // get names of possible programs
-    public ArrayList<String> getProgramNames(){
-        ArrayList<String> programNames = new ArrayList<>();
-        programNames.add(loadedProgram.getName());
-        SFunctions functions = loadedProgram.getSFunctions();
-        for(SFunction func : functions.getSFunction()){
-            programNames.add(func.getName());
-        }
-        return programNames;
+    public ArrayList<String> getLoadedProgramNames(){
+        return loadedProgram.getProgramNames();
     }
 
     public ExecutionContext runProgram(String program_name, HashMap<String, Integer> input, int degree){
@@ -139,6 +137,8 @@ public class Engine implements Serializable{
         // TODO: add history
         return context;
     }
+
+
 
 
 

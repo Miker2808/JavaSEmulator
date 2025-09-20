@@ -91,6 +91,9 @@ public class SInstruction implements Serializable {
     public static void setProgramViews(ArrayList<SProgramView> programViews) {
         SInstruction.programViews = programViews;
     }
+    protected static ArrayList<SProgramView> getProgramViews() {
+        return SInstruction.programViews;
+    }
 
     public SInstruction() {
         sVariable = "";

@@ -2,7 +2,17 @@ package engine.validator;
 
 import engine.instruction.*;
 
+import java.util.List;
+
 public class InstructionValidator {
+    protected List<String> validFunctions;
+    protected FunctionArgumentsValidator functionArgumentsValidator;
+
+    public InstructionValidator(List<String> validFunctions){
+        this.validFunctions = validFunctions;
+        functionArgumentsValidator = new FunctionArgumentsValidator(validFunctions);
+    }
+
 
     public void validate(SInstruction instr) throws InvalidInstructionException {
         InstructionName name = instr.getInstructionName();
@@ -89,14 +99,26 @@ public class InstructionValidator {
         validateVariableArgument(argVarName, variableName);
     }
 
-    // TODO: ADD SUPPORT
+
     public void validate(QuoteInstruction instruction) throws InvalidInstructionException{
-        //throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+        validate((SInstruction) instruction);
+        String functionName = instruction.getFunctionName();
+        String functionArgs = instruction.getFunctionArguments();
+
+        if(!functionArgumentsValidator.isFunctionAvailable(functionName)){
+            throw new InvalidInstructionException(String.format("Function %s does not exist", functionName));
+        }
+        try {
+            functionArgumentsValidator.validateArguments(functionArgs);
+        }
+        catch(Exception e){
+            throw new InvalidInstructionException(e.getMessage());
+        }
     }
 
     // TODO: ADD SUPPORT
     public void validate(JumpEqualFunctionInstruction instruction) throws InvalidInstructionException{
-        //throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
     }
 
     public void validate(UnsupportedInstruction instruction) throws InvalidInstructionException{
@@ -130,7 +152,6 @@ public class InstructionValidator {
             throw new InvalidInstructionException("invalid or unsupported instruction name");
         }
     }
-
 
     public static void validateSVariable(SInstruction instr) throws  InvalidInstructionException{
         InstructionName name = instr.getInstructionName();

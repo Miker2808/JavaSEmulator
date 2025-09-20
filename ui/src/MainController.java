@@ -165,7 +165,7 @@ public class MainController {
     private void initOnLoad(String path){
         loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
         loadedFilePathTextField.setText(path);
-        programSelectionChoiceBox.getItems().setAll(engine.getProgramNames());
+        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
         programSelectionChoiceBox.getSelectionModel().selectFirst();
         reloadSelectedProgram();
     }

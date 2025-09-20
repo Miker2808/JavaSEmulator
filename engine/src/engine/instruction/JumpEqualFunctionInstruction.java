@@ -14,6 +14,7 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
         super(base);
         setType("synthetic");
 
+
         // cant assign degree and cycles
 
         setArgumentLabel(getArgument(argumentLabelName));

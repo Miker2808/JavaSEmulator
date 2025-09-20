@@ -161,7 +161,7 @@ public class QuoteInstruction extends SInstruction {
                 cycles += getFunctionCycles(innerName, innerArgs);
             }
         }
-        */
+         */
 
         SProgramView program = getProgramView(functionName);
 
