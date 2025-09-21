@@ -31,4 +31,6 @@ public interface SInstructionsView {
     // returns input variables used in order
     List<String> getInputVariablesUsed();
 
+    List<SInstruction> getAllInstructions();
+
 }

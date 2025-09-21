@@ -32,6 +32,17 @@ public class QuoteInstruction extends SInstruction {
         setFunctionArguments(getArgument(argFunctionArgumentsName));
     }
 
+    public QuoteInstruction(String sVariable, String sLabel, String functionName, String functionArgumentsStr){
+        super();
+        this.setSVariable(sVariable);
+        this.setSLabel(sLabel);
+        this.setCycles(getCycles());
+        this.setType("synthetic");
+        this.setFunctionName(functionName);
+        this.setFunctionArguments(functionArgumentsStr);
+        this.setDegree(getDegree());
+    }
+
     public QuoteInstruction(QuoteInstruction other) {
         super(other);
         setCycles(other.getCycles());
@@ -85,23 +96,51 @@ public class QuoteInstruction extends SInstruction {
         List<SInstruction> expanded = new ArrayList<>();
 
         // TODO: Implement
+        // make a HashMap<String, String> which maps all old variables and labels to new ones.
+        // 1. Get all arguments for the instruction and convert into assignment if variable, or quote
+        // if a composite function call. assign into new x_i for now.
+        // 2. add all function instructions into expanded, after assignment.
+        // 3. iterate all instructions and replace all variables and labels with new free variable
+        // and label. use hashmap to decided if to request new variable or label, or use already assigned one.
+
+        // 1.
+        List<String> arguments = getArgumentsList();
+        for(int i = 0; i < arguments.size(); i++){
+            String arg = arguments.get(i).trim();
+            String label = (i == 0) ? getSLabel() : "";
+            if(FunctionArgumentsValidator.isValidVariable(arg)){
+                expanded.add(new AssignmentInstruction("x" + (i+1), label, arg));
+            }
+            else{
+                String func = FunctionArgumentsValidator.getFunctionName(arg);
+                String sub_args = FunctionArgumentsValidator.getArguments(arg);
+
+                expanded.add(new QuoteInstruction("x" + (i+1), label, func, sub_args));
+            }
+        }
+
+        SProgramView programView = getProgramView(getFunctionName());
+        expanded.addAll(programView.getInstructionsView().getAllInstructions());
+
+        HashMap<String, String> var_reuse_map = new HashMap<>();
+
+        for(int i = 0; i < expanded.size(); i++){
+            String sVar =  expanded.get(i).getSVariable();
+            String sLabel = expanded.get(i).getSLabel();
+            // TODO: Find a way to easily replace variables with new ones
+        }
+
+
+
+        if(expanded.isEmpty()){
+            expanded.add(new NeutralInstruction("y", getSVariable()));
+        }
 
         return expanded;
     }
 
     protected static boolean isVariable(String str){
         return str.matches("^(y|([xz][1-9][0-9]*))$");
-    }
-
-    protected static boolean isEnclosedInParenthesis (String str){
-        return str.matches("^\\(.*?\\)$");
-    }
-
-    protected static String removeParentheses(String s) {
-        if (isEnclosedInParenthesis(s)) {
-            return s.substring(1, s.length() - 1);
-        }
-        return s;
     }
 
 
@@ -148,6 +187,8 @@ public class QuoteInstruction extends SInstruction {
         return getFunctionMaxDegree(getFunctionName(), getFunctionArguments());
     }
 
+    // appears not needed to be calculated.
+    /*
     protected int getFunctionCycles(String functionName, String functionArguments){
         int cycles = 0;
 
@@ -175,9 +216,11 @@ public class QuoteInstruction extends SInstruction {
 
         return cycles;
     }
+     */
 
     public int getCycles(){
-        return getFunctionCycles(getFunctionName(), getFunctionArguments()) + 5;
+        //return getFunctionCycles(getFunctionName(), getFunctionArguments()) + 5;
+        return 5;
     }
 
     protected ExecutionContext runFunction(String functionName, String functionArguments, ExecutionContext context){
@@ -187,7 +230,7 @@ public class QuoteInstruction extends SInstruction {
         for(int i=0; i<arguments.size(); i++){
             String arg = arguments.get(i).trim();
 
-            if(isVariable(arg)){
+            if(FunctionArgumentsValidator.isValidVariable(arg)){
                 Integer value = context.getVariables().get(arg);
                 input.put("x" + (i+1), value);
             }

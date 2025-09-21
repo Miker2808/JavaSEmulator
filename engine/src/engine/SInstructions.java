@@ -13,6 +13,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -214,6 +215,11 @@ public class SInstructions implements Serializable, SInstructionsView {
 
     public void appendInstruction(SInstruction instr){
         sInstruction.add(instr);
+    }
+
+    @Override
+    public List<SInstruction> getAllInstructions(){
+        return Collections.unmodifiableList(sInstruction);
     }
 
     @Override
