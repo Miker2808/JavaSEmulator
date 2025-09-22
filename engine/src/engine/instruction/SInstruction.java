@@ -230,6 +230,18 @@ public class SInstruction implements Serializable {
         return "";
     }
 
+    public void setArgumentLabel(String label){
+    }
+
+    public void setFunctionArguments(String functionArguments) {}
+
+    public String getFunctionArguments() {
+        return "";
+    }
+
+    public void setArgumentVariable(String variable){
+    }
+
     // return argument const as string format
     public String getArgumentConst(){
         return "";

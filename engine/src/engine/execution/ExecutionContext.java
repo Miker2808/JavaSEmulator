@@ -8,13 +8,14 @@ import engine.instruction.SInstruction;
 import java.util.*;
 
 public class ExecutionContext {
-    private final HashMap<String, Integer> variables = new HashMap<>();
+    private final HashMap<String, Integer> variables;
     private final HashMap<String, Integer> labelMap;
     private int pc;
     private int cycles;
     private boolean exit;
 
     public ExecutionContext(SInstructionsView sInstructions, HashMap<String, Integer> InputVariables){
+        variables =  new HashMap<>();
         variables.putAll(InputVariables);
         List<String> used_variables = sInstructions.getVariablesUsed();
         for(String variable : used_variables){
@@ -44,25 +45,23 @@ public class ExecutionContext {
     }
 
     // converts hashmap of variables into ordered hash map in order of exercise requirements
-    private static LinkedHashMap<String, Integer> buildOrderedMap(Map<String, Integer> source) {
+    public static LinkedHashMap<String, Integer> buildOrderedMap(Map<String, Integer> source) {
         LinkedHashMap<String, Integer> result = new LinkedHashMap<>();
 
         // Always put "y" (default to 0 if missing)
-        result.putIfAbsent("y", source.getOrDefault("y", 0));
+        result.put("y", source.getOrDefault("y", 0));
 
-        // Add x1, x2, x3... in numeric order if present
-        int xIndex = 1;
-        while (source.containsKey("x" + xIndex)) {
-            result.putIfAbsent("x" + xIndex, source.get("x" + xIndex));
-            xIndex++;
-        }
+        // Handle all x{i} keys
+        source.keySet().stream()
+                .filter(k -> k.startsWith("x"))
+                .sorted(Comparator.comparingInt(k -> Integer.parseInt(k.substring(1))))
+                .forEach(k -> result.put(k, source.get(k)));
 
-        // Add z1, z2, z3... in numeric order if present
-        int zIndex = 1;
-        while (source.containsKey("z" + zIndex)) {
-            result.putIfAbsent("z" + zIndex, source.get("z" + zIndex));
-            zIndex++;
-        }
+        // Handle all z{j} keys
+        source.keySet().stream()
+                .filter(k -> k.startsWith("z"))
+                .sorted(Comparator.comparingInt(k -> Integer.parseInt(k.substring(1))))
+                .forEach(k -> result.put(k, source.get(k)));
 
         return result;
     }

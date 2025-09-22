@@ -486,8 +486,10 @@ public class MainController {
     @FXML
     void onDebugButtonClicked(MouseEvent event) {
 
-        engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
+        LinkedHashMap<String, Integer> variables = engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
         debug_run = true;
+
+        updateProgramVariablesTable(variables, false);
 
         highLightInstructionTableLine(1);
         updateInputControllers();

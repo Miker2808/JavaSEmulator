@@ -112,10 +112,11 @@ public class Engine implements Serializable{
     }
 
 
-    public void startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
+    public LinkedHashMap<String, Integer> startDebugRun(String program_name, HashMap<String, Integer> input, int degree){
         SProgramView expanded = getExpandedProgram(program_name, degree);
         this.interpreter = new SInterpreter(expanded.getInstructionsView(), input);
         running = true;
+        return this.interpreter.getOrderedVariables();
     }
 
     public ExecutionContext stepLoadedRun(){

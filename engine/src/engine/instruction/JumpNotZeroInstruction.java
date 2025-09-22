@@ -36,6 +36,7 @@ public class JumpNotZeroInstruction extends SInstruction{
         return new JumpNotZeroInstruction(this);
     }
 
+    @Override
     public void setArgumentLabel(String label){
         this.JNZLabel = label.trim().toUpperCase();
     }

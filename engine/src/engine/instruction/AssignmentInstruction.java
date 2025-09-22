@@ -43,6 +43,7 @@ public class AssignmentInstruction extends SInstruction {
         return new AssignmentInstruction(this);
     }
 
+    @Override
     public void setArgumentVariable(String variable) {
         this.assignedVariable = variable.trim().toLowerCase();
     }

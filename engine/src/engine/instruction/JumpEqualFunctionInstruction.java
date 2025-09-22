@@ -44,11 +44,13 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
         validator.validate(this);
     }
 
+
     @Override
     public String getInstructionString() {
         return String.format("IF %s = %s(%s) GOTO %s", getSVariable(), getFunctionName(), getFunctionArguments(), getArgumentLabel());
     }
 
+    @Override
     public void setArgumentLabel(String label) {
         this.JEFunctionLabel = label.trim().toUpperCase();
     }

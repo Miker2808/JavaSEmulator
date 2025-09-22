@@ -18,11 +18,7 @@ public class FunctionArgumentsValidator {
     }
 
     public static boolean functionNoArgs(String str){
-        return str.matches("^\\([A-Za-z0-9]+\\)$");
-    }
-
-    public static boolean validFunctionWithArgs(String str){
-        return str.matches("^[a-zA-Z0-9_]+\\(.+\\)$");
+        return str.matches("^\\([A-Za-z0-9_]+\\)$");
     }
 
     public boolean isFunctionAvailable(String functionName){
@@ -76,7 +72,7 @@ public class FunctionArgumentsValidator {
 
     public static String getFunctionName(String input) {
         if(functionNoArgs(input)){
-            return input.substring(1, input.length()-1);
+            return input.substring(1, input.length()-1).trim();
         }
 
         int openParen = input.indexOf(',');

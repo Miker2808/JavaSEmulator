@@ -51,36 +51,16 @@ public class SInterpreter
     }
 
 
+    public LinkedHashMap<String, Integer> getOrderedVariables(){
+        return context.getOrderedVariables();
+    }
+
     public boolean getExit(){
         return context.getExit();
     }
 
     public int getCycles(){
         return context.getCycles();
-    }
-
-    // converts hashmap of variables into ordered hash map in order of exercise requirements
-    public LinkedHashMap<String, Integer> getOrderedVariables() {
-        LinkedHashMap<String, Integer> result = new LinkedHashMap<>();
-
-        // Always put "y" (default to 0 if missing)
-        result.put("y", context.getVariables().getOrDefault("y", 0));
-
-        // Add x1, x2, x3... in numeric order if present
-        int xIndex = 1;
-        while (context.getVariables().containsKey("x" + xIndex)) {
-            result.put("x" + xIndex, context.getVariables().get("x" + xIndex));
-            xIndex++;
-        }
-
-        // Add z1, z2, z3... in numeric order if present
-        int zIndex = 1;
-        while (context.getVariables().containsKey("z" + zIndex)) {
-            result.put("z" + zIndex, context.getVariables().get("z" + zIndex));
-            zIndex++;
-        }
-
-        return result;
     }
 
 }

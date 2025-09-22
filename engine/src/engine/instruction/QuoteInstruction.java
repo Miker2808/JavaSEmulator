@@ -39,6 +39,7 @@ public class QuoteInstruction extends SInstruction {
         this.setDegree(getDegree());
     }
 
+
     public QuoteInstruction(QuoteInstruction other) {
         super(other);
         setCycles(other.getCycles());
@@ -46,6 +47,11 @@ public class QuoteInstruction extends SInstruction {
         setDegree(other.getDegree());
         setFunctionName(other.getFunctionName());
         setFunctionArguments(other.getFunctionArguments());
+    }
+
+    @Override
+    public QuoteInstruction copy() {
+        return new QuoteInstruction(this);
     }
 
     public String getFunctionName() {
@@ -64,6 +70,7 @@ public class QuoteInstruction extends SInstruction {
         return functionArguments;
     }
 
+    @Override
     public void setFunctionArguments(String functionArguments) {
         this.functionArguments = functionArguments.trim();
     }
@@ -77,16 +84,14 @@ public class QuoteInstruction extends SInstruction {
         validator.validate(this);
     }
 
-    @Override
-    public QuoteInstruction copy() {
-        return new QuoteInstruction(this);
-    }
 
     @Override
     public String getInstructionString() {
+        if(getFunctionArguments().isBlank()){
+            return String.format("%s <- (%s)", getSVariable(), getFunctionName());
+        }
         return String.format("%s <- (%s,%s)", getSVariable(), getFunctionName(), getFunctionArguments());
     }
-
 
     protected static String replaceKeys(String input, Map<String, String> replacements) {
         if (input == null || input.isEmpty() || replacements == null || replacements.isEmpty()) {
@@ -101,57 +106,71 @@ public class QuoteInstruction extends SInstruction {
         return result;
     }
 
+    // make a HashMap<String, String> which maps all old variables and labels to new ones.
+    // 1. Get all arguments for the instruction and convert into assignment if variable, or quote
+    // if a composite function call. assign into new x_i for now.
+    // 2. add all function instructions into expanded, after assignment.
+    // 3. iterate all instructions and replace all variables and labels with new free variable
+    // and label. use hashmap to decided if to request new variable or label, or use already assigned one.
+
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line) {
+        HashMap<String, String> reuse_map = new HashMap<>();
         List<SInstruction> expanded = new ArrayList<>();
 
-        // TODO: Implement
-        // make a HashMap<String, String> which maps all old variables and labels to new ones.
-        // 1. Get all arguments for the instruction and convert into assignment if variable, or quote
-        // if a composite function call. assign into new x_i for now.
-        // 2. add all function instructions into expanded, after assignment.
-        // 3. iterate all instructions and replace all variables and labels with new free variable
-        // and label. use hashmap to decided if to request new variable or label, or use already assigned one.
-
-        HashMap<String, String> reuse_map = new HashMap<>();
+        reuse_map.put("y", getSVariable());
 
         // 1.
 
         List<String> arguments = getArgumentsList();
         for(int i = 0; i < arguments.size(); i++){
             String arg = arguments.get(i).trim();
+
             String label = (i == 0) ? getSLabel() : "";
             if(FunctionArgumentsValidator.isValidVariable(arg)){
                 String new_var = context.freshVar();
                 reuse_map.put("x" + (i+1), new_var);
                 expanded.add(new AssignmentInstruction(new_var, label, arg));
             }
-            else{
+            else if(!arg.isEmpty()){
                 String func = FunctionArgumentsValidator.getFunctionName(arg);
-                String sub_args = FunctionArgumentsValidator.getArguments(arg);
-
+                String sub_args = "";
+                if(!FunctionArgumentsValidator.functionNoArgs(arg)){
+                    sub_args = FunctionArgumentsValidator.getArguments(arg);
+                }
                 String new_var = context.freshVar();
                 reuse_map.put("x" + (i+1), new_var);
                 expanded.add(new QuoteInstruction(new_var, label, func, sub_args));
             }
         }
 
-        SProgramView programView = getProgramView(getFunctionName());
-        expanded.addAll(programView.getInstructionsView().getAllInstructions());
-
-        replaceSymbols(expanded, reuse_map, context);
+        // 2. + 3.
+        expanded.addAll(getCopyFunctionRenamed(getFunctionName(), reuse_map, context));
 
         if(expanded.isEmpty()){
-            expanded.add(new NeutralInstruction("y", getSVariable()));
+            expanded.add(new NeutralInstruction("y", getSLabel()));
+        }
+        else{
+            // add last neutral instruction to jump into if exit.
+            if(reuse_map.containsKey("EXIT")) {
+                expanded.add(new NeutralInstruction("y", reuse_map.get("EXIT")));
+            }
+        }
+
+        for(SInstruction instr : expanded){
+            instr.setParentLine(line);
+            instr.setParent(this);
         }
 
         return expanded;
     }
 
 
-    protected HashMap<String, String> getReuseMap(String functionName, ExpansionContext context){
-        HashMap<String, String> map = new HashMap<>();
-        map.put("", "");
+    protected HashMap<String, String> getReuseMap(HashMap<String, String> map, String functionName, ExpansionContext context){
+        if(map == null) {
+            map = new HashMap<>();
+            map.put("", "");
+        }
         SProgramView functionView = getProgramView(functionName);
 
         for(SInstruction instr : functionView.getInstructionsView().getAllInstructions()){
@@ -189,31 +208,25 @@ public class QuoteInstruction extends SInstruction {
         return map;
     }
 
-    protected void replaceSymbols(List<SInstruction> expanded, HashMap<String, String> map, ExpansionContext context){
-        for(int i = 0; i < expanded.size(); i++){
-            String sVar =  expanded.get(i).getSVariable();
-            String sLabel = expanded.get(i).getSLabel();
+    protected ArrayList<SInstruction> getCopyFunctionRenamed(String functionName, HashMap<String, String> map, ExpansionContext context){
 
-            if(!map.containsKey(sVar)){
-                map.put(sVar, context.freshVar());
-            }
-            expanded.get(i).setSVariable(map.get(sVar));
+        HashMap<String, String> reuse_map = getReuseMap(map, functionName, context);
 
-            if(!map.containsKey(sLabel)){
-                map.put(sLabel, context.freshVar());
-            }
-            expanded.get(i).setSLabel(map.get(sLabel));
+        SProgramView  functionView = getProgramView(functionName);
+        ArrayList<SInstruction> copyFunctionRenamed = new ArrayList<>();
 
-
+        for(SInstruction instr : functionView.getInstructionsView().getAllInstructions()){
+            SInstruction instr_copy = instr.copy();
+            instr_copy.setSVariable(reuse_map.get(instr.getSVariable()));
+            instr_copy.setSLabel(reuse_map.get(instr.getSLabel()));
+            instr_copy.setArgumentVariable(reuse_map.get(instr.getArgumentVariable()));
+            instr_copy.setArgumentLabel(reuse_map.get(instr.getArgumentLabel()));
+            instr_copy.setFunctionArguments(replaceKeys(instr_copy.getFunctionArguments(), reuse_map));
+            copyFunctionRenamed.add(instr_copy);
         }
+
+        return copyFunctionRenamed;
     }
-
-
-
-    protected static boolean isVariable(String str){
-        return str.matches("^(y|([xz][1-9][0-9]*))$");
-    }
-
 
     protected SProgramView getProgramView(String name){
         SProgramView program = null; // will always find, as validator verifies it before.

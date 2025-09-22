@@ -49,6 +49,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
         return new JumpEqualVariableInstruction(this);
     }
 
+    @Override
     public void setArgumentVariable(String variable) {
         this.variableName = variable.trim().toLowerCase();
     }
@@ -58,6 +59,7 @@ public class JumpEqualVariableInstruction extends SInstruction {
         return variableName;
     }
 
+    @Override
     public void setArgumentLabel(String label) {
         this.JEVariableLabel = label.trim().toUpperCase();
     }

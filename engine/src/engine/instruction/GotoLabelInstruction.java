@@ -49,6 +49,7 @@ public class GotoLabelInstruction extends SInstruction {
         return String.format("GOTO %s", getArgumentLabel());
     }
 
+    @Override
     public void setArgumentLabel(String label) {
         this.gotoLabel = label.trim().toUpperCase();
     }
