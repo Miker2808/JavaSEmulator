@@ -17,6 +17,7 @@ import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -320,5 +321,6 @@ public class SInstruction implements Serializable {
         expanded.add(this);
         return expanded;
     }
+
 
 } // end of class

@@ -1,7 +1,5 @@
 package engine.instruction;
 
-import engine.SInstructions;
-import engine.SInstructionsView;
 import engine.SProgramView;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
@@ -9,11 +7,9 @@ import engine.interpreter.SInterpreter;
 import engine.validator.FunctionArgumentsValidator;
 import engine.validator.InstructionValidator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QuoteInstruction extends SInstruction {
 
@@ -91,6 +87,20 @@ public class QuoteInstruction extends SInstruction {
         return String.format("%s <- (%s,%s)", getSVariable(), getFunctionName(), getFunctionArguments());
     }
 
+
+    protected static String replaceKeys(String input, Map<String, String> replacements) {
+        if (input == null || input.isEmpty() || replacements == null || replacements.isEmpty()) {
+            return input;
+        }
+
+        String result = input;
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            result = result.replace(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line) {
         List<SInstruction> expanded = new ArrayList<>();
@@ -103,34 +113,33 @@ public class QuoteInstruction extends SInstruction {
         // 3. iterate all instructions and replace all variables and labels with new free variable
         // and label. use hashmap to decided if to request new variable or label, or use already assigned one.
 
+        HashMap<String, String> reuse_map = new HashMap<>();
+
         // 1.
+
         List<String> arguments = getArgumentsList();
         for(int i = 0; i < arguments.size(); i++){
             String arg = arguments.get(i).trim();
             String label = (i == 0) ? getSLabel() : "";
             if(FunctionArgumentsValidator.isValidVariable(arg)){
-                expanded.add(new AssignmentInstruction("x" + (i+1), label, arg));
+                String new_var = context.freshVar();
+                reuse_map.put("x" + (i+1), new_var);
+                expanded.add(new AssignmentInstruction(new_var, label, arg));
             }
             else{
                 String func = FunctionArgumentsValidator.getFunctionName(arg);
                 String sub_args = FunctionArgumentsValidator.getArguments(arg);
 
-                expanded.add(new QuoteInstruction("x" + (i+1), label, func, sub_args));
+                String new_var = context.freshVar();
+                reuse_map.put("x" + (i+1), new_var);
+                expanded.add(new QuoteInstruction(new_var, label, func, sub_args));
             }
         }
 
         SProgramView programView = getProgramView(getFunctionName());
         expanded.addAll(programView.getInstructionsView().getAllInstructions());
 
-        HashMap<String, String> var_reuse_map = new HashMap<>();
-
-        for(int i = 0; i < expanded.size(); i++){
-            String sVar =  expanded.get(i).getSVariable();
-            String sLabel = expanded.get(i).getSLabel();
-            // TODO: Find a way to easily replace variables with new ones
-        }
-
-
+        replaceSymbols(expanded, reuse_map, context);
 
         if(expanded.isEmpty()){
             expanded.add(new NeutralInstruction("y", getSVariable()));
@@ -138,6 +147,68 @@ public class QuoteInstruction extends SInstruction {
 
         return expanded;
     }
+
+
+    protected HashMap<String, String> getReuseMap(String functionName, ExpansionContext context){
+        HashMap<String, String> map = new HashMap<>();
+        map.put("", "");
+        SProgramView functionView = getProgramView(functionName);
+
+        for(SInstruction instr : functionView.getInstructionsView().getAllInstructions()){
+            if(!map.containsKey(instr.getSVariable())){
+                map.put(instr.getSVariable(), context.freshVar());
+            }
+            if(!map.containsKey(instr.getSLabel())){
+                map.put(instr.getSLabel(), context.freshLabel());
+            }
+            if(!map.containsKey(instr.getArgumentVariable())){
+                map.put(instr.getArgumentVariable(), context.freshVar());
+            }
+            if(!map.containsKey(instr.getArgumentLabel())){
+                map.put(instr.getArgumentLabel(), context.freshLabel());
+            }
+
+            if(instr.getInstructionName() == InstructionName.QUOTE || instr.getInstructionName() == InstructionName.JUMP_EQUAL_FUNCTION) {
+                List<String> arg_variables;
+                if (instr.getInstructionName() == InstructionName.QUOTE) {
+                    QuoteInstruction quote = (QuoteInstruction) instr;
+                    arg_variables = extractVariablesFromString(quote.getFunctionArguments());
+                } else {
+                    JumpEqualFunctionInstruction jump_func = (JumpEqualFunctionInstruction) instr;
+                    arg_variables = extractVariablesFromString(jump_func.getFunctionArguments());
+                }
+
+                for(String var :  arg_variables){
+                    if(!map.containsKey(var)){
+                        map.put(var, context.freshVar());
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
+
+    protected void replaceSymbols(List<SInstruction> expanded, HashMap<String, String> map, ExpansionContext context){
+        for(int i = 0; i < expanded.size(); i++){
+            String sVar =  expanded.get(i).getSVariable();
+            String sLabel = expanded.get(i).getSLabel();
+
+            if(!map.containsKey(sVar)){
+                map.put(sVar, context.freshVar());
+            }
+            expanded.get(i).setSVariable(map.get(sVar));
+
+            if(!map.containsKey(sLabel)){
+                map.put(sLabel, context.freshVar());
+            }
+            expanded.get(i).setSLabel(map.get(sLabel));
+
+
+        }
+    }
+
+
 
     protected static boolean isVariable(String str){
         return str.matches("^(y|([xz][1-9][0-9]*))$");
@@ -270,7 +341,7 @@ public class QuoteInstruction extends SInstruction {
 
     }
 
-
+    // returns only x{i>0} variables
     public ArrayList<String> getInputVariablesFromArguments() {
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("x[1-9][0-9]*");
         java.util.regex.Matcher matcher = pattern.matcher(getFunctionArguments());
@@ -283,6 +354,17 @@ public class QuoteInstruction extends SInstruction {
         return matches;
     }
 
+    // returns y or z{i>0} or x{i>0} variables
+    public static List<String> extractVariablesFromString(String input) {
+        List<String> matches = new ArrayList<>();
+        Pattern pattern = Pattern.compile("(y|[xz][1-9][0-9]*)"); // no ^ and $
+        Matcher matcher = pattern.matcher(input);
 
+        while (matcher.find()) {
+            matches.add(matcher.group());
+        }
+
+        return matches;
+    }
 
 }
