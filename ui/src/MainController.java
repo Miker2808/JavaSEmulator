@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -86,15 +87,17 @@ public class MainController {
     @FXML
     private Label cyclesMeterLabel;
     @FXML
-    private Button debugButton;
+    private Button executeButton;
     @FXML
     private Button resumeButton;
-    @FXML
-    private Button runButton;
     @FXML
     private Button stepOverButton;
     @FXML
     private Button stopButton;
+    @FXML
+    private RadioButton normalRadioButton;
+    @FXML
+    private RadioButton debugRadioButton;
 
     // tables
     @FXML
@@ -498,14 +501,15 @@ public class MainController {
     void updateInputControllers(){
         boolean not_loaded = !engine.isProgramLoaded();
         newRunButton.setDisable(not_loaded);
-        runButton.setDisable(debug_run || not_loaded || run_ended);
+        normalRadioButton.setDisable(not_loaded || run_ended);
+        debugRadioButton.setDisable(not_loaded || run_ended);
         stopButton.setDisable(!debug_run || not_loaded || run_ended);
         stepOverButton.setDisable(!debug_run || not_loaded || run_ended);
         resumeButton.setDisable(!debug_run || not_loaded || run_ended);
         expandButton.setDisable(not_loaded || debug_run);
         collapseButton.setDisable(not_loaded || debug_run);
         chooseDegreeTextField.setDisable(not_loaded || debug_run);
-        debugButton.setDisable(not_loaded || debug_run || run_ended);
+        executeButton.setDisable(not_loaded || run_ended);
         inputTable.setDisable(debug_run);
         programSelectionChoiceBox.setDisable(debug_run || not_loaded);
     }
@@ -520,32 +524,31 @@ public class MainController {
         updateInputControllers();
     }
 
-    @FXML
-    void onNormalRunClicked(MouseEvent event) {
-        HashMap<String, Integer> input_variables = getInputVariablesFromUI();
-
-        // run full program
-        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
-        // populate table with result variables (later it'll be the same with execution context
-
-        updateProgramVariablesTable(result.getOrderedVariables(), false);
-
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        run_ended = true;
-        updateInputControllers();
-    }
 
     @FXML
-    void onDebugButtonClicked(MouseEvent event) {
+    void onExecuteButtonClicked(MouseEvent event) {
+        if(debugRadioButton.isSelected()) {
+            LinkedHashMap<String, Integer> variables = engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
+            debug_run = true;
 
-        LinkedHashMap<String, Integer> variables = engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
-        debug_run = true;
+            updateProgramVariablesTable(variables, false);
 
-        updateProgramVariablesTable(variables, false);
+            highLightInstructionTableLine(1);
+            updateInputControllers();
+        }
+        else{
+            HashMap<String, Integer> input_variables = getInputVariablesFromUI();
 
-        highLightInstructionTableLine(1);
-        updateInputControllers();
+            // run full program
+            ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
+            // populate table with result variables (later it'll be the same with execution context
 
+            updateProgramVariablesTable(result.getOrderedVariables(), false);
+
+            cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+            run_ended = true;
+            updateInputControllers();
+        }
     }
 
     @FXML

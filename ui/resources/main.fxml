@@ -107,7 +107,6 @@
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="3.0" minHeight="3.0" prefHeight="3.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -118,31 +117,32 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stepOverButton" alignment="CENTER" disable="true" layoutX="46.0" layoutY="25.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStepOverClicked" prefWidth="120.0" text="Step over" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                              <Button fx:id="stepOverButton" alignment="CENTER" disable="true" layoutX="46.0" layoutY="25.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStepOverClicked" text="Step over" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" prefWidth="120.0" text="Stop" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" text="Stop" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="runButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onNormalRunClicked" text="Normal Run" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                              <Button fx:id="resumeButton" alignment="CENTER" disable="true" layoutX="59.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="resumeButton" alignment="CENTER" disable="true" layoutX="59.0" layoutY="80.0" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onResumeClicked" prefWidth="120.0" text="Resume" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+                              <Button fx:id="executeButton" alignment="CENTER" disable="true" layoutX="10.0" layoutY="46.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onExecuteButtonClicked" text="Execute" GridPane.rowIndex="2">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="debugButton" alignment="CENTER" disable="true" layoutX="10.0" layoutY="46.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onDebugButtonClicked" text="Debug Run" GridPane.columnSpan="2147483647" GridPane.rowIndex="3">
-                                 <font>
-                                    <Font name="System Bold" size="12.0" />
-                                 </font>
-                              </Button>
+                              <RadioButton fx:id="normalRadioButton" disable="true" mnemonicParsing="false" selected="true" text="Normal" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="runTypeGroup" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="debugRadioButton" disable="true" mnemonicParsing="false" text="Debug" toggleGroup="$runTypeGroup" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                            </children>
                            <GridPane.margin>
                               <Insets />
