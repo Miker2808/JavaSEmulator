@@ -84,26 +84,42 @@ public class QuoteInstruction extends SInstruction {
         validator.validate(this);
     }
 
-
     @Override
     public String getInstructionString() {
         if(getFunctionArguments().isBlank()){
-            return String.format("%s <- (%s)", getSVariable(), getFunctionName());
+            return String.format("%s <- (%s)", getSVariable(), getUserFunctionName(getFunctionName()));
         }
-        return String.format("%s <- (%s,%s)", getSVariable(), getFunctionName(), getFunctionArguments());
+        return String.format("%s <- (%s,%s)", getSVariable(), getUserFunctionName(getFunctionName()),
+                getUserFunctionArgs(getFunctionArguments()));
     }
 
-    protected static String replaceKeys(String input, Map<String, String> replacements) {
-        if (input == null || input.isEmpty() || replacements == null || replacements.isEmpty()) {
-            return input;
-        }
+    protected String getUserFunctionName(String functionName){
+        return getProgramView(functionName).getName();
+    }
 
-        String result = input;
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            result = result.replace(entry.getKey(), entry.getValue());
-        }
+    protected String getUserFunctionArgs(String functionArgs){
+        // TODO: Implement
+        return getFunctionArguments();
+    }
 
-        return result;
+    @Override
+    public int getDegree(){
+        return getFunctionMaxDegree(getFunctionName(), getFunctionArguments());
+    }
+
+    @Override
+    public int getCycles(){
+        return 5;
+    }
+
+    @Override
+    public void execute(ExecutionContext context){
+        ExecutionContext result = runFunction(getFunctionName(), getFunctionArguments(), context);
+
+        int value = result.getVariables().computeIfAbsent("y", k -> 0);
+        context.getVariables().put(getSVariable(), value);
+        context.increaseCycles(result.getCycles() + getCycles());
+        context.increasePC(1);
     }
 
     // make a HashMap<String, String> which maps all old variables and labels to new ones.
@@ -112,13 +128,15 @@ public class QuoteInstruction extends SInstruction {
     // 2. add all function instructions into expanded, after assignment.
     // 3. iterate all instructions and replace all variables and labels with new free variable
     // and label. use hashmap to decided if to request new variable or label, or use already assigned one.
-
     @Override
     public List<SInstruction> expand(ExpansionContext context, int line) {
         HashMap<String, String> reuse_map = new HashMap<>();
         List<SInstruction> expanded = new ArrayList<>();
 
         reuse_map.put("y", getSVariable());
+        reuse_map.put("", "");
+
+        expanded.add(new NeutralInstruction("y", getSLabel()));
 
         // 1.
 
@@ -147,15 +165,11 @@ public class QuoteInstruction extends SInstruction {
         // 2. + 3.
         expanded.addAll(getCopyFunctionRenamed(getFunctionName(), reuse_map, context));
 
-        if(expanded.isEmpty()){
-            expanded.add(new NeutralInstruction("y", getSLabel()));
+        // add last neutral instruction to jump into if exit.
+        if(reuse_map.containsKey("EXIT")) {
+            expanded.getLast().setSLabel("EXIT");
         }
-        else{
-            // add last neutral instruction to jump into if exit.
-            if(reuse_map.containsKey("EXIT")) {
-                expanded.add(new NeutralInstruction("y", reuse_map.get("EXIT")));
-            }
-        }
+
 
         for(SInstruction instr : expanded){
             instr.setParentLine(line);
@@ -267,45 +281,7 @@ public class QuoteInstruction extends SInstruction {
         return maxDegree + 1;
     }
 
-    public int getDegree(){
-        return getFunctionMaxDegree(getFunctionName(), getFunctionArguments());
-    }
 
-    // appears not needed to be calculated.
-    /*
-    protected int getFunctionCycles(String functionName, String functionArguments){
-        int cycles = 0;
-
-        List<String> arguments = FunctionArgumentsValidator.splitTopLevel(functionArguments);
-        for (String arg : arguments) {
-            // if of type "(Func1)"
-            if (FunctionArgumentsValidator.functionNoArgs(arg)) {
-                // Get cycles of composition calls.
-                String func = arg.substring(1, arg.length()-1);
-                cycles += getFunctionCycles(func, "");
-            }
-            // if of type "(Func1,x1,x2)"
-            else if (FunctionArgumentsValidator.enclosedInParenthesis(arg)) {
-                String func = FunctionArgumentsValidator.getFunctionName(arg);
-                String sub_args = FunctionArgumentsValidator.getArguments(arg);
-                cycles += getFunctionCycles(func, sub_args);
-            }
-        }
-
-        SProgramView program = getProgramView(functionName);
-
-        for(int line=1; line<=program.getInstructionsView().size(); line++){
-            cycles += program.getInstructionsView().getInstruction(line).getCycles();
-        }
-
-        return cycles;
-    }
-     */
-
-    public int getCycles(){
-        //return getFunctionCycles(getFunctionName(), getFunctionArguments()) + 5;
-        return 5;
-    }
 
     protected ExecutionContext runFunction(String functionName, String functionArguments, ExecutionContext context){
 
@@ -315,7 +291,7 @@ public class QuoteInstruction extends SInstruction {
             String arg = arguments.get(i).trim();
 
             if(FunctionArgumentsValidator.isValidVariable(arg)){
-                Integer value = context.getVariables().get(arg);
+                Integer value = context.getVariables().computeIfAbsent(arg, k -> 0);
                 input.put("x" + (i+1), value);
             }
             else if(!arg.isEmpty()){
@@ -331,7 +307,7 @@ public class QuoteInstruction extends SInstruction {
                 }
 
                 ExecutionContext result = runFunction(func, sub_args, context);
-                Integer value = result.getVariables().get("y");
+                Integer value = result.getVariables().computeIfAbsent("y", k -> 0);
                 input.put("x" + (i+1), value);
             }
         }
@@ -339,18 +315,6 @@ public class QuoteInstruction extends SInstruction {
         SProgramView program = getProgramView(functionName);
 
         return SInterpreter.staticRun(program.getInstructionsView(), input);
-
-    }
-
-    @Override
-    public void execute(ExecutionContext context){
-        ExecutionContext result = runFunction(getFunctionName(), getFunctionArguments(), context);
-
-        String var = this.getSVariable();
-        int value = result.getVariables().get("y");
-        context.getVariables().put(var, value);
-        context.increaseCycles(result.getCycles() + 5);
-        context.increasePC(1);
 
     }
 
@@ -378,6 +342,21 @@ public class QuoteInstruction extends SInstruction {
         }
 
         return matches;
+    }
+
+
+
+    protected static String replaceKeys(String input, Map<String, String> replacements) {
+        if (input == null || input.isEmpty() || replacements == null || replacements.isEmpty()) {
+            return input;
+        }
+
+        String result = input;
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            result = result.replace(entry.getKey(), entry.getValue());
+        }
+
+        return result;
     }
 
 }

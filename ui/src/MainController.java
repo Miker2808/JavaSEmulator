@@ -431,7 +431,8 @@ public class MainController {
         maxDegreeLabel.setText(String.format("%d", max_degree));
         collapseButton.setDisable(degree_selected == 0);
         expandButton.setDisable(degree_selected == max_degree);
-        updateInstructionsUI(engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected));
+        SProgramView expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
+        updateInstructionsUI(expanded);
     }
 
 

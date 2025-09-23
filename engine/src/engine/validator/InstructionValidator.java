@@ -118,7 +118,20 @@ public class InstructionValidator {
 
     // TODO: ADD SUPPORT
     public void validate(JumpEqualFunctionInstruction instruction) throws InvalidInstructionException{
-        throw new InvalidInstructionException(String.format("instruction name %s is not supported", instruction.getInstructionName()));
+        validate((SInstruction) instruction);
+        String functionName = instruction.getFunctionName();
+        String functionArgs = instruction.getFunctionArguments();
+
+        if(!functionArgumentsValidator.isFunctionAvailable(functionName)){
+            throw new InvalidInstructionException(String.format("Function %s does not exist", functionName));
+        }
+        try {
+            functionArgumentsValidator.validateArguments(functionArgs);
+        }
+        catch(Exception e){
+            throw new InvalidInstructionException(e.getMessage());
+        }
+
     }
 
     public void validate(UnsupportedInstruction instruction) throws InvalidInstructionException{
