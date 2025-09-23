@@ -6,6 +6,7 @@ import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -367,12 +368,19 @@ public class MainController {
         }));
     }
 
-    private void resetHighlightChoiceBox(SProgramView programView){
-        List<String> used_variables = programView.getInstructionsView().getVariablesUsed();
-        List<String> used_labels = programView.getInstructionsView().getLabelsUsed();
-        highlightChoiceBox.getItems().setAll(used_variables);
-        highlightChoiceBox.getItems().addFirst("Highlight Selection");
-        highlightChoiceBox.getItems().addAll(used_labels);
+    private void resetHighlightChoiceBox(SProgramView programView) {
+        List<String> usedVariables = programView.getInstructionsView().getVariablesUsed();
+        List<String> usedLabels = programView.getInstructionsView().getLabelsUsed();
+
+        // Build a single list
+        ObservableList<String> allItems = FXCollections.observableArrayList();
+        allItems.add("Highlight Selection");
+        allItems.addAll(usedVariables);
+        allItems.addAll(usedLabels);
+
+        // Replace the ChoiceBox items in one shot
+        highlightChoiceBox.setItems(allItems);
+
         highlightChoiceBox.getSelectionModel().selectFirst();
     }
 
@@ -460,7 +468,6 @@ public class MainController {
 
     @FXML
     void onNewRunClicked(MouseEvent event) {
-        resetInputTable();
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
         debug_run = false;

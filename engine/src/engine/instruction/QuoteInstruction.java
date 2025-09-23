@@ -167,7 +167,7 @@ public class QuoteInstruction extends SInstruction {
 
         // add last neutral instruction to jump into if exit.
         if(reuse_map.containsKey("EXIT")) {
-            expanded.getLast().setSLabel("EXIT");
+            expanded.add(new NeutralInstruction("y", reuse_map.get("EXIT")));
         }
 
 

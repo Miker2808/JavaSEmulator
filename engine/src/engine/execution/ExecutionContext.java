@@ -4,7 +4,6 @@ import engine.SInstructions;
 import engine.SInstructionsView;
 import engine.SProgram;
 import engine.instruction.SInstruction;
-
 import java.util.*;
 
 public class ExecutionContext {
@@ -15,6 +14,7 @@ public class ExecutionContext {
     private boolean exit;
 
     public ExecutionContext(SInstructionsView sInstructions, HashMap<String, Integer> InputVariables){
+
         variables =  new HashMap<>();
         variables.putAll(InputVariables);
         List<String> used_variables = sInstructions.getVariablesUsed();

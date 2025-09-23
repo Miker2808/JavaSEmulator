@@ -12,10 +12,7 @@ import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -58,37 +55,35 @@ public class SInstructions implements Serializable, SInstructionsView {
 
     // Returns list of input variables used in program in order
     @Override
-    public List<String> getInputVariablesUsed(){
-        List<String> vars = new ArrayList<>();
+    public List<String> getInputVariablesUsed() {
+        Set<String> vars = new LinkedHashSet<>(); // prevents duplicates automatically
 
-        for (int line = 1; line <= size(); line++){
+        for (int line = 1; line <= size(); line++) {
             SInstruction instr = getInstruction(line);
 
             String variable = instr.getSVariable();
-
-            // check that the variable itself is input variable, append if yes
-            if(variable.matches("^(x[1-9][0-9]*)$") && !vars.contains(variable))
+            if (variable.matches("^(x[1-9][0-9]*)$"))
                 vars.add(variable);
 
             String argVariable = instr.getArgumentVariable();
-
-            if(argVariable.matches("^(x[1-9][0-9]*)$") && !vars.contains(argVariable)){
+            if (argVariable.matches("^(x[1-9][0-9]*)$"))
                 vars.add(argVariable);
-            }
 
-            // the idea why to check both is because sometimes it might be x1 <- x2,
-            // and then you will want to add x1 and x2 to the input variables list
-            // (even though x1 is redundant logically)
-
-            if(instr.getInstructionName() == InstructionName.QUOTE){
-                QuoteInstruction quote_instruction = (QuoteInstruction) instr;
-                vars.addAll(quote_instruction.getInputVariablesFromArguments());
+            if (instr.getInstructionName() == InstructionName.QUOTE) {
+                QuoteInstruction quoteInstruction = (QuoteInstruction) instr;
+                vars.addAll(
+                        quoteInstruction.getInputVariablesFromArguments().stream()
+                                .filter(v -> v.matches("^(x[1-9][0-9]*)$"))
+                                .toList()
+                );
             }
         }
 
-        vars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
+        // sort by numeric part
+        List<String> sortedVars = new ArrayList<>(vars);
+        sortedVars.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
 
-        return vars;
+        return sortedVars;
     }
 
     @Override
