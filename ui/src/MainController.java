@@ -43,7 +43,7 @@ public class MainController {
     @FXML
     private Label maxDegreeLabel;
     @FXML
-    private ChoiceBox<String> highlightChoiceBox;
+    private ComboBox<String> highlightSelectionBox;
     @FXML
     private Button loadProgramButton;
     @FXML
@@ -129,7 +129,7 @@ public class MainController {
     @FXML
     public void initialize() {
         initializeInstructionTable();
-        initializeHighlightChoiceBox();
+        initializeHighlightSelectionBox();
         initializedExpansionsTable();
         initializeInputTable();
         initializeProgramVariablesTable();
@@ -181,7 +181,7 @@ public class MainController {
         updateInstructionsUI(selectedProgramView);
         resetInputTable();
         updateInputControllers();
-        resetHighlightChoiceBox(selectedProgramView);
+        resetHighlightSelectionBox(selectedProgramView);
         updateUIOnExpansion();
     }
 
@@ -286,8 +286,12 @@ public class MainController {
         });
     }
 
-    private void initializeHighlightChoiceBox() {
-        highlightChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+    private void initializeHighlightSelectionBox() {
+        highlightSelectionBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            if (newV == null) return; // guard against null
+            // Skip headers if you added them
+            if (newV.equals("Variables:") || newV.equals("Labels:")) return;
+
             updateSearchHighlights(newV);
             instructionsTable.refresh();
         });
@@ -368,21 +372,61 @@ public class MainController {
         }));
     }
 
-    private void resetHighlightChoiceBox(SProgramView programView) {
-        List<String> usedVariables = programView.getInstructionsView().getVariablesUsed();
-        List<String> usedLabels = programView.getInstructionsView().getLabelsUsed();
+    private void resetHighlightSelectionBox(SProgramView programView) {
+        List<String> variables = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
 
-        // Build a single list
-        ObservableList<String> allItems = FXCollections.observableArrayList();
-        allItems.add("Highlight Selection");
-        allItems.addAll(usedVariables);
-        allItems.addAll(usedLabels);
+        // Separate items into Variables and Labels
+        for (String item : programView.getInstructionsView().getVariablesUsed()) {
+            if (item.equals("EXIT") || item.startsWith("L")) {
+                labels.add(item);
+            } else {
+                variables.add(item);
+            }
+        }
+        for (String item : programView.getInstructionsView().getLabelsUsed()) {
+            labels.add(item);
+        }
 
-        // Replace the ChoiceBox items in one shot
-        highlightChoiceBox.setItems(allItems);
+        // Combine into ObservableList with headers
+        ObservableList<String> comboItems = FXCollections.observableArrayList();
+        comboItems.add("Variables:");
+        comboItems.addAll(variables);
+        comboItems.add("Labels:");
+        comboItems.addAll(labels);
 
-        highlightChoiceBox.getSelectionModel().selectFirst();
+        // Set items in ComboBox
+        highlightSelectionBox.setItems(comboItems);
+
+        // Show only 10 items at a time in the popup
+        highlightSelectionBox.setVisibleRowCount(10);
+
+        // Select the first item by default (skip header)
+        highlightSelectionBox.getSelectionModel().selectFirst();
+
+        // Custom cell factory to style headers and prevent selection
+        highlightSelectionBox.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setDisable(false);
+                } else {
+                    setText(item);
+                    if (item.endsWith(":")) {
+                        setStyle("-fx-font-weight: bold;"); // bold headers
+                        setDisable(true); // prevent header selection
+                    } else {
+                        setStyle(""); // normal items
+                        setDisable(false);
+                    }
+                }
+            }
+        });
     }
+
+
 
     @FXML
     private void onEditCommitInputColumn(TableColumn.CellEditEvent<VariableRow, Integer> event){
@@ -408,7 +452,7 @@ public class MainController {
             instructionsTable.getItems().add(instr);
         }
         chooseDegreeTextField.setText("" + degree_selected);
-        resetHighlightChoiceBox(programView);
+        resetHighlightSelectionBox(programView);
     }
 
     @FXML
