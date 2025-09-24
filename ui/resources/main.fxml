@@ -86,12 +86,12 @@
                               <TableColumn fx:id="cyclesHistoryColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Cycles" />
                            </columns>
                         </TableView>
-                        <Button fx:id="showInfoButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Show Info" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                        <Button fx:id="showInfoButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onShowInfoClicked" text="Show Info" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="10.0" right="10.0" />
                            </GridPane.margin>
                         </Button>
-                        <Button fx:id="reRunButton" layoutX="10.0" layoutY="207.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Re-Run" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Button fx:id="reRunButton" disable="true" layoutX="10.0" layoutY="207.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onReRunClicked" text="Re-Run" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>

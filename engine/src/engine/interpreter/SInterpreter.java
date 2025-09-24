@@ -31,8 +31,7 @@ public class SInterpreter
     // emulates a run on a clean environment
     public ExecutionContext run(){
 
-        int num_lines = sInstructions.size();
-        while(!context.getExit() && context.getPC() <= num_lines){
+        while(!context.getExit()){
             step();
         }
         return context;

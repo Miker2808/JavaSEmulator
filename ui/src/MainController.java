@@ -2,6 +2,7 @@
 
 import engine.*;
 import engine.execution.ExecutionContext;
+import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
 import ui.VariableRow;
+import ui.VariableTablePopup;
 
 
 public class MainController {
@@ -31,8 +33,7 @@ public class MainController {
     private final Engine engine = new Engine();
     // bunch of variables to make my lazy ass more comfortable
     private int degree_selected = 0;
-    private Boolean debug_run = false;
-    private Boolean run_ended = false;
+    private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
@@ -236,8 +237,7 @@ public class MainController {
 
     private void reloadSelectedProgram(){
         degree_selected = 0;
-        run_ended = false;
-        debug_run = false;
+        running = false;
 
         String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
         selectedProgramView = engine.getSelectedProgram(selected_program);
@@ -334,6 +334,11 @@ public class MainController {
                     return;
                 }
             }
+        });
+
+        historyTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            showInfoButton.setDisable(newSel == null);
+            reRunButton.setDisable((newSel == null) || running);
         });
 
     }
@@ -610,28 +615,36 @@ public class MainController {
         );
     }
 
+    void setInputTableValues(LinkedHashMap<String, Integer> variables) {
+        inputTable.getItems().setAll(
+                variables.entrySet().stream()
+                        .map(e -> new VariableRow(e.getKey(), e.getValue()))
+                        .toList()
+        );
+    }
+
     void updateInputControllers(){
         boolean not_loaded = !engine.isProgramLoaded();
-        newRunButton.setDisable(not_loaded);
-        normalRadioButton.setDisable(not_loaded || run_ended);
-        debugRadioButton.setDisable(not_loaded || run_ended);
-        stopButton.setDisable(!debug_run || not_loaded || run_ended);
-        stepOverButton.setDisable(!debug_run || not_loaded || run_ended);
-        resumeButton.setDisable(!debug_run || not_loaded || run_ended);
-        expandButton.setDisable(not_loaded || debug_run);
-        collapseButton.setDisable(not_loaded || debug_run);
-        chooseDegreeTextField.setDisable(not_loaded || debug_run);
-        executeButton.setDisable(not_loaded || run_ended);
-        inputTable.setDisable(debug_run);
-        programSelectionChoiceBox.setDisable(debug_run || not_loaded);
+        boolean debug = debugRadioButton.isSelected();
+        newRunButton.setDisable(not_loaded || running);
+        normalRadioButton.setDisable(not_loaded || running);
+        debugRadioButton.setDisable(not_loaded || running);
+        stopButton.setDisable(not_loaded || !(debug && running));
+        stepOverButton.setDisable(not_loaded || !(debug && running));
+        resumeButton.setDisable(not_loaded || !(debug && running));
+        expandButton.setDisable(not_loaded || running);
+        collapseButton.setDisable(not_loaded || running);
+        chooseDegreeTextField.setDisable(not_loaded || running);
+        executeButton.setDisable(not_loaded || running);
+        inputTable.setDisable(not_loaded || running);
+        programSelectionChoiceBox.setDisable(not_loaded || running);
     }
 
     @FXML
     void onNewRunClicked(MouseEvent event) {
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
-        debug_run = false;
-        run_ended = false;
+        running = false;
         clearInstructionTableHighlight();
         updateInputControllers();
     }
@@ -641,11 +654,10 @@ public class MainController {
     void onExecuteButtonClicked(MouseEvent event) {
         if(debugRadioButton.isSelected()) {
             LinkedHashMap<String, Integer> variables = engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
-            debug_run = true;
 
             updateProgramVariablesTable(variables, false);
-
             highLightInstructionTableLine(1);
+            running = true;
         }
         else{
             // run full program
@@ -655,16 +667,16 @@ public class MainController {
             updateProgramVariablesTable(result.getOrderedVariables(), false);
 
             cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-            run_ended = true;
+            running = false;
+            updateHistoryTableUI(selectedProgramView);
 
         }
         updateInputControllers();
-        updateHistoryTableUI(selectedProgramView);
     }
 
     @FXML
     void onResumeClicked(MouseEvent event) {
-
+        running = false;
         // execute single step
         ExecutionContext result = engine.resumeLoadedRun();
         // populate table with result variables (later it'll be the same with execution context
@@ -672,9 +684,6 @@ public class MainController {
 
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
         highLightInstructionTableLine(result.getPC());
-
-        debug_run = false;
-        run_ended = true;
         updateInputControllers();
         updateHistoryTableUI(selectedProgramView);
     }
@@ -691,8 +700,7 @@ public class MainController {
         cyclesMeterLabel.setText("Cycles: " + result.getCycles());
         highLightInstructionTableLine(result.getPC());
         if(result.getExit()){
-            debug_run = false;
-            run_ended = true;
+            running = false;
             updateInputControllers();
             updateHistoryTableUI(selectedProgramView);
         }
@@ -701,13 +709,10 @@ public class MainController {
 
     @FXML
     void onStopClicked(MouseEvent event) {
-        debug_run = false;
-        run_ended = true;
+        running = false;
         clearInstructionTableHighlight();
         updateInputControllers();
         updateHistoryTableUI(selectedProgramView);
-
-
     }
 
     LinkedHashMap<String, Integer> getInputVariablesFromUI(){
@@ -760,6 +765,24 @@ public class MainController {
         }
         return count;
 
+    }
+
+    @FXML
+    public void onReRunClicked(MouseEvent event) {
+        ExecutionHistory selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        if(selectedHistory != null){
+            degree_selected = selectedHistory.getDegree();
+            updateUIOnExpansion();
+            setInputTableValues(selectedHistory.getInputVariables());
+        }
+    }
+
+    @FXML
+    public void onShowInfoClicked(MouseEvent event) {
+        ExecutionHistory selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        if(selectedHistory != null){
+            new VariableTablePopup(selectedHistory.getVariables());
+        }
     }
 
 

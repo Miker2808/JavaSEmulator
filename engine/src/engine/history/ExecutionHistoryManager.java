@@ -1,4 +1,4 @@
-package engine;
+package engine.history;
 
 import java.util.ArrayList;
 import java.util.HashMap;
