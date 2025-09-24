@@ -13,10 +13,20 @@ import java.util.regex.Pattern;
 
 public class QuoteInstruction extends SInstruction {
 
+    protected static ArrayList<SProgramView> programViews;
+
     protected final String argFunctionName = "functionName";
     protected final String argFunctionArgumentsName = "functionArguments";
     protected String functionName;
     protected String functionArguments;
+
+    public static void setProgramViews(ArrayList<SProgramView> programViews) {
+        QuoteInstruction.programViews = programViews;
+    }
+
+    protected static ArrayList<SProgramView> getProgramViews() {
+        return QuoteInstruction.programViews;
+    }
 
     public QuoteInstruction(SInstruction base) {
         super(base);
@@ -94,12 +104,24 @@ public class QuoteInstruction extends SInstruction {
     }
 
     protected String getUserFunctionName(String functionName){
+        SProgramView view = getProgramView(functionName);
+        if(view.getProgramType() == SProgramView.ProgramType.FUNCTION){
+            return view.getUserString();
+        }
         return getProgramView(functionName).getName();
     }
 
     protected String getUserFunctionArgs(String functionArgs){
-        // TODO: Implement
-        return getFunctionArguments();
+        HashMap<String, String> functionNameMap = new HashMap<>();
+        for(SProgramView programView : QuoteInstruction.programViews){
+            if(programView.getProgramType() == SProgramView.ProgramType.FUNCTION) {
+                functionNameMap.put(programView.getName(), programView.getUserString());
+            }else {
+                functionNameMap.put(programView.getName(), programView.getName());
+            }
+        }
+
+        return replaceKeys(functionArgs, functionNameMap);
     }
 
     @Override
@@ -244,7 +266,7 @@ public class QuoteInstruction extends SInstruction {
 
     protected SProgramView getProgramView(String name){
         SProgramView program = null; // will always find, as validator verifies it before.
-        for(SProgramView programView : SInstruction.programViews){
+        for(SProgramView programView : QuoteInstruction.programViews){
             if(programView.getName().equals(name)){
                 program = programView;
             }

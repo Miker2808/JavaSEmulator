@@ -5,6 +5,7 @@ import engine.execution.ExecutionContext;
 import engine.expander.SProgramExpander;
 import engine.functions.SFunction;
 import engine.functions.SFunctions;
+import engine.instruction.QuoteInstruction;
 import engine.instruction.SInstruction;
 import engine.interpreter.SInterpreter;
 import jakarta.xml.bind.JAXBContext;
@@ -43,7 +44,7 @@ public class Engine implements Serializable{
         }
 
         loadedProgramTemp.validateProgram();
-        SInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
+        QuoteInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
 
         // happens only if validateProgram was successful (did not raise an exception)
         loadedProgram = loadedProgramTemp;
@@ -60,6 +61,8 @@ public class Engine implements Serializable{
 
         return programViews;
     }
+
+
 
     public boolean isProgramLoaded(){
         return loadedProgram != null;

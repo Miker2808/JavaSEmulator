@@ -17,7 +17,8 @@
 /* Labels */
 .label {
     -fx-text-fill: #2e2e2e;
-    -fx-font-family: "Roboto", "Segoe UI", "Arial";
+    -fx-font-family: "SansSerif";
+    -fx-font-scale: 2;
 }
 
 /* Text input fields */
@@ -96,4 +97,8 @@
 .combo-box .list-cell:selected {
     -fx-background-color: #4a90e2;
     -fx-text-fill: #ffffff;
+}
+
+.table-view .table-cell {
+    -fx-font-family: "SansSerif";
 }

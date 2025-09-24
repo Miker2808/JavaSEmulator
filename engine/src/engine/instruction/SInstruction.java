@@ -74,7 +74,6 @@ import java.util.Objects;
 @XmlRootElement(name = "S-Instruction")
 public class SInstruction implements Serializable {
 
-    protected static ArrayList<SProgramView> programViews;
 
     private String sVariable;
     private SInstructionArguments sInstructionArguments;
@@ -89,12 +88,7 @@ public class SInstruction implements Serializable {
     private int parent_line; // line of instruction in a program
     private SInstruction parent;
 
-    public static void setProgramViews(ArrayList<SProgramView> programViews) {
-        SInstruction.programViews = programViews;
-    }
-    protected static ArrayList<SProgramView> getProgramViews() {
-        return SInstruction.programViews;
-    }
+
 
     public SInstruction() {
         sVariable = "";
