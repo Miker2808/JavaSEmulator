@@ -30,8 +30,8 @@
                <children>
                   <TableView fx:id="historyChainTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
                     <columns>
-                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="30.0" text="#" />
-                        <TableColumn fx:id="historyChainType" minWidth="35.0" prefWidth="35.0" text="Type" />
+                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="35.0" text="#" />
+                        <TableColumn fx:id="historyChainType" minWidth="35.0" prefWidth="50.0" text="Type" />
                         <TableColumn fx:id="historyChainLabel" minWidth="40.0" prefWidth="40.0" text="Label" />
                         <TableColumn fx:id="historyChainInstruction" minWidth="100.0" prefWidth="325.0" text="Instruction" />
                         <TableColumn fx:id="historyChainCycles" minWidth="45.0" prefWidth="45.0" text="Cycles" />
@@ -48,10 +48,10 @@
                      <children>
                         <TableView fx:id="instructionsTable" minWidth="200.0" prefHeight="200.0" prefWidth="200.0">
                           <columns>
-                            <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="30.0" text="#" />
-                            <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="35.0" text="Type" />
-                              <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Label" />
-                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="325.0" text="Instruction" />
+                            <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="35.0" text="#" />
+                            <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
+                              <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="50.0" text="Label" />
+                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="400.0" text="Instruction" />
                               <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
                           </columns>
                         </TableView>
@@ -240,27 +240,57 @@
             </GridPane>
          </center>
          <top>
-            <Label text="S-Emulator" BorderPane.alignment="CENTER">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-               <textFill>
-                  <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="0.35545023696682465">
-                     <stops>
-                        <Stop>
-                           <color>
-                              <Color red="1.0" green="0.4100719392299652" />
-                           </color>
-                        </Stop>
-                        <Stop offset="1.0">
-                           <color>
-                              <Color red="1.0" green="1.0" blue="1.0" />
-                           </color>
-                        </Stop>
-                     </stops>
-                  </LinearGradient>
-               </textFill>
-            </Label>
+            <GridPane BorderPane.alignment="CENTER">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="15.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <Label text="S-Emulator" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <textFill>
+                        <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="0.35545023696682465">
+                           <stops>
+                              <Stop>
+                                 <color>
+                                    <Color red="1.0" green="0.4100719392299652" />
+                                 </color>
+                              </Stop>
+                              <Stop offset="1.0">
+                                 <color>
+                                    <Color red="1.0" green="1.0" blue="1.0" />
+                                 </color>
+                              </Stop>
+                           </stops>
+                        </LinearGradient>
+                     </textFill>
+                  </Label>
+                  <MenuButton maxHeight="20.0" maxWidth="75.0" minHeight="20.0" minWidth="75.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="75.0" text="Settings" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="10.0" />
+                     </font>
+                     <items>
+                        <Menu mnemonicParsing="false" text="Theme">
+                           <items>
+                              <RadioMenuItem mnemonicParsing="false" selected="true" text="Default">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="themeRadioMenu" />
+                                 </toggleGroup>
+                              </RadioMenuItem>
+                              <RadioMenuItem mnemonicParsing="false" text="Modern" toggleGroup="$themeRadioMenu" />
+                              <RadioMenuItem mnemonicParsing="false" text="Dark" toggleGroup="$themeRadioMenu" />
+                              <RadioMenuItem mnemonicParsing="false" text="Blue" toggleGroup="$themeRadioMenu" />
+                           </items>
+                        </Menu>
+                     </items>
+                  </MenuButton>
+               </children>
+            </GridPane>
          </top>
       </BorderPane>
    </content>

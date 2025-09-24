@@ -1,0 +1,98 @@
+/* Scrollable background */
+.scroll-pane .viewport {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e8ebef, #dfe3e8);
+}
+
+/* Buttons */
+.button, .menu-button {
+    -fx-background-color: #4a90e2;   /* modern blue accent */
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 6;
+}
+
+.button:hover {
+    -fx-background-color: #6aa8ea;   /* lighter hover */
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #2e2e2e;          /* dark gray, softer than black */
+}
+
+/* Text input fields */
+.text-field, .text-area {
+    -fx-background-color: #f5f7fa;   /* light neutral */
+    -fx-text-fill: #2e2e2e;
+    -fx-border-color: #cfd5db;
+}
+
+/* Choice and combo boxes */
+.choice-box, .combo-box, .menu-button {
+    -fx-background-color: #f0f3f7;
+    -fx-text-fill: #2e2e2e;
+}
+
+/* Radio buttons */
+.radio-button {
+    -fx-text-fill: #2e2e2e;
+}
+
+/* TableView container */
+.table-view {
+    -fx-background-color: #e8ebef;
+}
+
+/* Column headers */
+.table-view .column-header-background {
+    -fx-background-color: #dfe3e8;
+}
+
+.table-view .column-header,
+.table-view .column-header .label,
+.table-view .column-header .label .text {
+    -fx-background-color: #f0f3f7;
+    -fx-border-color: #cfd5db;
+    -fx-border-width: 0.5;
+    -fx-text-fill: #333333;
+}
+
+/* Filler area (right of last column) */
+.table-view .filler {
+    -fx-background-color: #e0e4e9;
+}
+
+/* Selected column header */
+.table-view .column-header:selected,
+.table-view .column-header .label:selected {
+    -fx-background-color: #4a90e2;   /* blue accent */
+    -fx-text-fill: #ffffff;
+}
+
+/* Context menus */
+.context-menu {
+    -fx-background-color: #f5f7fa;
+}
+
+/* ComboBox (chosen label) */
+.combo-box {
+    -fx-background-color: #f0f3f7;
+    -fx-text-fill: #2e2e2e;
+}
+
+/* ComboBox popup list */
+.combo-box .list-cell {
+    -fx-background-color: #f5f7fa;
+    -fx-text-fill: #2e2e2e;
+}
+
+/* Hover over items in the popup */
+.combo-box .list-cell:hover {
+    -fx-background-color: #e0e7f1;
+    -fx-text-fill: #2e2e2e;
+}
+
+/* Selected item in the popup */
+.combo-box .list-cell:selected {
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: #ffffff;
+}

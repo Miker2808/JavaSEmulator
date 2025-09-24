@@ -8,17 +8,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 
 import java.io.File;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
 import ui.VariableRow;
@@ -34,6 +36,10 @@ public class MainController {
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
+
+
+    @FXML private ToggleGroup themeRadioMenu;
+    private Stage stage;
 
     @FXML
     private ChoiceBox<String> programSelectionChoiceBox;
@@ -116,6 +122,7 @@ public class MainController {
     private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
 
+
     // History
     @FXML
     private TableView<?> historyTable;
@@ -131,6 +138,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        initializeTheme();
         initializeInstructionTable();
         initializeHighlightSelectionBox();
         initializedExpansionsTable();
@@ -143,6 +151,40 @@ public class MainController {
 
         initializeChooseDegreeTextField();
     }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    @FXML
+    private void initializeTheme() {
+        themeRadioMenu.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle == null) return;
+
+            RadioMenuItem selected = (RadioMenuItem) newToggle;
+            String theme = selected.getText();
+
+            switch (theme) {
+                case "Default" -> applyTheme(null);
+                case "Dark" -> applyTheme("dark.css");
+                case "Blue" -> applyTheme("blue.css");
+                case "Modern" -> applyTheme("modern.css");
+            }
+        });
+    }
+
+    private void applyTheme(String cssFile) {
+        Scene scene = stage.getScene();
+
+        scene.getStylesheets().clear();
+        if (cssFile != null) {
+            URL cssUrl = getClass().getResource(cssFile);
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+        }
+    }
+
 
     @FXML
     void onClickedLoadProgramButton(MouseEvent event) {
@@ -627,7 +669,7 @@ public class MainController {
                 if(highlight) {
                     if (newItem != null && newItem.getVariable() != null &&
                             !Objects.equals(oldValues.get(newItem.getVariable()), newItem.getValue())) {
-                        row.setStyle("-fx-background-color: orange;");
+                        row.setStyle("-fx-background-color: orange");
                     }
                 }
             });

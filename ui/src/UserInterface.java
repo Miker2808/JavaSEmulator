@@ -20,13 +20,14 @@ public class UserInterface extends Application{
 
         Parent root = loader.load();
 
-        // Get the controller (defined in FXML)
-        MainController controller = loader.getController();
-
         // Setup the stage
         primaryStage.setTitle("S-Emulator");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
+        // Get the controller (defined in FXML)
+        MainController controller = loader.getController();
+        controller.setStage(primaryStage);
     }
 
     public static void main(String[] args) {
