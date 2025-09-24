@@ -50,6 +50,9 @@ public class SInterpreter
         return context;
     }
 
+    public ExecutionContext getExecutionContext(){
+        return context;
+    }
 
     public LinkedHashMap<String, Integer> getOrderedVariables(){
         return context.getOrderedVariables();

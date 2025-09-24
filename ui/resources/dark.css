@@ -95,6 +95,7 @@
     -fx-text-fill: white;
 }
 
+/* font inside table view row */
 .table-view .table-cell {
     -fx-font-family: "SansSerif";
 }

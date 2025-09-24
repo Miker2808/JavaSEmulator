@@ -75,6 +75,7 @@ public class MainController {
     @FXML
     private Label instructionsCountLabel;
 
+    // Expansion table
     @FXML
     private TableView<SInstruction> historyChainTable;
     @FXML
@@ -87,6 +88,18 @@ public class MainController {
     private TableColumn<SInstruction, String> historyChainLabel;
     @FXML
     private TableColumn<SInstruction, String> historyChainInstruction;
+
+    // History Table
+    @FXML
+    private TableView<ExecutionHistory> historyTable;
+    @FXML
+    private TableColumn<ExecutionHistory, Number> numHistoryColumn;
+    @FXML
+    private TableColumn<ExecutionHistory, Number> degreeHistoryColumn;
+    @FXML
+    private TableColumn<ExecutionHistory, Number> yHistoryColumn;
+    @FXML
+    private TableColumn<ExecutionHistory, Number> cyclesHistoryColumn;
 
 
     // Debugger / Execution Section
@@ -124,11 +137,12 @@ public class MainController {
     @FXML
     private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
-
-
-    // History
+    // History buttons
     @FXML
-    private TableView<?> historyTable;
+    private Button showInfoButton;
+    @FXML
+    private Button reRunButton;
+
 
     // opens an "Alert" window with information.
     private void showInfoMessage(String title, String message){
@@ -148,6 +162,7 @@ public class MainController {
         initializeInputTable();
         initializeProgramVariablesTable();
         initializeProgramSelectionChoiceBox();
+        initializeHistoryTable();
 
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
@@ -231,6 +246,8 @@ public class MainController {
         updateInputControllers();
         resetHighlightSelectionBox(selectedProgramView);
         updateUIOnExpansion();
+        updateHistoryTableUI(selectedProgramView);
+
     }
 
     private void initializeInstructionTable(){
@@ -288,6 +305,39 @@ public class MainController {
 
     }
 
+    private void initializeHistoryTable(){
+        numHistoryColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getNum())
+        );
+        degreeHistoryColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getDegree())
+        );
+        yHistoryColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getY())
+        );
+        // labelColumn — string from getLabel()
+        cyclesHistoryColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().getCycles())
+        );
+
+
+        // prepare table list
+        historyTable.setItems(FXCollections.observableArrayList());
+
+        historyTable.setRowFactory(tv -> new TableRow<ExecutionHistory>() {
+            @Override
+            protected void updateItem(ExecutionHistory item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setStyle("");
+                    return;
+                }
+            }
+        });
+
+    }
+
     private void initializedExpansionsTable(){
         //  lineColumn "#" — dynamic row numbering
         historyChainLine.setCellValueFactory(cell ->
@@ -337,7 +387,7 @@ public class MainController {
     private void initializeHighlightSelectionBox() {
         highlightSelectionBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
             if (newV == null) return; // guard against null
-            // Skip headers if you added them
+            // Skip headers
             if (newV.equals("Variables:") || newV.equals("Labels:")) return;
 
             updateSearchHighlights(newV);
@@ -505,6 +555,14 @@ public class MainController {
 
     }
 
+    void updateHistoryTableUI(SProgramView programView){
+        historyTable.getItems().clear();
+        ArrayList<ExecutionHistory> history = engine.getHistory(programView.getName());
+        for (ExecutionHistory executionHistory : history) {
+            historyTable.getItems().add(executionHistory);
+        }
+    }
+
     void updateInstructionsTableSummary(SProgramView programView){
         int count = programView.getInstructionsView().size();
         int synth_count = countSynthetic(programView.getInstructionsView());
@@ -588,21 +646,20 @@ public class MainController {
             updateProgramVariablesTable(variables, false);
 
             highLightInstructionTableLine(1);
-            updateInputControllers();
         }
         else{
-            HashMap<String, Integer> input_variables = getInputVariablesFromUI();
-
             // run full program
-            ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), input_variables, degree_selected);
+            ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
             // populate table with result variables (later it'll be the same with execution context
 
             updateProgramVariablesTable(result.getOrderedVariables(), false);
 
             cyclesMeterLabel.setText("Cycles: " + result.getCycles());
             run_ended = true;
-            updateInputControllers();
+
         }
+        updateInputControllers();
+        updateHistoryTableUI(selectedProgramView);
     }
 
     @FXML
@@ -619,6 +676,7 @@ public class MainController {
         debug_run = false;
         run_ended = true;
         updateInputControllers();
+        updateHistoryTableUI(selectedProgramView);
     }
 
     @FXML
@@ -636,6 +694,7 @@ public class MainController {
             debug_run = false;
             run_ended = true;
             updateInputControllers();
+            updateHistoryTableUI(selectedProgramView);
         }
 
     }
@@ -646,11 +705,13 @@ public class MainController {
         run_ended = true;
         clearInstructionTableHighlight();
         updateInputControllers();
+        updateHistoryTableUI(selectedProgramView);
+
 
     }
 
-    HashMap<String, Integer> getInputVariablesFromUI(){
-        HashMap<String, Integer> input_variables = new HashMap<>();
+    LinkedHashMap<String, Integer> getInputVariablesFromUI(){
+        LinkedHashMap<String, Integer> input_variables = new LinkedHashMap<>();
 
         for (VariableRow row : inputTable.getItems()) {
             String key = row.getVariable();
