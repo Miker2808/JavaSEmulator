@@ -73,6 +73,9 @@ public class MainController {
     private TableColumn<SInstruction, String> instructionColumn;
 
     @FXML
+    private Label instructionsCountLabel;
+
+    @FXML
     private TableView<SInstruction> historyChainTable;
     @FXML
     private TableColumn<SInstruction, Number> historyChainLine;
@@ -498,6 +501,15 @@ public class MainController {
         }
         chooseDegreeTextField.setText("" + degree_selected);
         resetHighlightSelectionBox(programView);
+        updateInstructionsTableSummary(programView);
+
+    }
+
+    void updateInstructionsTableSummary(SProgramView programView){
+        int count = programView.getInstructionsView().size();
+        int synth_count = countSynthetic(programView.getInstructionsView());
+        int basic = count - synth_count;
+        instructionsCountLabel.setText("Instructions: " + count + " (Basic: " + basic + " / Synthetic: " + synth_count + " )");
     }
 
     @FXML
@@ -678,7 +690,16 @@ public class MainController {
     }
 
 
+    public int countSynthetic(SInstructionsView instructions){
+        int count = 0;
+        for(SInstruction instr : instructions.getAllInstructions()){
+            if(Objects.equals(instr.getType(), "synthetic")){
+                count++;
+            }
+        }
+        return count;
 
+    }
 
 
 }

@@ -5,23 +5,24 @@
 
 /* Buttons */
 .button, .menu-button {
-    -fx-background-color: #4a90e2;   /* modern blue accent */
+    -fx-background-color: #4a90e2;
     -fx-text-fill: #ffffff;
     -fx-background-radius: 6;
 }
 
 .button:hover {
-    -fx-background-color: #6aa8ea;   /* lighter hover */
+    -fx-background-color: #6aa8ea;
 }
 
 /* Labels */
 .label {
-    -fx-text-fill: #2e2e2e;          /* dark gray, softer than black */
+    -fx-text-fill: #2e2e2e;
+    -fx-font-family: "Roboto", "Segoe UI", "Arial";
 }
 
 /* Text input fields */
 .text-field, .text-area {
-    -fx-background-color: #f5f7fa;   /* light neutral */
+    -fx-background-color: #f5f7fa;
     -fx-text-fill: #2e2e2e;
     -fx-border-color: #cfd5db;
 }

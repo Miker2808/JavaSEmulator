@@ -17,6 +17,7 @@
 /* Labels */
 .label {
     -fx-text-fill: #e8e8e8;          /* soft white */
+    -fx-font-family: "Roboto", "Segoe UI", "Arial";
 }
 
 /* Text input fields */
