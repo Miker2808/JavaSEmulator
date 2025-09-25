@@ -23,6 +23,7 @@ public class Engine implements Serializable{
     private ExecutionHistory currentExecutionHistory = null;
     private SInterpreter interpreter;
     private boolean running = false;
+    private boolean new_run = true;
     private String current_running = "";
 
     // loads XML file for SProgram. raises exception on invalid
@@ -105,7 +106,7 @@ public class Engine implements Serializable{
         return loadedProgram.getProgramNames();
     }
 
-    public ExecutionContext runProgram(String program_name, LinkedHashMap<String, Integer> input, int degree){
+    private ExecutionContext runStaticProgram(String program_name, LinkedHashMap<String, Integer> input, int degree){
         // default main program
         SProgramView expanded = getExpandedProgram(program_name, degree);
         ExecutionContext context = SInterpreter.staticRun(expanded.getInstructionsView(), input);
@@ -114,22 +115,24 @@ public class Engine implements Serializable{
         return context;
     }
 
-    public LinkedHashMap<String, Integer> startDebugRun(String program_name, LinkedHashMap<String, Integer> input, int degree){
+    public ExecutionContext runProgram(String program_name, LinkedHashMap<String, Integer> input, int degree, boolean debug, Set<Integer> breakpoints){
+        current_running = program_name;
+        if(!debug){
+            running = false;
+            return runStaticProgram(program_name, input, degree);
+        }
+        new_run = true;
         SProgramView expanded = getExpandedProgram(program_name, degree);
         this.interpreter = new SInterpreter(expanded.getInstructionsView(), input);
         currentExecutionHistory = new ExecutionHistory(input, degree);
-        running = true;
-        current_running = program_name;
-        return this.interpreter.getOrderedVariables();
+        return resumeLoadedRun(breakpoints);
     }
 
     public ExecutionContext stepLoadedRun(){
         ExecutionContext context = this.interpreter.step();
-
+        currentExecutionHistory.setContext(context);
         if(context.getExit()){
             running = false;
-            current_running = "";
-            currentExecutionHistory.setContext(context);
             historyManager.addExecutionHistory(current_running, currentExecutionHistory);
         }
         return context;
@@ -138,24 +141,33 @@ public class Engine implements Serializable{
     public void stopLoadedRun(){
         if(running){
             running = false;
-            current_running = "";
-            currentExecutionHistory.setContext(this.interpreter.getExecutionContext());
             historyManager.addExecutionHistory(current_running, currentExecutionHistory);
         }
     }
 
-    public ExecutionContext resumeLoadedRun(){
+    public ExecutionContext resumeLoadedRun(Set<Integer> breakpoints){
 
-        ExecutionContext context = this.interpreter.step();
+        ExecutionContext context = this.interpreter.getExecutionContext();
+        int steps = 0;
         while(!context.getExit()){
+            if(breakpoints != null){
+                if(breakpoints.contains(context.getPC())){
+                    if(steps > 0 || new_run) {
+                        break;
+                    }
+                }
+            }
             context = this.interpreter.step();
+            steps++;
+        }
+        new_run = false;
+        currentExecutionHistory.setContext(context);
+        running = true;
+        if(context.getExit()){
+            historyManager.addExecutionHistory(current_running, currentExecutionHistory);
+            running = false;
         }
 
-        currentExecutionHistory.setContext(context);
-        historyManager.addExecutionHistory(current_running, currentExecutionHistory);
-
-        running = false;
-        current_running = "";
         return context;
     }
 

@@ -1,11 +1,10 @@
-
-
-import com.sun.tools.javac.Main;
-import engine.*;
+import engine.Engine;
+import engine.SInstructionsView;
+import engine.SProgramView;
 import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
-import javafx.animation.*;
+import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -15,17 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.effect.ColorInput;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
-
-import java.io.File;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -33,6 +22,11 @@ import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
 import ui.VariableRow;
 import ui.VariableTablePopup;
+
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class MainController {
@@ -42,6 +36,7 @@ public class MainController {
     private int degree_selected = 0;
     private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
+    private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
     private Stage stage;
@@ -71,6 +66,8 @@ public class MainController {
 // instructions table
     @FXML
     private TableView<SInstruction> instructionsTable;
+    @FXML
+    private TableColumn<SInstruction, String> breakPointColumn;
     @FXML
     private TableColumn<SInstruction, Number> lineColumn;
     @FXML
@@ -254,10 +251,12 @@ public class MainController {
         selectedProgramView = engine.getSelectedProgram(selected_program);
         updateInstructionsUI(selectedProgramView);
         resetInputTable();
+        programVariablesTable.getItems().clear();
         updateInputControllers();
         resetHighlightSelectionBox(selectedProgramView);
         updateUIOnExpansion();
         updateHistoryTableUI(selectedProgramView);
+
 
     }
 
@@ -313,6 +312,8 @@ public class MainController {
                 setStyle(String.join("", styles));
             }
         });
+
+        initBreakpointColumn();
 
     }
 
@@ -467,11 +468,6 @@ public class MainController {
         });
     }
 
-    // clear highlight
-    public void clearVariableHighlight() {
-        inputTable.refresh();
-    }
-
     void initializeProgramVariablesTable(){
         programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
         programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
@@ -562,11 +558,13 @@ public class MainController {
     void updateInstructionsUI(SProgramView programView){
 
         instructionsTable.getItems().clear();
+        instructionsTable.refresh();
         for(int i=1; i <= programView.getInstructionsView().size(); i++){
             SInstruction instr = programView.getInstructionsView().getInstruction(i);
             instructionsTable.getItems().add(instr);
         }
         chooseDegreeTextField.setText("" + degree_selected);
+
         resetHighlightSelectionBox(programView);
         updateInstructionsTableSummary(programView);
 
@@ -615,6 +613,7 @@ public class MainController {
         maxDegreeLabel.setText(String.format("%d", max_degree));
         collapseButton.setDisable(degree_selected == 0);
         expandButton.setDisable(degree_selected == max_degree);
+        breakPoints.clear();
         SProgramView expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
         updateInstructionsUI(expanded);
     }
@@ -661,36 +660,37 @@ public class MainController {
         updateInputControllers();
     }
 
-
     @FXML
     void onExecuteButtonClicked(MouseEvent event) {
+
+        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(),
+                getInputVariablesFromUI(),
+                degree_selected,
+                debugRadioButton.isSelected(),
+                breakPoints);
+        running = !result.getExit();
+
         if(debugRadioButton.isSelected()) {
-            LinkedHashMap<String, Integer> variables = engine.startDebugRun(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
-
-            updateProgramVariablesTable(variables, false);
-            highLightInstructionTableLine(1);
-            running = true;
+            highLightInstructionTableLine(result.getPC());
         }
-        else{
-            // run full program
-            ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(), getInputVariablesFromUI(), degree_selected);
-            // populate table with result variables (later it'll be the same with execution context
 
-            updateProgramVariablesTable(result.getOrderedVariables(), false);
+        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
+        updateProgramVariablesTable(result.getOrderedVariables(), false);
+        updateInputControllers();
 
-            cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-            running = false;
+        if(result.getExit()){
             updateHistoryTableUI(selectedProgramView);
 
         }
-        updateInputControllers();
     }
 
     @FXML
     void onResumeClicked(MouseEvent event) {
-        running = false;
         // execute single step
-        ExecutionContext result = engine.resumeLoadedRun();
+        ExecutionContext result = engine.resumeLoadedRun(breakPoints);
+
+        running = !result.getExit();
+
         // populate table with result variables (later it'll be the same with execution context
         updateProgramVariablesTable(result.getOrderedVariables(), true);
 
@@ -722,6 +722,7 @@ public class MainController {
     @FXML
     void onStopClicked(MouseEvent event) {
         running = false;
+        engine.stopLoadedRun();
         clearInstructionTableHighlight();
         updateInputControllers();
         updateHistoryTableUI(selectedProgramView);
@@ -834,6 +835,58 @@ public class MainController {
             }
         });
     }
+
+    private void initBreakpointColumn() {
+        breakPointColumn.setCellFactory(col -> {
+            TableCell<SInstruction, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || getIndex() >= getTableView().getItems().size()) {
+                        setText(null);
+                    } else {
+                        SInstruction row = getTableView().getItems().get(getIndex());
+                        // check breakPoints set to persist mark
+                        setText(breakPoints.contains(row.getLine()) ? "⬤" : "");
+                    }
+                    setStyle("-fx-alignment: CENTER;");
+                }
+            };
+
+            cell.setOnMouseClicked(e -> {
+                if (!cell.isEmpty()) {
+                    SInstruction row = instructionsTable.getItems().get(cell.getIndex());
+                    boolean marked = breakPoints.contains(row.getLine());
+
+                    // toggle mark in breakPoints
+                    if (marked) breakPoints.remove(row.getLine());
+                    else breakPoints.add(row.getLine());
+
+                    // update cell text immediately
+                    cell.setText(!marked ? "⬤" : "");
+
+                    onBreakpointClicked(row, !marked);
+                }
+            });
+
+            return cell;
+        });
+    }
+
+    // example callback
+    private void onBreakpointClicked(SInstruction instruction, boolean marked) {
+        if(marked){
+            breakPoints.add(instruction.getLine());
+        }
+        else{
+            breakPoints.remove(instruction.getLine());
+        }
+
+    }
+
+
+
+
 
 
 }

@@ -48,6 +48,7 @@
                      <children>
                         <TableView fx:id="instructionsTable" minWidth="200.0" prefHeight="200.0" prefWidth="200.0">
                           <columns>
+                              <TableColumn fx:id="breakPointColumn" editable="false" maxWidth="35.0" minWidth="30.0" prefWidth="35.0" resizable="false" sortable="false" text="BP" />
                             <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="35.0" text="#" />
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
                               <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="50.0" text="Label" />

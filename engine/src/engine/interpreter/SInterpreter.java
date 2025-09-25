@@ -25,27 +25,21 @@ public class SInterpreter
         while(!context.getExit() && context.getPC() <= num_lines){
             instructions.getInstruction(context.getPC()).execute(context);
         }
-        return context;
-    }
-
-    // emulates a run on a clean environment
-    public ExecutionContext run(){
-
-        while(!context.getExit()){
-            step();
-        }
+        context.setExit(true);
         return context;
     }
 
     // Runs a single step in execution
     public ExecutionContext step(){
         int num_lines = sInstructions.size();
-        if(context.getPC() > num_lines){
-            context.setExit(true);
-        }
-        if(!context.getExit()) {
+
+        if(!context.getExit() && context.getPC() <= num_lines) {
             sInstructions.getInstruction(context.getPC()).execute(context);
         }
+        if(!(context.getPC() <= num_lines)){
+            context.setExit(true);
+        }
+
         return context;
     }
 
