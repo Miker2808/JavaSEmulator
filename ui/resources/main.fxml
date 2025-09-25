@@ -292,6 +292,7 @@
                         <Font name="System Bold" size="10.0" />
                      </font>
                      <items>
+                        <CheckMenuItem fx:id="animationsMenuCheck" mnemonicParsing="false" text="Animations" />
                         <Menu mnemonicParsing="false" text="Theme">
                            <items>
                               <RadioMenuItem mnemonicParsing="false" selected="true" text="Default">

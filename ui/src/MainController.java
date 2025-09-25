@@ -4,6 +4,10 @@ import engine.*;
 import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
 import ui.ProgressBarDialog;
 import ui.VariableRow;
@@ -37,10 +42,12 @@ public class MainController {
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
-
+    private Stage stage;
 
     @FXML private ToggleGroup themeRadioMenu;
-    private Stage stage;
+
+    @FXML
+    private CheckMenuItem animationsMenuCheck;
 
     @FXML
     private ChoiceBox<String> programSelectionChoiceBox;
@@ -164,7 +171,9 @@ public class MainController {
         initializeProgramVariablesTable();
         initializeProgramSelectionChoiceBox();
         initializeHistoryTable();
-
+        applySlideAnimation(resumeButton, Duration.millis(500));
+        applySlideAnimation(stepOverButton, Duration.millis(500));
+        applySlideAnimation(stopButton, Duration.millis(500));
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
 
@@ -785,5 +794,31 @@ public class MainController {
         }
     }
 
+    private void applySlideAnimation(Button button, Duration duration) {
+        // initial state if button is disabled
+        if (animationsMenuCheck.isSelected()) {
+                button.setScaleY(0);
+        } else {
+            button.setScaleX(1);
+            button.setScaleY(1);
+        }
+
+        button.disabledProperty().addListener((obs, wasDisabled, isDisabled) -> {
+            if(animationsMenuCheck.isSelected()) {
+                ScaleTransition st = new ScaleTransition(duration, button);
+                if (isDisabled) {
+                    st.setToY(0);
+                } else {
+                    st.setToY(1);
+                }
+                st.play();
+            }
+            else{
+                ScaleTransition st = new ScaleTransition(duration, button);
+                st.setToX(1);
+                st.setToY(1);
+            }
+        });
+    }
 
 }
