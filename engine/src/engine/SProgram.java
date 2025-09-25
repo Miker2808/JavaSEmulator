@@ -35,21 +35,24 @@ public class SProgram implements Serializable, SProgramView {
             throw new InvalidInstructionException("S-Program name is required");
         }
         validateInstructions(getSInstructions());
-        for(SFunction function : getSFunctions().getSFunction()){
-            if(function.getName() == null || function.getName().isEmpty()){
+        SFunctions functions = getSFunctions();
+        for (SFunction function : functions.getSFunction()) {
+            if (function.getName() == null || function.getName().isEmpty()) {
                 throw new InvalidFunctionException("S-Function name is required");
             }
             validateInstructions(function.getSInstructions());
         }
+
     }
 
     public ArrayList<String> getProgramNames(){
         ArrayList<String> programNames = new ArrayList<>();
         programNames.add(getName());
         SFunctions functions = getSFunctions();
-        for(SFunction func : functions.getSFunction()){
+        for (SFunction func : functions.getSFunction()) {
             programNames.add(func.getName());
         }
+
         return programNames;
     }
 
@@ -96,6 +99,9 @@ public class SProgram implements Serializable, SProgramView {
     }
 
     public SFunctions getSFunctions() {
+        if(sFunctions == null){
+            sFunctions = new SFunctions();
+        }
         return sFunctions;
     }
 

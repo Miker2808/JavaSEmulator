@@ -1,13 +1,11 @@
 
 
+import com.sun.tools.javac.Main;
 import engine.*;
 import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,6 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.effect.ColorInput;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -502,6 +504,7 @@ public class MainController {
 
         // Combine into ObservableList with headers
         ObservableList<String> comboItems = FXCollections.observableArrayList();
+        comboItems.add("Clear");
         comboItems.add("Variables:");
         comboItems.addAll(variables);
         comboItems.add("Labels:");
@@ -813,12 +816,24 @@ public class MainController {
                 }
                 st.play();
             }
-            else{
+        });
+
+        animationsMenuCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if(!isSelected) {
                 ScaleTransition st = new ScaleTransition(duration, button);
-                st.setToX(1);
                 st.setToY(1);
+                st.setToX(1);
+                st.play();
+            }
+            else {
+                if(button.isDisabled()) {
+                    ScaleTransition st = new ScaleTransition(duration, button);
+                    st.setToY(0);
+                    st.play();
+                }
             }
         });
     }
+
 
 }
