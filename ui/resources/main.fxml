@@ -122,6 +122,7 @@
                             <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
                             <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.33" />
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.33" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.33" prefWidth="100.0" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -140,7 +141,7 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" text="Stop" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+                              <Button fx:id="stopButton" alignment="CENTER" disable="true" layoutX="179.0" layoutY="80.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onStopClicked" text="Stop" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -150,17 +151,22 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="executeButton" alignment="CENTER" disable="true" layoutX="10.0" layoutY="46.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onExecuteButtonClicked" text="Execute" GridPane.rowIndex="2">
+                              <Button fx:id="executeButton" alignment="CENTER" disable="true" layoutX="10.0" layoutY="46.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onExecuteButtonClicked" text="Execute" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Button>
-                              <RadioButton fx:id="normalRadioButton" disable="true" mnemonicParsing="false" selected="true" text="Normal" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                              <RadioButton fx:id="normalRadioButton" disable="true" mnemonicParsing="false" selected="true" text="Normal" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="runTypeGroup" />
                                  </toggleGroup>
                               </RadioButton>
-                              <RadioButton fx:id="debugRadioButton" disable="true" mnemonicParsing="false" text="Debug" toggleGroup="$runTypeGroup" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                              <RadioButton fx:id="debugRadioButton" disable="true" mnemonicParsing="false" text="Debug" toggleGroup="$runTypeGroup" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                              <Button fx:id="backstepButton" alignment="CENTER" disable="true" layoutX="273.0" layoutY="85.0" maxWidth="1.7976931348623157E308" minWidth="10.0" mnemonicParsing="false" onMouseClicked="#onBackStepClicked" text="Backstep" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Button>
                            </children>
                            <GridPane.margin>
                               <Insets />

@@ -122,6 +122,8 @@ public class MainController {
     @FXML
     private Button stepOverButton;
     @FXML
+    private Button backstepButton;
+    @FXML
     private Button stopButton;
     @FXML
     private RadioButton normalRadioButton;
@@ -173,6 +175,7 @@ public class MainController {
         applySlideAnimation(resumeButton, Duration.millis(500));
         applySlideAnimation(stepOverButton, Duration.millis(500));
         applySlideAnimation(stopButton, Duration.millis(500));
+        applySlideAnimation(backstepButton, Duration.millis(500));
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
 
@@ -252,7 +255,6 @@ public class MainController {
         updateInstructionsUI(selectedProgramView);
         resetInputTable();
         programVariablesTable.getItems().clear();
-        updateInputControllers();
         resetHighlightSelectionBox(selectedProgramView);
         updateUIOnExpansion();
         updateHistoryTableUI(selectedProgramView);
@@ -609,13 +611,11 @@ public class MainController {
     }
 
     void updateUIOnExpansion(){
-        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
-        maxDegreeLabel.setText(String.format("%d", max_degree));
-        collapseButton.setDisable(degree_selected == 0);
-        expandButton.setDisable(degree_selected == max_degree);
         breakPoints.clear();
+        lineHighlighted = null;
         SProgramView expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
         updateInstructionsUI(expanded);
+        updateInputControllers();
     }
 
 
@@ -637,18 +637,22 @@ public class MainController {
     void updateInputControllers(){
         boolean not_loaded = !engine.isProgramLoaded();
         boolean debug = debugRadioButton.isSelected();
+        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
+        maxDegreeLabel.setText(String.format("%d", max_degree));
         newRunButton.setDisable(not_loaded || running);
         normalRadioButton.setDisable(not_loaded || running);
         debugRadioButton.setDisable(not_loaded || running);
         stopButton.setDisable(not_loaded || !(debug && running));
+        backstepButton.setDisable(not_loaded || !(debug && running));
         stepOverButton.setDisable(not_loaded || !(debug && running));
         resumeButton.setDisable(not_loaded || !(debug && running));
-        expandButton.setDisable(not_loaded || running);
-        collapseButton.setDisable(not_loaded || running);
+        expandButton.setDisable(not_loaded || running || (degree_selected == max_degree));
+        collapseButton.setDisable(not_loaded || running || (degree_selected == 0));
         chooseDegreeTextField.setDisable(not_loaded || running);
         executeButton.setDisable(not_loaded || running);
         inputTable.setDisable(not_loaded || running);
         programSelectionChoiceBox.setDisable(not_loaded || running);
+
     }
 
     @FXML
@@ -717,6 +721,14 @@ public class MainController {
             updateHistoryTableUI(selectedProgramView);
         }
 
+    }
+
+    @FXML
+    void onBackStepClicked(MouseEvent event) {
+        ExecutionContext backstep = engine.backstepLoadedRun();
+        updateProgramVariablesTable(backstep.getOrderedVariables(), true);
+        cyclesMeterLabel.setText("Cycles: " + backstep.getCycles());
+        highLightInstructionTableLine(backstep.getPC());
     }
 
     @FXML

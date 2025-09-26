@@ -27,6 +27,14 @@ public class ExecutionContext {
         cycles = 0;
     }
 
+    public ExecutionContext(ExecutionContext other){
+        variables = new HashMap<>(other.variables);
+        labelMap = new HashMap<>(other.labelMap);
+        cycles = other.cycles;
+        exit = other.exit;
+        pc = other.pc;
+    }
+
     // maps labels to line number
     // simply assigns label to map on first encounter each line
     private HashMap<String, Integer> mapLabels(SInstructionsView sInstructions){

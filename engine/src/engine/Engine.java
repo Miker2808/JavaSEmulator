@@ -138,6 +138,12 @@ public class Engine implements Serializable{
         return context;
     }
 
+    public ExecutionContext backstepLoadedRun(){
+        ExecutionContext context = this.interpreter.backstep();
+        currentExecutionHistory.setContext(context);
+        return context;
+    }
+
     public void stopLoadedRun(){
         if(running){
             running = false;
