@@ -27,6 +27,9 @@ public class SVariable {
     }
 
     public String toString(){
+        if(type == 'y'){
+            return "y";
+        }
         return String.format("%c%d",type, number);
     }
 }
