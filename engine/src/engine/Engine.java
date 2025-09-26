@@ -129,7 +129,7 @@ public class Engine implements Serializable{
     }
 
     public ExecutionContext stepLoadedRun(){
-        ExecutionContext context = this.interpreter.step();
+        ExecutionContext context = this.interpreter.step(true);
         currentExecutionHistory.setContext(context);
         if(context.getExit()){
             running = false;
@@ -163,7 +163,7 @@ public class Engine implements Serializable{
                     }
                 }
             }
-            context = this.interpreter.step();
+            context = this.interpreter.step(false);
             steps++;
         }
         new_run = false;

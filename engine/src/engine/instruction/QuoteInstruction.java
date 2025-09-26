@@ -335,7 +335,7 @@ public class QuoteInstruction extends SInstruction {
 
                 ExecutionContext result = runFunction(func, sub_args, context);
                 //Integer value = result.getVariables().computeIfAbsent("y", k -> 0);
-                int value = context.getVariableValue(new SVariable(arg));
+                int value = result.getVariableValue(new SVariable("y"));
                 input.put("x" + (i+1), value);
             }
         }

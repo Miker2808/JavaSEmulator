@@ -13,12 +13,13 @@ public class SInterpreter
     private ExecutionContext context;
     private HashMap<String, Integer> inputVariables;
     private ExecutionContextHistory contextHistory;
+    private final int backstep_capacity = 20;
     private int steps = 0;
 
     public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables){
         this.sInstructions = sInstructions;
         this.inputVariables = new HashMap<>(inputVariables);
-        this.contextHistory = new ExecutionContextHistory(3);
+        this.contextHistory = new ExecutionContextHistory(backstep_capacity);
         this.context = new ExecutionContext(sInstructions, inputVariables);
 
     }
@@ -34,9 +35,11 @@ public class SInterpreter
     }
 
     // Runs a single step in execution
-    public ExecutionContext step(){
+    public ExecutionContext step(boolean keephistory){
         int num_lines = sInstructions.size();
-        contextHistory.push(context);
+        if(keephistory) {
+            contextHistory.push(context);
+        }
         if(!context.getExit() && context.getPC() <= num_lines) {
             sInstructions.getInstruction(context.getPC()).execute(context);
         }
@@ -64,7 +67,10 @@ public class SInterpreter
         int curr_steps = 0;
         ExecutionContext context = new ExecutionContext(sInstructions, inputVariables);
         while(curr_steps < steps){
-            contextHistory.push(context);
+            if(steps - curr_steps < backstep_capacity) {
+                contextHistory.push(context);
+            }
+
             sInstructions.getInstruction(context.getPC()).execute(context);
             curr_steps++;
         }
