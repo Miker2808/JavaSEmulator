@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.validator.InstructionValidator;
 
@@ -44,11 +45,17 @@ public class IncreaseInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        String var = this.getSVariable();
-        int value = context.getVariables().computeIfAbsent(var, k -> 0) + 1;
-        context.getVariables().put(var, value);
+        //String var = this.getSVariable();
+        //int value = context.getVariables().computeIfAbsent(var, k -> 0) + 1;
+        //context.getVariables().put(var, value);
+
+        SVariable var = this.getSVariableS();
+        int value = context.getVariableValue(var) + 1;
+        context.setVariableValue(var, value);
+
         context.increaseCycles(getCycles());
         context.increasePC(1);
+
     }
 
 

@@ -1,6 +1,7 @@
 package engine.instruction;
 
 import engine.SProgramView;
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.interpreter.SInterpreter;
@@ -138,8 +139,11 @@ public class QuoteInstruction extends SInstruction {
     public void execute(ExecutionContext context){
         ExecutionContext result = runFunction(getFunctionName(), getFunctionArguments(), context);
 
-        int value = result.getVariables().computeIfAbsent("y", k -> 0);
-        context.getVariables().put(getSVariable(), value);
+        //int value = result.getVariables().computeIfAbsent("y", k -> 0);
+        //context.getVariables().put(getSVariable(), value);
+        int value = result.getVariableValue(new SVariable("y"));
+        context.setVariableValue(getSVariableS(), value);
+
         context.increaseCycles(result.getCycles() + getCycles());
         context.increasePC(1);
     }
@@ -313,7 +317,8 @@ public class QuoteInstruction extends SInstruction {
             String arg = arguments.get(i).trim();
 
             if(FunctionArgumentsValidator.isValidVariable(arg)){
-                Integer value = context.getVariables().computeIfAbsent(arg, k -> 0);
+                //Integer value = context.getVariables().computeIfAbsent(arg, k -> 0);
+                int value = context.getVariableValue(new SVariable(arg));
                 input.put("x" + (i+1), value);
             }
             else if(!arg.isEmpty()){
@@ -329,7 +334,8 @@ public class QuoteInstruction extends SInstruction {
                 }
 
                 ExecutionContext result = runFunction(func, sub_args, context);
-                Integer value = result.getVariables().computeIfAbsent("y", k -> 0);
+                //Integer value = result.getVariables().computeIfAbsent("y", k -> 0);
+                int value = context.getVariableValue(new SVariable(arg));
                 input.put("x" + (i+1), value);
             }
         }

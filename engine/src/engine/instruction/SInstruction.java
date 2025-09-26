@@ -7,7 +7,7 @@
 
 package engine.instruction;
 
-import engine.SProgramView;
+import engine.SVariable.SVariable;
 import engine.arguments.SInstructionArgument;
 import engine.arguments.SInstructionArguments;
 import engine.execution.ExecutionContext;
@@ -17,7 +17,6 @@ import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -88,7 +87,7 @@ public class SInstruction implements Serializable {
     private int parent_line; // line of instruction in a program
     private SInstruction parent;
 
-
+    private SVariable sVariableSmart;
 
     public SInstruction() {
         sVariable = "";
@@ -112,6 +111,8 @@ public class SInstruction implements Serializable {
         this.parent = other.getParent();
         this.degree = other.getDegree();
         this.parent_line = other.getParentLine();
+
+        this.sVariableSmart = other.sVariableSmart;
     }
 
     public SInstruction copy(){
@@ -248,6 +249,7 @@ public class SInstruction implements Serializable {
     @XmlElement(name = "S-Variable", required = true)
     public void setSVariable(String value) {
         this.sVariable = value.trim().toLowerCase();
+        this.sVariableSmart = new SVariable(sVariable);
     }
 
     public SInstructionArguments getSInstructionArguments() {
@@ -326,6 +328,10 @@ public class SInstruction implements Serializable {
         List<SInstruction> expanded = new ArrayList<>();
         expanded.add(this);
         return expanded;
+    }
+
+    public SVariable getSVariableS(){
+        return sVariableSmart;
     }
 
 

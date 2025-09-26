@@ -24,5 +24,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="angus-activation" level="project" />
+    <orderEntry type="library" name="fastutil-8.5.16" level="project" />
   </component>
 </module>

@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
@@ -10,6 +11,7 @@ import java.util.List;
 public class AssignmentInstruction extends SInstruction {
     private String assignedVariable;
     private final String argName = "assignedVariable";
+    private SVariable argVar;
 
     public AssignmentInstruction(SInstruction base) {
         super(base);
@@ -46,6 +48,7 @@ public class AssignmentInstruction extends SInstruction {
     @Override
     public void setArgumentVariable(String variable) {
         this.assignedVariable = variable.trim().toLowerCase();
+        this.argVar = new SVariable(this.assignedVariable);
     }
 
     @Override
@@ -100,10 +103,15 @@ public class AssignmentInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        String var = this.getSVariable();
-        String argVar = this.getArgumentVariable();
-        int value =  context.getVariables().computeIfAbsent(argVar, k -> 0);
-        context.getVariables().put(var, value);
+        //String var = this.getSVariable();
+        //String argVar = this.getArgumentVariable();
+        //int value =  context.getVariables().computeIfAbsent(argVar, k -> 0);
+        //context.getVariables().put(var, value);
+
+        SVariable var = this.getSVariableS();
+        int value = context.getVariableValue(argVar);
+        context.setVariableValue(var, value);
+
         context.increaseCycles(getCycles());
         context.increasePC(1);
     }

@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
@@ -116,11 +117,14 @@ public class JumpEqualConstantInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        String var = this.getSVariable();
+        //String var = this.getSVariable();
         String argLabel = this.getArgumentLabel();
         int constValue = Integer.parseInt(getArgumentConst());
         //noinspection DuplicatedCode
-        int value = context.getVariables().computeIfAbsent(var, k -> 0);
+        //int value = context.getVariables().computeIfAbsent(var, k -> 0);
+
+        SVariable var = this.getSVariableS();
+        int value = context.getVariableValue(var);
 
         if(value == constValue){
             if(argLabel.equals("EXIT")){

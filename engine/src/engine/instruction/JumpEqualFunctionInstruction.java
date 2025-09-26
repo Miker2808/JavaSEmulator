@@ -1,6 +1,7 @@
 package engine.instruction;
 
 import engine.SProgramView;
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.FunctionArgumentsValidator;
@@ -91,9 +92,14 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
     public void execute(ExecutionContext context){
         ExecutionContext result = runFunction(getFunctionName(), getFunctionArguments(), context);
 
-        String var = this.getSVariable();
-        int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
-        int value = result.getVariables().get("y");
+        //String var = this.getSVariable();
+        //int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
+        //int value = result.getVariables().get("y");
+
+        SVariable var = this.getSVariableS();
+        int varValue = context.getVariableValue(var);
+        int value = result.getVariableValue(new SVariable("y"));
+
         String argLabel = this.getArgumentLabel();
 
         if(varValue == value){

@@ -3,11 +3,17 @@ package engine.execution;
 import engine.SInstructions;
 import engine.SInstructionsView;
 import engine.SProgram;
+import engine.SVariable.SVariable;
+import engine.SVariable.SVariablesMap;
 import engine.instruction.SInstruction;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
 import java.util.*;
+
 
 public class ExecutionContext {
     private final HashMap<String, Integer> variables;
+    private final SVariablesMap variablesSmartMap;
     private final HashMap<String, Integer> labelMap;
     private int pc;
     private int cycles;
@@ -16,10 +22,16 @@ public class ExecutionContext {
     public ExecutionContext(SInstructionsView sInstructions, HashMap<String, Integer> InputVariables){
 
         variables =  new HashMap<>();
+        variablesSmartMap = new SVariablesMap();
+
         variables.putAll(InputVariables);
+        variablesSmartMap.putAll(InputVariables);
+
         List<String> used_variables = sInstructions.getVariablesUsed();
         for(String variable : used_variables){
             variables.putIfAbsent(variable, 0);
+
+            variablesSmartMap.get(new SVariable(variable));
         }
         labelMap = mapLabels(sInstructions);
         exit = false;
@@ -29,14 +41,13 @@ public class ExecutionContext {
 
     public ExecutionContext(ExecutionContext other){
         variables = new HashMap<>(other.variables);
+        variablesSmartMap = new SVariablesMap(other.variablesSmartMap);
         labelMap = new HashMap<>(other.labelMap);
         cycles = other.cycles;
         exit = other.exit;
         pc = other.pc;
     }
 
-    // maps labels to line number
-    // simply assigns label to map on first encounter each line
     private HashMap<String, Integer> mapLabels(SInstructionsView sInstructions){
         HashMap<String, Integer> map = new HashMap<>();
         int size = sInstructions.size();
@@ -102,9 +113,9 @@ public class ExecutionContext {
     }
 
     public LinkedHashMap<String, Integer> getOrderedVariables(){
-        return buildOrderedMap(variables);
+        //return buildOrderedMap(variables);
+        return variablesSmartMap.getOrderedMap();
     }
-
 
     public void increaseCycles(int cycles){
         this.cycles += cycles;
@@ -115,5 +126,13 @@ public class ExecutionContext {
 
     public int getLabelLine(String label){
         return labelMap.get(label);
+    }
+
+    public int getVariableValue(SVariable variable){
+        return variablesSmartMap.get(variable);
+    }
+
+    public void setVariableValue(SVariable variable, int value){
+        variablesSmartMap.put(variable, value);
     }
 }

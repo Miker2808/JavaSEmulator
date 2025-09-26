@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
@@ -88,13 +89,18 @@ public class ConstantAssignmentInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        String var = this.getSVariable();
+        //String var = this.getSVariable();
         int value = Integer.parseInt(this.getArgumentConst());
+
+        SVariable var = this.getSVariableS();
+
         if(value < 0){
             value = 0;
         }
 
-        context.getVariables().put(var, value);
+        //context.getVariables().put(var, value);
+        context.setVariableValue(var, value);
+
         context.increaseCycles(getCycles());
         context.increasePC(1);
     }

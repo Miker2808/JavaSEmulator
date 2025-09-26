@@ -1,5 +1,6 @@
 package engine.instruction;
 
+import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
 import engine.validator.InstructionValidator;
@@ -8,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JumpEqualVariableInstruction extends SInstruction {
-    private String variableName;
+    private String argVariable;
     private final String argVarName = "variableName";
     private String JEVariableLabel;
     private final String argLabelName = "JEVariableLabel";
+    private SVariable argVariableSmart;
 
     public JumpEqualVariableInstruction(SInstruction base) {
         super(base);
@@ -51,12 +53,13 @@ public class JumpEqualVariableInstruction extends SInstruction {
 
     @Override
     public void setArgumentVariable(String variable) {
-        this.variableName = variable.trim().toLowerCase();
+        this.argVariable = variable.trim().toLowerCase();
+        this.argVariableSmart = new SVariable(this.argVariable);
     }
 
     @Override
     public String getArgumentVariable() {
-        return variableName;
+        return argVariable;
     }
 
     @Override
@@ -119,12 +122,17 @@ public class JumpEqualVariableInstruction extends SInstruction {
 
     @Override
     public void execute(ExecutionContext context){
-        String var = this.getSVariable();
+        //String var = this.getSVariable();
         String argLabel = this.getArgumentLabel();
-        String argVar = getArgumentVariable();
-        int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
+        //String argVar = getArgumentVariable();
+        //int varValue = context.getVariables().computeIfAbsent(var, k -> 0);
         //noinspection DuplicatedCode
-        int paramValue = context.getVariables().computeIfAbsent(argVar, k -> 0);
+        //int paramValue = context.getVariables().computeIfAbsent(argVar, k -> 0);
+
+        SVariable var = this.getSVariableS();
+        SVariable argVar = this.argVariableSmart;
+        int varValue = context.getVariableValue(var);
+        int paramValue = context.getVariableValue(argVar);
 
         if(varValue == paramValue){
             if(argLabel.equals("EXIT")){
