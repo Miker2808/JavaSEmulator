@@ -1,12 +1,13 @@
+package ui;
+
 import engine.Engine;
-
-import java.util.Scanner;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
+
+import java.util.Scanner;
 
 public class UserInterface extends Application{
     Engine engine;

@@ -2,7 +2,6 @@ package engine.SVariable;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

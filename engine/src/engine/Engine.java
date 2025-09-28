@@ -13,8 +13,11 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 
 public class Engine implements Serializable{
@@ -23,7 +26,6 @@ public class Engine implements Serializable{
     private ExecutionHistory currentExecutionHistory = null;
     private SInterpreter interpreter;
     private boolean running = false;
-    private boolean new_run = true;
     private String current_running = "";
 
     // loads XML file for SProgram. raises exception on invalid
@@ -121,7 +123,6 @@ public class Engine implements Serializable{
             running = false;
             return runStaticProgram(program_name, input, degree);
         }
-        new_run = true;
         SProgramView expanded = getExpandedProgram(program_name, degree);
         this.interpreter = new SInterpreter(expanded.getInstructionsView(), input);
         currentExecutionHistory = new ExecutionHistory(input, degree);
@@ -153,20 +154,7 @@ public class Engine implements Serializable{
 
     public ExecutionContext resumeLoadedRun(Set<Integer> breakpoints){
 
-        ExecutionContext context = this.interpreter.getExecutionContext();
-        int steps = 0;
-        while(!context.getExit()){
-            if(breakpoints != null){
-                if(breakpoints.contains(context.getPC())){
-                    if(steps > 0 || new_run) {
-                        break;
-                    }
-                }
-            }
-            context = this.interpreter.step(false);
-            steps++;
-        }
-        new_run = false;
+        ExecutionContext context = this.interpreter.runToBreakPoint(breakpoints);
         currentExecutionHistory.setContext(context);
         running = true;
         if(context.getExit()){

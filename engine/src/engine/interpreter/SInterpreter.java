@@ -6,6 +6,7 @@ import engine.execution.ExecutionContextHistory;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class SInterpreter
 {
@@ -78,8 +79,31 @@ public class SInterpreter
         return context;
     }
 
+    public ExecutionContext runToBreakPoint(Set<Integer> breakpoints){
+        int curr_steps = 0;
+        while(!context.getExit()){
+            if(breakpoints != null){
+                if(breakpoints.contains(context.getPC())){
+                    if(curr_steps > 0 || steps == 0) {
+                        break;
+                    }
+                }
+            }
+            this.step(false);
+            curr_steps++;
+        }
+
+        contextHistory.clear();
+
+        return context;
+
+    }
+
     public ExecutionContext getExecutionContext(){
         return context;
+    }
+    public void setExecutionContext(ExecutionContext context){
+        this.context = context;
     }
 
     public LinkedHashMap<String, Integer> getOrderedVariables(){

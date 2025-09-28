@@ -35,4 +35,8 @@ public class ExecutionContextHistory {
     public int size() {
         return history.size();
     }
+
+    public void clear(){
+        history.clear();
+    }
 }

@@ -1,14 +1,11 @@
 package engine.instruction;
 
-import engine.SProgramView;
 import engine.SVariable.SVariable;
 import engine.execution.ExecutionContext;
 import engine.expander.ExpansionContext;
-import engine.validator.FunctionArgumentsValidator;
 import engine.validator.InstructionValidator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class JumpEqualFunctionInstruction extends QuoteInstruction {

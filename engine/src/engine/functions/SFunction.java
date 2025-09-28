@@ -7,19 +7,12 @@
 
 package engine.functions;
 
+import engine.SInstructions;
 import engine.SInstructionsView;
 import engine.SProgramView;
-import engine.SInstructions;
-import engine.instruction.SInstruction;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)

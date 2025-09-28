@@ -1,12 +1,9 @@
 package engine.execution;
 
-import engine.SInstructions;
 import engine.SInstructionsView;
-import engine.SProgram;
 import engine.SVariable.SVariable;
 import engine.SVariable.SVariablesMap;
 import engine.instruction.SInstruction;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 import java.util.*;
 

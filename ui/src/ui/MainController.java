@@ -1,14 +1,14 @@
+package ui;
+
 import engine.Engine;
 import engine.SInstructionsView;
 import engine.SProgramView;
 import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
-import javafx.beans.property.*;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,16 +16,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
-import ui.ProgressBarDialog;
-import ui.VariableRow;
-import ui.VariableTablePopup;
 
 import java.io.File;
 import java.net.URL;
@@ -36,22 +31,18 @@ import java.util.stream.Collectors;
 public class MainController {
 
     private final Engine engine = new Engine();
-    // bunch of variables to make my lazy ass more comfortable
-    private int degree_selected = 0;
+
+    private Integer degree_selected = 0;
     private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
     private Stage stage;
-    private final BooleanProperty animateTable = new SimpleBooleanProperty(true);
-
 
     @FXML private ToggleGroup themeRadioMenu;
-
     @FXML
     private CheckMenuItem animationsMenuCheck;
-
     @FXML
     private ChoiceBox<String> programSelectionChoiceBox;
     @FXML
@@ -158,48 +149,13 @@ public class MainController {
     @FXML
     private Button reRunButton;
 
-    public static void animateButton(Button button, CheckMenuItem checkMenuItem) {
-        Timeline timeline = new Timeline();
-
-        for (int i = 0; i <= 100; i++) {
-            double hue = i * 3.6; // 0 to 360 degrees
-            Color color = Color.hsb(hue, 0.8, 0.9);
-            String colorHex = String.format("#%02X%02X%02X",
-                    (int)(color.getRed() * 255),
-                    (int)(color.getGreen() * 255),
-                    (int)(color.getBlue() * 255));
-
-            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * 50),
-                    e -> button.setStyle("-fx-background-color: " + colorHex + ";"));
-            timeline.getKeyFrames().add(keyFrame);
-        }
-
-        timeline.setCycleCount(Timeline.INDEFINITE);
-
-        checkMenuItem.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            if (isSelected) {
-                timeline.play();
-            } else {
-                timeline.stop();
-                button.setStyle("-fx-border-radius: 10px;"); // Reset with radius
-            }
-        });
-
-        // Start immediately if already checked
-        if (checkMenuItem.isSelected()) {
-            timeline.play();
-        }
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
-    // opens an "Alert" window with information.
-    private void showInfoMessage(String title, String message){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null); // removes the ugly header
-        alert.showAndWait();
-    }
+    public MainController() {}
 
-
+// ** Initializers **
     @FXML
     public void initialize() {
         initializeTheme();
@@ -210,19 +166,14 @@ public class MainController {
         initializeProgramVariablesTable();
         initializeProgramSelectionChoiceBox();
         initializeHistoryTable();
-        applySlideAnimation(resumeButton, Duration.millis(500));
-        applySlideAnimation(stepOverButton, Duration.millis(500));
-        applySlideAnimation(stopButton, Duration.millis(500));
-        applySlideAnimation(backstepButton, Duration.millis(500));
+        applySlideAnimation(resumeButton, animationsMenuCheck, Duration.millis(500));
+        applySlideAnimation(stepOverButton, animationsMenuCheck, Duration.millis(500));
+        applySlideAnimation(stopButton, animationsMenuCheck, Duration.millis(500));
+        applySlideAnimation(backstepButton, animationsMenuCheck, Duration.millis(500));
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
         initializeChooseDegreeTextField();
-        animateButton(loadProgramButton, animationsMenuCheck);
-        System.out.println("PASS");
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
+        CustomAnimations.animateButton(loadProgramButton, animationsMenuCheck);
     }
 
     @FXML
@@ -235,71 +186,11 @@ public class MainController {
 
             switch (theme) {
                 case "Default" -> applyTheme(null);
-                case "Dark" -> applyTheme("dark.css");
-                case "Blue" -> applyTheme("blue.css");
-                case "Modern" -> applyTheme("modern.css");
+                case "Dark" -> applyTheme("/dark.css");
+                case "Blue" -> applyTheme("/blue.css");
+                case "Modern" -> applyTheme("/modern.css");
             }
         });
-    }
-
-    private void applyTheme(String cssFile) {
-        Scene scene = stage.getScene();
-
-        scene.getStylesheets().clear();
-        if (cssFile != null) {
-            URL cssUrl = getClass().getResource(cssFile);
-            if (cssUrl != null) {
-                scene.getStylesheets().add(cssUrl.toExternalForm());
-            }
-        }
-    }
-
-
-    @FXML
-    void onClickedLoadProgramButton(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
-
-        if (selectedFile != null) {
-
-            String path = selectedFile.getAbsolutePath();
-            if(path.endsWith(".xml")) {
-                new ProgressBarDialog(.3f).start();
-            }
-            try {
-                engine.loadFromXML(path);
-                initOnLoad(path);
-            }
-            catch(Exception e){
-                // add alert window
-                showInfoMessage("Failed to load XML file", e.getMessage());
-            }
-        }
-    }
-
-    private void initOnLoad(String path){
-        loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
-        loadedFilePathTextField.setText(path);
-        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
-        programSelectionChoiceBox.getSelectionModel().selectFirst();
-        reloadSelectedProgram();
-        animateTable.set(true);
-    }
-
-    private void reloadSelectedProgram(){
-        degree_selected = 0;
-        running = false;
-
-        String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
-        selectedProgramView = engine.getSelectedProgram(selected_program);
-        updateInstructionsUI(selectedProgramView);
-        resetInputTable();
-        programVariablesTable.getItems().clear();
-        resetHighlightSelectionBox(selectedProgramView);
-        updateUIOnExpansion();
-        updateHistoryTableUI(selectedProgramView);
-
-
     }
 
     private void initializeInstructionTable(){
@@ -369,11 +260,9 @@ public class MainController {
         yHistoryColumn.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().getY())
         );
-        // labelColumn — string from getLabel()
         cyclesHistoryColumn.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().getCycles())
         );
-
 
         // prepare table list
         historyTable.setItems(FXCollections.observableArrayList());
@@ -385,7 +274,6 @@ public class MainController {
 
                 if (empty || item == null) {
                     setStyle("");
-                    return;
                 }
             }
         });
@@ -456,12 +344,139 @@ public class MainController {
 
     private void initializeProgramSelectionChoiceBox(){
         programSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            onProgramSelection();
+            reloadSelectedProgram();
         });
     }
 
-    private void onProgramSelection(){
+
+    void initializeProgramVariablesTable(){
+        programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+        programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+    }
+
+    // initialize textfield for degree, limiting to positive integers only
+    void initializeChooseDegreeTextField(){
+        chooseDegreeTextField.setTextFormatter(new TextFormatter<Integer>(c -> {
+            if (c.getControlNewText().matches("\\d*")) {
+                return c; // allow digits only
+            }
+            return null; // block everything else
+        }));
+    }
+
+    void initializeInputTable(){
+        inputTable.setEditable(true);
+
+        inputTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
+
+        inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
+                new IntegerStringConverter()) {
+            @Override
+            public void startEdit() {
+                VariableRow row = getTableRow().getItem();
+                if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
+                    super.startEdit(); // only editable if left column is not empty
+                }
+            }
+        });
+    }
+
+    private void initBreakpointColumn() {
+        breakPointColumn.setCellFactory(col -> {
+            TableCell<SInstruction, String> cell = new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || getIndex() >= getTableView().getItems().size()) {
+                        setText(null);
+                    } else {
+                        SInstruction row = getTableView().getItems().get(getIndex());
+                        // check breakPoints set to persist mark
+                        setText(breakPoints.contains(row.getLine()) ? "⬤" : "");
+                    }
+                    setStyle("-fx-alignment: CENTER;");
+                }
+            };
+
+            cell.setOnMouseClicked(e -> {
+                if (!cell.isEmpty()) {
+                    SInstruction row = instructionsTable.getItems().get(cell.getIndex());
+                    boolean marked = breakPoints.contains(row.getLine());
+
+                    // toggle mark in breakPoints
+                    if (marked) breakPoints.remove(row.getLine());
+                    else breakPoints.add(row.getLine());
+
+                    // update cell text immediately
+                    cell.setText(!marked ? "⬤" : "");
+
+                    onBreakpointClicked(row, !marked);
+                }
+            });
+
+            return cell;
+        });
+    }
+
+    private void applyTheme(String cssFile) {
+        Scene scene = stage.getScene();
+
+        scene.getStylesheets().clear();
+        if (cssFile != null) {
+            URL cssUrl = getClass().getResource(cssFile);
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+        }
+    }
+
+    @FXML
+    void onClickedLoadProgramButton(MouseEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
+
+        if (selectedFile != null) {
+
+            String path = selectedFile.getAbsolutePath();
+            if(path.endsWith(".xml")) {
+                new ProgressBarDialog(.3f).start();
+            }
+            try {
+                engine.loadFromXML(path);
+                initOnLoad(path);
+            }
+            catch(Exception e){
+                // add alert window
+                InfoMessage.showInfoMessage("Failed to load XML file", e.getMessage());
+            }
+        }
+    }
+
+    // properties to update on successful load
+    private void initOnLoad(String path){
+        loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
+        loadedFilePathTextField.setText(path);
+        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
+        programSelectionChoiceBox.getSelectionModel().selectFirst();
         reloadSelectedProgram();
+    }
+
+    // properties to update on program change
+    private void reloadSelectedProgram(){
+        degree_selected = 0;
+        running = false;
+
+        String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
+        selectedProgramView = engine.getSelectedProgram(selected_program);
+        updateInstructionsUI(selectedProgramView);
+        resetInputTable();
+        programVariablesTable.getItems().clear();
+        resetHighlightSelectionBox(selectedProgramView);
+        updateUIOnExpansion();
+        updateHistoryTableUI(selectedProgramView);
+
+
     }
 
     // Called when search filter changes
@@ -490,38 +505,6 @@ public class MainController {
     public void clearInstructionTableHighlight() {
         lineHighlighted = null;
         instructionsTable.refresh();
-    }
-
-    void initializeInputTable(){
-        inputTable.setEditable(true);
-
-        inputTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
-
-        inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-        inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
-                new IntegerStringConverter()) {
-            @Override
-            public void startEdit() {
-                VariableRow row = getTableRow().getItem();
-                if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
-                    super.startEdit(); // only editable if left column is not empty
-                }
-            }
-        });
-    }
-
-    void initializeProgramVariablesTable(){
-        programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
-        programVariablesTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-    }
-
-    void initializeChooseDegreeTextField(){
-        chooseDegreeTextField.setTextFormatter(new TextFormatter<Integer>(c -> {
-            if (c.getControlNewText().matches("\\d*")) {
-                return c; // allow digits only
-            }
-            return null; // block everything else
-        }));
     }
 
     private void resetHighlightSelectionBox(SProgramView programView) {
@@ -580,7 +563,6 @@ public class MainController {
     }
 
 
-
     @FXML
     private void onEditCommitInputColumn(TableColumn.CellEditEvent<VariableRow, Integer> event){
         Integer newValue = event.getNewValue();
@@ -591,7 +573,7 @@ public class MainController {
             event.getRowValue().setValue(newValue);
         } else {
             event.getTableView().refresh();
-            showInfoMessage("Invalid input variable value","Please enter a non-negative integer.");
+            InfoMessage.showInfoMessage("Invalid input variable value","Please enter a non-negative integer.");
         }
         event.getTableView().refresh();
     }
@@ -849,17 +831,17 @@ public class MainController {
         }
     }
 
-    private void applySlideAnimation(Button button, Duration duration) {
+    private void applySlideAnimation(Button button, CheckMenuItem condition, Duration duration) {
         // initial state if button is disabled
-        if (animationsMenuCheck.isSelected()) {
-                button.setScaleY(0);
+        if (condition.isSelected()) {
+            button.setScaleY(0);
         } else {
             button.setScaleX(1);
             button.setScaleY(1);
         }
 
         button.disabledProperty().addListener((obs, wasDisabled, isDisabled) -> {
-            if(animationsMenuCheck.isSelected()) {
+            if(condition.isSelected()) {
                 ScaleTransition st = new ScaleTransition(duration, button);
                 if (isDisabled) {
                     st.setToY(0);
@@ -870,7 +852,7 @@ public class MainController {
             }
         });
 
-        animationsMenuCheck.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+        condition.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
             if(!isSelected) {
                 ScaleTransition st = new ScaleTransition(duration, button);
                 st.setToY(1);
@@ -887,44 +869,6 @@ public class MainController {
         });
     }
 
-    private void initBreakpointColumn() {
-        breakPointColumn.setCellFactory(col -> {
-            TableCell<SInstruction, String> cell = new TableCell<>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || getIndex() >= getTableView().getItems().size()) {
-                        setText(null);
-                    } else {
-                        SInstruction row = getTableView().getItems().get(getIndex());
-                        // check breakPoints set to persist mark
-                        setText(breakPoints.contains(row.getLine()) ? "⬤" : "");
-                    }
-                    setStyle("-fx-alignment: CENTER;");
-                }
-            };
-
-            cell.setOnMouseClicked(e -> {
-                if (!cell.isEmpty()) {
-                    SInstruction row = instructionsTable.getItems().get(cell.getIndex());
-                    boolean marked = breakPoints.contains(row.getLine());
-
-                    // toggle mark in breakPoints
-                    if (marked) breakPoints.remove(row.getLine());
-                    else breakPoints.add(row.getLine());
-
-                    // update cell text immediately
-                    cell.setText(!marked ? "⬤" : "");
-
-                    onBreakpointClicked(row, !marked);
-                }
-            });
-
-            return cell;
-        });
-    }
-
-    // example callback
     private void onBreakpointClicked(SInstruction instruction, boolean marked) {
         if(marked){
             breakPoints.add(instruction.getLine());
@@ -934,10 +878,5 @@ public class MainController {
         }
 
     }
-
-
-
-
-
 
 }
