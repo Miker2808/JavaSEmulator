@@ -4,9 +4,11 @@ import engine.SProgramView;
 import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.instruction.SInstruction;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.animation.Timeline;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,7 +16,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -40,6 +44,8 @@ public class MainController {
     private Integer lineHighlighted = null; // only one line at a time
     SProgramView selectedProgramView = null;
     private Stage stage;
+    private final BooleanProperty animateTable = new SimpleBooleanProperty(true);
+
 
     @FXML private ToggleGroup themeRadioMenu;
 
@@ -152,6 +158,38 @@ public class MainController {
     @FXML
     private Button reRunButton;
 
+    public static void animateButton(Button button, CheckMenuItem checkMenuItem) {
+        Timeline timeline = new Timeline();
+
+        for (int i = 0; i <= 100; i++) {
+            double hue = i * 3.6; // 0 to 360 degrees
+            Color color = Color.hsb(hue, 0.8, 0.9);
+            String colorHex = String.format("#%02X%02X%02X",
+                    (int)(color.getRed() * 255),
+                    (int)(color.getGreen() * 255),
+                    (int)(color.getBlue() * 255));
+
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(i * 50),
+                    e -> button.setStyle("-fx-background-color: " + colorHex + ";"));
+            timeline.getKeyFrames().add(keyFrame);
+        }
+
+        timeline.setCycleCount(Timeline.INDEFINITE);
+
+        checkMenuItem.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            if (isSelected) {
+                timeline.play();
+            } else {
+                timeline.stop();
+                button.setStyle("-fx-border-radius: 10px;"); // Reset with radius
+            }
+        });
+
+        // Start immediately if already checked
+        if (checkMenuItem.isSelected()) {
+            timeline.play();
+        }
+    }
 
     // opens an "Alert" window with information.
     private void showInfoMessage(String title, String message){
@@ -178,8 +216,9 @@ public class MainController {
         applySlideAnimation(backstepButton, Duration.millis(500));
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
-
         initializeChooseDegreeTextField();
+        animateButton(loadProgramButton, animationsMenuCheck);
+        System.out.println("PASS");
     }
 
     public void setStage(Stage stage) {
@@ -244,6 +283,7 @@ public class MainController {
         programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
         programSelectionChoiceBox.getSelectionModel().selectFirst();
         reloadSelectedProgram();
+        animateTable.set(true);
     }
 
     private void reloadSelectedProgram(){
@@ -666,7 +706,6 @@ public class MainController {
 
     @FXML
     void onExecuteButtonClicked(MouseEvent event) {
-
         ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(),
                 getInputVariablesFromUI(),
                 degree_selected,

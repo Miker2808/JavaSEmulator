@@ -22,21 +22,12 @@
                   <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
-                <RowConstraints minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
+                  <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
                 <RowConstraints vgrow="ALWAYS" />
                 <RowConstraints percentHeight="30.0" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <TableView fx:id="historyChainTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
-                    <columns>
-                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="35.0" text="#" />
-                        <TableColumn fx:id="historyChainType" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
-                        <TableColumn fx:id="historyChainLabel" editable="false" minWidth="40.0" prefWidth="40.0" text="Label" />
-                        <TableColumn fx:id="historyChainInstruction" editable="false" minWidth="100.0" prefWidth="325.0" sortable="false" text="Instruction" />
-                        <TableColumn fx:id="historyChainCycles" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Cycles" />
-                    </columns>
-                  </TableView>
                   <GridPane GridPane.rowIndex="2">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -260,6 +251,15 @@
                         <Insets />
                      </opaqueInsets>
                   </HBox>
+                  <TableView fx:id="historyChainTable" minHeight="100.0" minWidth="100.0" GridPane.rowIndex="3">
+                    <columns>
+                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="35.0" text="#" />
+                        <TableColumn fx:id="historyChainType" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
+                        <TableColumn fx:id="historyChainLabel" editable="false" minWidth="40.0" prefWidth="40.0" text="Label" />
+                        <TableColumn fx:id="historyChainInstruction" editable="false" minWidth="100.0" prefWidth="325.0" sortable="false" text="Instruction" />
+                        <TableColumn fx:id="historyChainCycles" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Cycles" />
+                    </columns>
+                  </TableView>
                </children>
             </GridPane>
          </center>
