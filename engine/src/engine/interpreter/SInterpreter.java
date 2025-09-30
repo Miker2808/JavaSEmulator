@@ -16,12 +16,14 @@ public class SInterpreter
     private ExecutionContextHistory contextHistory;
     private final int backstep_capacity = 20;
     private int steps = 0;
+    private boolean new_run = true;
 
     public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables){
         this.sInstructions = sInstructions;
         this.inputVariables = new HashMap<>(inputVariables);
         this.contextHistory = new ExecutionContextHistory(backstep_capacity);
         this.context = new ExecutionContext(sInstructions, inputVariables);
+
 
     }
 
@@ -75,16 +77,16 @@ public class SInterpreter
             sInstructions.getInstruction(context.getPC()).execute(context);
             curr_steps++;
         }
-
         return context;
     }
 
     public ExecutionContext runToBreakPoint(Set<Integer> breakpoints){
         int curr_steps = 0;
         while(!context.getExit()){
+
             if(breakpoints != null){
                 if(breakpoints.contains(context.getPC())){
-                    if(curr_steps > 0 || steps == 0) {
+                    if(new_run || curr_steps > 0){
                         break;
                     }
                 }
@@ -92,7 +94,7 @@ public class SInterpreter
             this.step(false);
             curr_steps++;
         }
-
+        new_run = false;
         contextHistory.clear();
 
         return context;
