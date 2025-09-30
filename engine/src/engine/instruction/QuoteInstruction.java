@@ -35,6 +35,7 @@ public class QuoteInstruction extends SInstruction {
     public QuoteInstruction(SInstruction base) {
         super(base);
         setType("synthetic");
+        setInstructionName(InstructionName.QUOTE);
 
         // cant assign degree and cycles
 
@@ -44,6 +45,7 @@ public class QuoteInstruction extends SInstruction {
 
     public QuoteInstruction(String sVariable, String sLabel, String functionName, String functionArgumentsStr){
         super();
+        setInstructionName(InstructionName.QUOTE);
         this.setSVariable(sVariable);
         this.setSLabel(sLabel);
         this.setCycles(getCycles());
@@ -51,11 +53,14 @@ public class QuoteInstruction extends SInstruction {
         this.setFunctionName(functionName);
         this.setFunctionArguments(functionArgumentsStr);
         this.setDegree(getDegree());
+
+
     }
 
 
     public QuoteInstruction(QuoteInstruction other) {
         super(other);
+        setInstructionName(getInstructionName());
         setCycles(other.getCycles());
         setType(other.getType());
         setDegree(other.getDegree());

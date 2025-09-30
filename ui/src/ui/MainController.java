@@ -70,7 +70,7 @@ public class MainController {
     @FXML
     private TableColumn<SInstruction, String> typeColumn;
     @FXML
-    private TableColumn<SInstruction, Number> cyclesColumn;
+    private TableColumn<SInstruction, String> cyclesColumn;
     @FXML
     private TableColumn<SInstruction, String> labelColumn;
     @FXML
@@ -87,7 +87,7 @@ public class MainController {
     @FXML
     private TableColumn<SInstruction, String> historyChainType;
     @FXML
-    private TableColumn<SInstruction, Number> historyChainCycles;
+    private TableColumn<SInstruction, String> historyChainCycles;
     @FXML
     private TableColumn<SInstruction, String> historyChainLabel;
     @FXML
@@ -204,7 +204,7 @@ public class MainController {
         );
         // cyclesColumn — integer from getCycles()
         cyclesColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getCycles())
+                new SimpleStringProperty(cell.getValue().getCyclesStr())
         );
 
         // labelColumn — string from getLabel()
@@ -296,7 +296,7 @@ public class MainController {
         );
         // cyclesColumn — integer from getCycles()
         historyChainCycles.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getCycles())
+                new SimpleStringProperty(cell.getValue().getCyclesStr())
         );
 
         // labelColumn — string from getLabel()
@@ -587,6 +587,7 @@ public class MainController {
             SInstruction instr = programView.getInstructionsView().getInstruction(i);
             instructionsTable.getItems().add(instr);
         }
+
         chooseDegreeTextField.setText("" + degree_selected);
 
         resetHighlightSelectionBox(programView);

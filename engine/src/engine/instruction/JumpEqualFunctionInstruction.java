@@ -15,7 +15,7 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
     public JumpEqualFunctionInstruction(SInstruction base) {
         super(base);
         setType("synthetic");
-
+        setInstructionName(InstructionName.JUMP_EQUAL_FUNCTION);
         setArgumentLabel(getArgument(argumentLabelName));
         setFunctionArguments(getArgument(argFunctionArgumentsName));
         setFunctionName(getArgument(argFunctionName));
@@ -23,10 +23,10 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
 
     JumpEqualFunctionInstruction(JumpEqualFunctionInstruction other) {
         super(other);
+        setInstructionName(getInstructionName());
         setType(other.getType());
         setCycles(other.getCycles());
         setDegree(other.getDegree());
-
         setFunctionName(other.getFunctionName());
         setFunctionArguments(other.getFunctionArguments());
         setArgumentLabel(other.getArgumentLabel());

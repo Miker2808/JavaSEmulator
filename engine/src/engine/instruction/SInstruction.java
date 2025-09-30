@@ -20,52 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * <p>Java class for anonymous complex type</p>.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.</p>
- * 
- * <pre>{@code
- * <complexType>
- *   <complexContent>
- *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       <all>
- *         <element ref="{}S-Variable"/>
- *         <element ref="{}S-Instruction-Arguments" minOccurs="0"/>
- *         <element ref="{}S-Label" minOccurs="0"/>
- *       </all>
- *       <attribute name="type" use="required">
- *         <simpleType>
- *           <restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *             <enumeration value="basic"/>
- *             <enumeration value="synthetic"/>
- *           </restriction>
- *         </simpleType>
- *       </attribute>
- *       <attribute name="name" use="required">
- *         <simpleType>
- *           <restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *             <enumeration value="NEUTRAL"/>
- *             <enumeration value="INCREASE"/>
- *             <enumeration value="DECREASE"/>
- *             <enumeration value="JUMP_NOT_ZERO"/>
- *             <enumeration value="ZERO_VARIABLE"/>
- *             <enumeration value="ASSIGNMENT"/>
- *             <enumeration value="GOTO_LABEL"/>
- *             <enumeration value="CONSTANT_ASSIGNMENT"/>
- *             <enumeration value="JUMP_ZERO"/>
- *             <enumeration value="JUMP_EQUAL_CONSTANT"/>
- *             <enumeration value="JUMP_EQUAL_VARIABLE"/>
- *           </restriction>
- *         </simpleType>
- *       </attribute>
- *     </restriction>
- *   </complexContent>
- * </complexType>
- * }</pre>
- *
- * 
- */
+
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(name = "", propOrder = {
 
@@ -122,6 +77,15 @@ public class SInstruction implements Serializable {
 
     public int getCycles(){
         return this.cycles;
+    }
+
+    public String getCyclesStr(){
+        if(this.name == InstructionName.QUOTE || this.name == InstructionName.JUMP_EQUAL_FUNCTION){
+            return String.format("+%d", getCycles());
+        }
+        else{
+            return String.format("%d", getCycles());
+        }
     }
 
     public void setCycles(int value){
