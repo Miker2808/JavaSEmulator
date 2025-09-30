@@ -151,29 +151,43 @@ public class SInstructions implements Serializable, SInstructionsView {
         return max_z_var;
     }
 
-    // returns list of labels used in order
+    // returns list of labels used in order, but keeps EXIT as last.
     @Override
-    public List<String> getLabelsUsed(){
-        List<String> labels = new ArrayList<>();
-        boolean isExitAvailable = false;
+    public List<String> getLabelsUsed() {
+        boolean hasExit = false;
+        Set<String> labels = new HashSet<>();
 
-        for (int line = 1; line <= size(); line++){
+        for (int line = 1; line <= size(); line++) {
             String label = getInstruction(line).getSLabel();
-            if(!label.equals("EXIT") && !label.isEmpty() && !labels.contains(label)) {
-                labels.add(label);
+            String argLabel = getInstruction(line).getArgumentLabel();
+
+            if (label != null && !label.isEmpty()) {
+                if (label.equals("EXIT")) {
+                    hasExit = true;
+                } else {
+                    labels.add(label);
+                }
             }
-            else{
-                isExitAvailable = true;
+
+            if (argLabel != null && !argLabel.isEmpty()) {
+                if (argLabel.equals("EXIT")) {
+                    hasExit = true;
+                } else {
+                    labels.add(argLabel);
+                }
             }
         }
 
-        labels.sort(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))));
+        List<String> result = labels.stream()
+                .sorted(Comparator.comparingInt(v -> Integer.parseInt(v.substring(1))))
+                .toList();
 
-        if(isExitAvailable){
-            labels.add("EXIT\n");
+        if (hasExit) {
+            result = new ArrayList<>(result); // make mutable
+            result.add("EXIT");
         }
 
-        return labels;
+        return result;
     }
 
     @Override
@@ -183,17 +197,21 @@ public class SInstructions implements Serializable, SInstructionsView {
         for (int line = 1; line <= size(); line++){
             SInstruction instr = this.getInstruction(line);
 
-            String variable = instr.getSVariable();
+            List<String> candidates = new ArrayList<>();
+            candidates.add(instr.getSVariable());
+            candidates.add(instr.getArgumentVariable());
 
-            // check that the variable itself is input variable, append if yes
-            if(variable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(variable))
-                vars.add(variable);
-
-            String argVariable = instr.getArgumentVariable();
-
-            if(argVariable.matches("^(y|([xz][1-9][0-9]*))$") && !vars.contains(argVariable)){
-                vars.add(argVariable);
+            if (instr.getInstructionName() == InstructionName.QUOTE) {
+                QuoteInstruction quoteInstruction = (QuoteInstruction) instr;
+                candidates.addAll(quoteInstruction.getInputVariablesFromArguments());
             }
+
+            vars.addAll(
+                    candidates.stream()
+                            .filter(v -> v != null && v.matches("^(y|([xz][1-9][0-9]*))$"))
+                            .filter(v -> !vars.contains(v))
+                            .toList()
+            );
         }
 
         vars.sort(Comparator
@@ -203,6 +221,7 @@ public class SInstructions implements Serializable, SInstructionsView {
         );
         return vars;
     }
+
 
     public void addAll(List<SInstruction> instructions){
         sInstruction.addAll(instructions);

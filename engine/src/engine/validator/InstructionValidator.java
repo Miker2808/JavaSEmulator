@@ -116,7 +116,6 @@ public class InstructionValidator {
         }
     }
 
-    // TODO: ADD SUPPORT
     public void validate(JumpEqualFunctionInstruction instruction) throws InvalidInstructionException{
         validate((SInstruction) instruction);
         String functionName = instruction.getFunctionName();

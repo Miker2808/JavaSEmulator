@@ -513,11 +513,7 @@ public class MainController {
 
         // Separate items into Variables and Labels
         for (String item : programView.getInstructionsView().getVariablesUsed()) {
-            if (item.equals("EXIT") || item.startsWith("L")) {
-                labels.add(item);
-            } else {
-                variables.add(item);
-            }
+            variables.add(item);
         }
         for (String item : programView.getInstructionsView().getLabelsUsed()) {
             labels.add(item);
