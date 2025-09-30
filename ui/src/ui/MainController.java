@@ -25,6 +25,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -485,9 +486,13 @@ public class MainController {
         if (choice != null && !choice.trim().isEmpty()) {
             String query = choice.toUpperCase().trim();
             for (SInstruction instr : instructionsTable.getItems()) {
-                boolean match =
-                        instr.getSLabel().toUpperCase().contains(query) ||
-                                instr.getInstructionString().toUpperCase().contains(query);
+                String queryUpper = query.toUpperCase();
+                String labelUpper = instr.getSLabel().toUpperCase();
+                String instrStrUpper = instr.getInstructionString().toUpperCase();
+
+                boolean match = labelUpper.matches("\\b" + Pattern.quote(queryUpper) + "\\b") ||
+                        instrStrUpper.matches(".*\\b" + Pattern.quote(queryUpper) + "\\b.*");
+
                 if (match) {
                     searchHighlightedLines.add(instr.getLine());
                 }

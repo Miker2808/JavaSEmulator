@@ -53,10 +53,7 @@ public class QuoteInstruction extends SInstruction {
         this.setFunctionName(functionName);
         this.setFunctionArguments(functionArgumentsStr);
         this.setDegree(getDegree());
-
-
     }
-
 
     public QuoteInstruction(QuoteInstruction other) {
         super(other);
