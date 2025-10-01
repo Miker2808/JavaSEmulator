@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -440,18 +441,37 @@ public class MainController {
         if (selectedFile != null) {
 
             String path = selectedFile.getAbsolutePath();
-            if(path.endsWith(".xml")) {
-                new ProgressBarDialog(.3f).start();
+            if(!path.endsWith(".xml")) {
+                InfoMessage.showInfoMessage("Failed to load XML file", "File name doesnt end with .xml");
+                return;
             }
-            try {
-                engine.loadFromXML(path);
-                initOnLoad(path);
-            }
-            catch(Exception e){
-                // add alert window
-                InfoMessage.showInfoMessage("Failed to load XML file", e.getMessage());
-            }
+            loadProgramFromPath(path);
         }
+    }
+
+    private void loadProgramFromPath(String path) {
+        Task<Void> loadTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                engine.loadFromXML(path);
+                return null;
+            }
+        };
+
+        loadTask.setOnSucceeded(event -> {
+            initOnLoad(path);
+        });
+
+        loadTask.setOnFailed(event -> {
+            Throwable exception = loadTask.getException();
+            InfoMessage.showInfoMessage("Failed to load XML file", exception.getMessage());
+        });
+
+        // Show progress dialog and run task
+        new ProgressBarDialog(.3f).start();
+        Thread taskThread = new Thread(loadTask);
+        taskThread.setDaemon(true);
+        taskThread.start();
     }
 
     // properties to update on successful load
