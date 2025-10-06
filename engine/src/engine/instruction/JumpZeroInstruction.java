@@ -18,6 +18,9 @@ public class JumpZeroInstruction extends SInstruction {
         this.setCycles(2);
         this.setType("synthetic");
         this.setDegree(2);
+
+        this.setCredits(500);
+        this.setGeneration(3);
     }
 
     public JumpZeroInstruction(JumpZeroInstruction other) {
@@ -26,6 +29,9 @@ public class JumpZeroInstruction extends SInstruction {
         this.setType(other.getType());
         this.setDegree(other.getDegree());
         this.setArgumentLabel(other.getArgumentLabel());
+
+        this.setCredits(other.getCredits());
+        this.setGeneration(other.getGeneration());
     }
 
     @Override
@@ -42,6 +48,9 @@ public class JumpZeroInstruction extends SInstruction {
         this.setCycles(1);
         this.setType("synthetic");
         this.setDegree(2);
+
+        this.setCredits(500);
+        this.setGeneration(3);
     }
 
     public void setArgumentLabel(String label) {

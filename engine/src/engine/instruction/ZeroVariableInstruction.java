@@ -16,6 +16,9 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setCycles(1);
         this.setType("synthetic");
         this.setDegree(1);
+
+        this.setCredits(100);
+        this.setGeneration(2);
     }
 
     public ZeroVariableInstruction(String variable, String label){
@@ -26,6 +29,9 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setCycles(1);
         this.setType("synthetic");
         this.setDegree(1);
+
+        this.setCredits(100);
+        this.setGeneration(2);
     }
 
     public ZeroVariableInstruction(ZeroVariableInstruction other){
@@ -33,6 +39,9 @@ public class ZeroVariableInstruction extends  SInstruction {
         this.setCycles(other.getCycles());
         this.setType(other.getType());
         this.setDegree(other.getDegree());
+
+        this.setCredits(other.getCredits());
+        this.setGeneration(other.getGeneration());
     }
 
     @Override

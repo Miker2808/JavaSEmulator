@@ -18,6 +18,9 @@ public class ConstantAssignmentInstruction extends SInstruction {
         this.setType("synthetic");
         this.setDegree(2);
         this.setArgumentConst(getArgument(argName));
+
+        this.setCredits(100);
+        this.setGeneration(2);
     }
 
     public ConstantAssignmentInstruction(String variable, String label, int constantValue) {
@@ -29,6 +32,9 @@ public class ConstantAssignmentInstruction extends SInstruction {
         this.setType("synthetic");
         this.setDegree(2);
         setArgumentConst(String.format("%d",constantValue));
+
+        this.setCredits(100);
+        this.setGeneration(2);
     }
 
     public ConstantAssignmentInstruction(ConstantAssignmentInstruction other) {
@@ -37,6 +43,8 @@ public class ConstantAssignmentInstruction extends SInstruction {
         this.setType(other.getType());
         this.setDegree(other.getDegree());
         this.setArgumentConst(other.getArgumentConst());
+        this.setCredits(other.getCredits());
+        this.setGeneration(other.getGeneration());
     }
 
     @Override

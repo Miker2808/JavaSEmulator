@@ -19,6 +19,9 @@ public class AssignmentInstruction extends SInstruction {
         this.setCycles(4);
         this.setType("synthetic");
         this.setDegree(2);
+
+        this.setCredits(500);
+        this.setGeneration(3);
     }
 
     public AssignmentInstruction(String variable, String label, String assignedVariable) {
@@ -30,6 +33,9 @@ public class AssignmentInstruction extends SInstruction {
         this.setCycles(4);
         this.setType("synthetic");
         this.setDegree(2);
+
+        this.setCredits(500);
+        this.setGeneration(3);
     }
 
     public AssignmentInstruction(AssignmentInstruction other) {
@@ -38,6 +44,9 @@ public class AssignmentInstruction extends SInstruction {
         this.setCycles(other.getCycles());
         this.setType(other.getType());
         this.setDegree(other.getDegree());
+
+        this.setCredits(other.getCredits());
+        this.setGeneration(other.getGeneration());
     }
 
     @Override

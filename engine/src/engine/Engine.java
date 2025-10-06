@@ -30,31 +30,24 @@ public class Engine implements Serializable{
 
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
-    public void loadFromXML(String path) throws Exception {
-        SProgram loadedProgramTemp;
-
-        // verify path to a file
-        XMLValidator.validateXMLFile(path);
+    public static SProgram loadFromXML(File xmlFile) throws Exception {
+        SProgram program;
 
         // try to unmarshal to SProgram object
         try {
             JAXBContext context = JAXBContext.newInstance(SProgram.class);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            File xmlFile = new File(path);
-
             // This will throw JAXBException if XML is invalid or doesn't match class
-            loadedProgramTemp = (SProgram) unmarshaller.unmarshal(xmlFile);
+            program = (SProgram) unmarshaller.unmarshal(xmlFile);
 
         } catch (JAXBException e) {
-            throw new Exception("Failed to load XML: XML file may be invalid schema-wise");
+            throw new Exception("XML file may be invalid schema-wise");
         }
 
-        loadedProgramTemp.validateProgram();
-        QuoteInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
+        program.validateProgram(); // throws exception if invalid
+        //QuoteInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
 
-        // happens only if validateProgram was successful (did not raise an exception)
-        loadedProgram = loadedProgramTemp;
-        historyManager.clearHistory();
+        return program;
     }
 
     // populates Quote instruction with references to functions and main program
@@ -66,6 +59,10 @@ public class Engine implements Serializable{
         }catch (Exception ignored){}
 
         return programViews;
+    }
+
+    public void loadProgram(SProgram program){
+        this.loadedProgram = program;
     }
 
     public boolean isProgramLoaded(){

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="semulator-server:Web">
+    <output-path>$PROJECT_DIR$/out/artifacts/semulator_server_Web</output-path>
+    <root id="archive" name="semulator-server_Web.war">
+      <element id="artifact" artifact-name="semulator-server:Web exploded" />
+    </root>
+  </artifact>
+</component>

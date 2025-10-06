@@ -453,7 +453,8 @@ public class MainController {
         Task<Void> loadTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                engine.loadFromXML(path);
+                File xmlFile = new File(path);
+                engine.loadFromXML(xmlFile);
                 return null;
             }
         };
