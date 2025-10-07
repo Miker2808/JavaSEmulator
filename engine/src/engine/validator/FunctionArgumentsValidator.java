@@ -1,12 +1,13 @@
 package engine.validator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class FunctionArgumentsValidator {
-    private List<String> availableFunctions;
+    private HashSet<String> availableFunctions;
 
-    FunctionArgumentsValidator(List<String> availableFunctions){
+    FunctionArgumentsValidator(HashSet<String> availableFunctions){
         this.availableFunctions = availableFunctions;
     }
 
@@ -23,12 +24,7 @@ public class FunctionArgumentsValidator {
     }
 
     public boolean isFunctionAvailable(String functionName){
-        for(String availableFunction : availableFunctions){
-            if(availableFunction.equals(functionName)){
-                return true;
-            }
-        }
-        return false;
+        return availableFunctions.contains(functionName);
     }
 
     public void validateArguments(String str) throws InvalidFunctionException{
@@ -109,20 +105,4 @@ public class FunctionArgumentsValidator {
         return result;
     }
 
-    /*
-    public static void main(String[] args) {
-        List<String> validFunctions = new ArrayList<>(List.of("Func1", "Func2", "Func3", "Func4"));
-        String input = "(Func1,z1,x2),(Func2,(Func3,x3,y,(Func4,z2))),z5,(Func2)";
-
-
-        FunctionArgumentsValidator funcValidator = new FunctionArgumentsValidator(validFunctions);
-        try {
-            funcValidator.validateArguments(input);
-            System.out.println("All good");
-        }catch (InvalidFunctionException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-     */
 }

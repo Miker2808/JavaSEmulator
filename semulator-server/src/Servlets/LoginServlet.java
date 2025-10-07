@@ -16,10 +16,10 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("user");
+        response.setContentType("text/plain;charset=UTF-8");
 
         if (username == null || username.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("Missing 'user' parameter");
             return;
         }
@@ -35,11 +35,9 @@ public class LoginServlet extends HttpServlet {
 
         if (success) {
             response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("Successfully added user " + username);
         } else {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("Username is taken");
         }
     }

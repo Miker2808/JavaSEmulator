@@ -45,9 +45,6 @@ public class Engine implements Serializable{
             throw new Exception("XML file may be invalid schema-wise");
         }
 
-        program.validateProgram(); // throws exception if invalid
-        //QuoteInstruction.setProgramViews(getProgramViews(loadedProgramTemp));
-
         return program;
     }
 
@@ -103,7 +100,8 @@ public class Engine implements Serializable{
 
     // get names of possible programs
     public ArrayList<String> getLoadedProgramNames(){
-        return loadedProgram.getProgramNames();
+        System.out.println("getLoadedProgramNames needs reimplementation!");
+        return null;
     }
 
     private ExecutionContext runStaticProgram(String program_name, LinkedHashMap<String, Integer> input, int degree){

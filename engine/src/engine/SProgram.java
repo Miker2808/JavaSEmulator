@@ -9,6 +9,8 @@ import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -27,35 +29,24 @@ public class SProgram implements Serializable, SProgramView {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
-    public void validateProgram() throws Exception {
+    public void validateProgram(HashSet<String> availableFunctions) throws Exception {
         if(getName() == null || getName().isEmpty()){
             throw new InvalidInstructionException("S-Program name is required");
         }
-        validateInstructions(getSInstructions());
+        validateInstructions(getSInstructions(), availableFunctions);
         SFunctions functions = getSFunctions();
         for (SFunction function : functions.getSFunction()) {
             if (function.getName() == null || function.getName().isEmpty()) {
                 throw new InvalidFunctionException("S-Function name is required");
             }
-            validateInstructions(function.getSInstructions());
+            validateInstructions(function.getSInstructions(), availableFunctions);
         }
 
     }
 
-    public ArrayList<String> getProgramNames(){
-        ArrayList<String> programNames = new ArrayList<>();
-        programNames.add(getName());
-        SFunctions functions = getSFunctions();
-        for (SFunction func : functions.getSFunction()) {
-            programNames.add(func.getName());
-        }
-
-        return programNames;
-    }
-
-    protected void validateInstructions(SInstructions instructions) throws InvalidInstructionException {
+    protected void validateInstructions(SInstructions instructions, HashSet<String> availableFunctions) throws InvalidInstructionException {
         // validate instructions in general
-        InstructionValidator validator = new InstructionValidator(getProgramNames());
+        InstructionValidator validator = new InstructionValidator(availableFunctions);
         for(int line = 1; line <= instructions.size(); line++){
             try {
 

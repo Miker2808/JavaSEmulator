@@ -2,13 +2,13 @@ package engine.validator;
 
 import engine.instruction.*;
 
-import java.util.List;
+import java.util.HashSet;
 
 public class InstructionValidator {
-    protected List<String> validFunctions;
+    protected HashSet<String> validFunctions;
     protected FunctionArgumentsValidator functionArgumentsValidator;
 
-    public InstructionValidator(List<String> validFunctions){
+    public InstructionValidator(HashSet<String> validFunctions){
         this.validFunctions = validFunctions;
         functionArgumentsValidator = new FunctionArgumentsValidator(validFunctions);
     }
