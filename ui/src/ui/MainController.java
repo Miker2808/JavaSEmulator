@@ -454,7 +454,7 @@ public class MainController {
             @Override
             protected Void call() throws Exception {
                 File xmlFile = new File(path);
-                engine.loadFromXML(xmlFile);
+                //engine.loadFromXML(xmlFile);
                 return null;
             }
         };

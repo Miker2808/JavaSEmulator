@@ -9,9 +9,6 @@
         <webroots>
           <root url="file://$MODULE_DIR$/../../semulator-server/web" relative="/" />
         </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/../../semulator-server/src" />
-        </sourceRoots>
       </configuration>
     </facet>
   </component>
@@ -21,8 +18,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Tomcat 10.1.26" level="application_server_libraries" />
     <orderEntry type="library" name="gson-2.11.0" level="project" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="engine" />
   </component>
 </module>

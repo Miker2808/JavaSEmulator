@@ -6,6 +6,12 @@
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="semulator-server" />
+          <element id="module-output" name="engine" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="fastutil" />
+          <element id="library" level="project" name="jaxb" />
+          <element id="library" level="project" name="gson-2.11.0" />
         </element>
       </element>
     </root>
