@@ -150,10 +150,8 @@ public class MainController {
     private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
     // History buttons
-    @FXML
-    private Button showInfoButton;
-    @FXML
-    private Button reRunButton;
+    @FXML private Button showInfoButton;
+    @FXML private Button reRunButton;
 
     public void setStage(Stage stage) {
         this.stage = stage;

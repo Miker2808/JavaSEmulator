@@ -10,5 +10,6 @@ public class ExecutionHistoryDTO {
     public int y;
     public int cycles;
     public int num;
+    public String genStr;
 
 }

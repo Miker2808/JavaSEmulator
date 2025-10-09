@@ -52,12 +52,22 @@ public class UserInstance {
     public void setCreditsAvailable(Integer creditsAvailable) {
         this.creditsAvailable = creditsAvailable;
     }
+
+    public void addCreditsAvailable(Integer creditsAvailable) {
+        this.creditsAvailable += creditsAvailable;
+    }
+
     public Integer getCreditsUsed() {
         return creditsUsed;
     }
     public void setCreditsUsed(Integer creditsUsed) {
         this.creditsUsed = creditsUsed;
     }
+
+    public void addCreditsUsed(Integer creditsUsed) {
+        this.creditsUsed += creditsUsed;
+    }
+
     public Integer getTotalRuns() {
         return totalRuns;
     }

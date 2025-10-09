@@ -1,5 +1,7 @@
 package ui.netcode;
 
+import com.google.gson.Gson;
+import dto.DashboardDTO;
 import okhttp3.*;
 
 import java.io.File;
@@ -27,7 +29,7 @@ public class NetCode {
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("file","/D:/test folder/xmls/minus.xml",
+                .addFormDataPart("file",file.getAbsolutePath(),
                         RequestBody.create(MediaType.parse("application/octet-stream"), file))
                 .build();
 
@@ -40,5 +42,41 @@ public class NetCode {
 
         return client.newCall(request).execute();
     }
+
+    public static Response chargeCredits(String username, int credits) throws IOException {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
+        String url = String.format("%s/credits?user=%s&charge=%s", URL, username, credits);
+        Request request = new Request.Builder()
+                .url(url)
+                .method("POST", body)
+                .build();
+        return client.newCall(request).execute();
+    }
+
+    public static DashboardDTO getDashboardDTO(String username) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        String url = String.format("%s/dashboard?user=%s", URL, username);
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        Response response = client.newCall(request).execute();
+
+        if(response.isSuccessful()) {
+            String json = response.body().string();
+            Gson gson = new Gson();
+            return gson.fromJson(json, DashboardDTO.class);
+        }
+
+        else{
+            throw new IOException(response.body().string());
+        }
+    }
+
+
 
 }

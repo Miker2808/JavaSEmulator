@@ -109,7 +109,7 @@
                     </rowConstraints>
                      <children>
                         <TextField fx:id="creditsTextField" alignment="CENTER" maxHeight="30.0" promptText="Credits" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                        <Button fx:id="chargeCreditsButton" maxHeight="30.0" mnemonicParsing="false" text="Charge Credits" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        <Button fx:id="chargeCreditsButton" maxHeight="30.0" mnemonicParsing="false" onMouseClicked="#onChargeCreditsClicked" text="Charge Credits" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                         <Button fx:id="loadFileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="30.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onClickedLoadProgramButton" text="Load File" />
                         <TextField fx:id="loadedFilePathTextField" editable="false" maxHeight="30.0" promptText="No file loaded" GridPane.columnIndex="1" />
                      </children>
