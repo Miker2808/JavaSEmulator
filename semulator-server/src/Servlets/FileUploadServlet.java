@@ -29,6 +29,22 @@ public class FileUploadServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Collection<Part> parts = request.getParts();
 
+        String username = request.getParameter("user");
+
+        ServletContext context = getServletContext();
+
+        if (username == null || username.isEmpty()) {
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Missing 'user' parameter");
+            return;
+        }
+
+        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
+        UserInstance userInstance = userInstanceMap.get(username);
+        if(userInstance == null){
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User not found");
+            return;
+        }
+
         if (parts.size() != 1) {
             sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Exactly one file must be uploaded");
             return;
@@ -41,10 +57,11 @@ public class FileUploadServlet extends HttpServlet {
         }
 
         try (InputStream xmlStream = filePart.getInputStream()) {
-            ServletContext context = getServletContext();
+
             ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
 
             SProgram program = Engine.loadFromXML(xmlStream);
+            program.setUploader(username);
 
             programsStorage.addAll(program);
 
@@ -52,6 +69,11 @@ public class FileUploadServlet extends HttpServlet {
             availableFunctions.addAll(programsStorage.getAvailableProgramNames());
 
             program.validateProgram(availableFunctions);
+
+            // update user instance on how many programs and functions he uploaded
+            userInstance.setNumFilesUploaded(userInstance.getNumFilesUploaded() + 1);
+            userInstance.setNumFunctionsUploaded(userInstance.getNumFunctionsUploaded() + program.getSFunctions().getSFunction().size());
+
 
             sendPlain(response, HttpServletResponse.SC_OK, "Successfully uploaded file: " + filePart.getSubmittedFileName());
 

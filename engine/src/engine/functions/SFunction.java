@@ -28,6 +28,8 @@ public class SFunction implements Serializable, SProgramView {
     protected String userString;
     @XmlAttribute(name = "name", required = true)
     protected String name;
+    @XmlTransient
+    protected String uploader;
 
 
     public SInstructions getSInstructions() {
@@ -60,6 +62,13 @@ public class SFunction implements Serializable, SProgramView {
 
     public void setName(String value) {
         this.name = value;
+    }
+
+    public String getUploader() {
+        return uploader;
+    }
+    public void setUploader(String value) {
+        this.uploader = value;
     }
 
     @Override

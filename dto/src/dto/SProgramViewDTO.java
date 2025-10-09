@@ -7,4 +7,6 @@ public class SProgramViewDTO {
     public String type;
     public String name;
     public String userstring;
+    public String uploader;
+    public String maxDegree;
 }

@@ -19,7 +19,7 @@ public class LoginServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
 
         if (username == null || username.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Missing 'user' parameter");
             return;
         }

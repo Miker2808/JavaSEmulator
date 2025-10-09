@@ -1,4 +1,4 @@
-package ui;
+package ui.elements;
 
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controllers.LoginController">
+
+    <children>
+        <VBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
+
+            <Label style="-fx-font-size: 18px;" text="Login" />
+            <TextField fx:id="usernameField" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" promptText="Username" />
+            <Button defaultButton="true" onAction="#onLoginClicked" text="Login" />
+        </VBox>
+    </children>
+</AnchorPane>

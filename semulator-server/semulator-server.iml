@@ -22,5 +22,6 @@
     <orderEntry type="library" name="gson-2.11.0" level="project" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="engine" />
+    <orderEntry type="module" module-name="dto" />
   </component>
 </module>

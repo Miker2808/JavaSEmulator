@@ -1,11 +1,9 @@
-package ui;
+package ui.controllers;
 
-import engine.Engine;
-import engine.SInstructionsView;
-import engine.SProgramView;
-import engine.execution.ExecutionContext;
-import engine.history.ExecutionHistory;
-import engine.instruction.SInstruction;
+import dto.ExecutionHistoryDTO;
+import dto.SProgramViewDTO;
+
+import dto.SInstructionDTO;
 
 import javafx.animation.ScaleTransition;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -23,6 +21,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
+import ui.elements.CustomAnimations;
+import ui.elements.InfoMessage;
+import ui.elements.ProgressBarDialog;
+import ui.elements.VariableTablePopup;
+import ui.storage.VariableRow;
 
 import java.io.File;
 import java.net.URL;
@@ -33,14 +36,14 @@ import java.util.stream.Collectors;
 
 public class MainController {
 
-    private final Engine engine = new Engine();
+    SProgramViewDTO selectedProgramView = null;
 
     private Integer degree_selected = 0;
     private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
-    SProgramView selectedProgramView = null;
+
     private Stage stage;
 
     @FXML private ToggleGroup themeRadioMenu;
@@ -65,48 +68,48 @@ public class MainController {
 
 // instructions table
     @FXML
-    private TableView<SInstruction> instructionsTable;
+    private TableView<SInstructionDTO> instructionsTable;
     @FXML
-    private TableColumn<SInstruction, String> breakPointColumn;
+    private TableColumn<SInstructionDTO, String> breakPointColumn;
     @FXML
-    private TableColumn<SInstruction, Number> lineColumn;
+    private TableColumn<SInstructionDTO, Number> lineColumn;
     @FXML
-    private TableColumn<SInstruction, String> typeColumn;
+    private TableColumn<SInstructionDTO, String> typeColumn;
     @FXML
-    private TableColumn<SInstruction, String> cyclesColumn;
+    private TableColumn<SInstructionDTO, String> cyclesColumn;
     @FXML
-    private TableColumn<SInstruction, String> labelColumn;
+    private TableColumn<SInstructionDTO, String> labelColumn;
     @FXML
-    private TableColumn<SInstruction, String> instructionColumn;
+    private TableColumn<SInstructionDTO, String> instructionColumn;
 
     @FXML
     private Label instructionsCountLabel;
 
     // Expansion table
     @FXML
-    private TableView<SInstruction> historyChainTable;
+    private TableView<SInstructionDTO> historyChainTable;
     @FXML
-    private TableColumn<SInstruction, Number> historyChainLine;
+    private TableColumn<SInstructionDTO, Number> historyChainLine;
     @FXML
-    private TableColumn<SInstruction, String> historyChainType;
+    private TableColumn<SInstructionDTO, String> historyChainType;
     @FXML
-    private TableColumn<SInstruction, String> historyChainCycles;
+    private TableColumn<SInstructionDTO, String> historyChainCycles;
     @FXML
-    private TableColumn<SInstruction, String> historyChainLabel;
+    private TableColumn<SInstructionDTO, String> historyChainLabel;
     @FXML
-    private TableColumn<SInstruction, String> historyChainInstruction;
+    private TableColumn<SInstructionDTO, String> historyChainInstruction;
 
     // History Table
     @FXML
-    private TableView<ExecutionHistory> historyTable;
+    private TableView<ExecutionHistoryDTO> historyTable;
     @FXML
-    private TableColumn<ExecutionHistory, Number> numHistoryColumn;
+    private TableColumn<ExecutionHistoryDTO, Number> numHistoryColumn;
     @FXML
-    private TableColumn<ExecutionHistory, Number> degreeHistoryColumn;
+    private TableColumn<ExecutionHistoryDTO, Number> degreeHistoryColumn;
     @FXML
-    private TableColumn<ExecutionHistory, Number> yHistoryColumn;
+    private TableColumn<ExecutionHistoryDTO, Number> yHistoryColumn;
     @FXML
-    private TableColumn<ExecutionHistory, Number> cyclesHistoryColumn;
+    private TableColumn<ExecutionHistoryDTO, Number> cyclesHistoryColumn;
 
 
     // Debugger / Execution Section
@@ -199,33 +202,33 @@ public class MainController {
     private void initializeInstructionTable(){
         //lineColumn "#" — dynamic row numbering
         lineColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getLine())
+                new SimpleIntegerProperty(cell.getValue().line)
         );
         // typeColumn — string from getType()
         typeColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getTypeShort())
+                new SimpleStringProperty(cell.getValue().typeShort)
         );
         // cyclesColumn — integer from getCycles()
         cyclesColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getCyclesStr())
+                new SimpleStringProperty(cell.getValue().cyclesStr)
         );
 
         // labelColumn — string from getLabel()
         labelColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getSLabel())
+                new SimpleStringProperty(cell.getValue().sLabel)
         );
 
         // instructionColumn — string from getInstructionString()
         instructionColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getInstructionString())
+                new SimpleStringProperty(cell.getValue().instructionString)
         );
 
         // prepare table list
         instructionsTable.setItems(FXCollections.observableArrayList());
 
-        instructionsTable.setRowFactory(tv -> new TableRow<SInstruction>() {
+        instructionsTable.setRowFactory(tv -> new TableRow<SInstructionDTO>() {
             @Override
-            protected void updateItem(SInstruction item, boolean empty) {
+            protected void updateItem(SInstructionDTO item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (empty || item == null) {
@@ -236,12 +239,12 @@ public class MainController {
                 List<String> styles = new ArrayList<>();
 
                 // Search highlight
-                if (searchHighlightedLines.contains(item.getLine())) {
+                if (searchHighlightedLines.contains(item.line)) {
                     styles.add("-fx-background-color: yellow;");
                 }
 
                 // Line highlight
-                if (lineHighlighted != null && item.getLine() == lineHighlighted) {
+                if (lineHighlighted != null && item.line == lineHighlighted) {
                     styles.add("-fx-background-color: lightgreen;"); // stronger color
                 }
 
@@ -255,24 +258,24 @@ public class MainController {
 
     private void initializeHistoryTable(){
         numHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getNum())
+                new SimpleIntegerProperty(cell.getValue().num)
         );
         degreeHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getDegree())
+                new SimpleIntegerProperty(cell.getValue().degree)
         );
         yHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getY())
+                new SimpleIntegerProperty(cell.getValue().y)
         );
         cyclesHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getCycles())
+                new SimpleIntegerProperty(cell.getValue().cycles)
         );
 
         // prepare table list
         historyTable.setItems(FXCollections.observableArrayList());
 
-        historyTable.setRowFactory(tv -> new TableRow<ExecutionHistory>() {
+        historyTable.setRowFactory(tv -> new TableRow<ExecutionHistoryDTO>() {
             @Override
-            protected void updateItem(ExecutionHistory item, boolean empty) {
+            protected void updateItem(ExecutionHistoryDTO item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (empty || item == null) {
@@ -291,25 +294,25 @@ public class MainController {
     private void initializedExpansionsTable(){
         //  lineColumn "#" — dynamic row numbering
         historyChainLine.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().getLine())
+                new SimpleIntegerProperty(cell.getValue().line)
         );
         // typeColumn — string from getType()
         historyChainType.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getTypeShort())
+                new SimpleStringProperty(cell.getValue().typeShort)
         );
         // cyclesColumn — integer from getCycles()
         historyChainCycles.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getCyclesStr())
+                new SimpleStringProperty(cell.getValue().cyclesStr)
         );
 
         // labelColumn — string from getLabel()
         historyChainLabel.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getSLabel())
+                new SimpleStringProperty(cell.getValue().sLabel)
         );
 
         // instructionColumn — string from getInstructionString()
         historyChainInstruction.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().getInstructionString())
+                new SimpleStringProperty(cell.getValue().instructionString)
         );
 
         // prepare table list
@@ -320,9 +323,10 @@ public class MainController {
                 historyChainTable.getItems().clear();
                 return;
             }
-
-            List<SInstruction> chain = new ArrayList<>();
-            SInstruction current = newSel.getParent();  // start from parent, not self
+            // TODO: request chain from server
+            /*
+            List<SInstructionDTO> chain = new ArrayList<>();
+            SInstructionDTO current = newSel.getParent();  // start from parent, not self
 
             // walk up to root
             while (current != null) {
@@ -331,6 +335,8 @@ public class MainController {
             }
 
             historyChainTable.getItems().setAll(chain);
+
+             */
         });
     }
 
@@ -387,16 +393,16 @@ public class MainController {
 
     private void initBreakpointColumn() {
         breakPointColumn.setCellFactory(col -> {
-            TableCell<SInstruction, String> cell = new TableCell<>() {
+            TableCell<SInstructionDTO, String> cell = new TableCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty || getIndex() >= getTableView().getItems().size()) {
                         setText(null);
                     } else {
-                        SInstruction row = getTableView().getItems().get(getIndex());
+                        SInstructionDTO row = getTableView().getItems().get(getIndex());
                         // check breakPoints set to persist mark
-                        setText(breakPoints.contains(row.getLine()) ? "⬤" : "");
+                        setText(breakPoints.contains(row.line) ? "⬤" : "");
                     }
                     setStyle("-fx-alignment: CENTER;");
                 }
@@ -404,12 +410,12 @@ public class MainController {
 
             cell.setOnMouseClicked(e -> {
                 if (!cell.isEmpty()) {
-                    SInstruction row = instructionsTable.getItems().get(cell.getIndex());
-                    boolean marked = breakPoints.contains(row.getLine());
+                    SInstructionDTO row = instructionsTable.getItems().get(cell.getIndex());
+                    boolean marked = breakPoints.contains(row.line);
 
                     // toggle mark in breakPoints
-                    if (marked) breakPoints.remove(row.getLine());
-                    else breakPoints.add(row.getLine());
+                    if (marked) breakPoints.remove(row.line);
+                    else breakPoints.add(row.line);
 
                     // update cell text immediately
                     cell.setText(!marked ? "⬤" : "");
@@ -478,11 +484,16 @@ public class MainController {
 
     // properties to update on successful load
     private void initOnLoad(String path){
+
+        // TODO: change to request from server instead.
+        /*
         loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
         loadedFilePathTextField.setText(path);
         programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
         programSelectionChoiceBox.getSelectionModel().selectFirst();
         reloadSelectedProgram();
+
+         */
     }
 
     // properties to update on program change
@@ -490,6 +501,8 @@ public class MainController {
         degree_selected = 0;
         running = false;
 
+        // TODO: request program from UI
+        /*
         String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
         selectedProgramView = engine.getSelectedProgram(selected_program);
         updateInstructionsUI(selectedProgramView);
@@ -499,6 +512,8 @@ public class MainController {
         updateUIOnExpansion();
         updateHistoryTableUI(selectedProgramView);
 
+         */
+
 
     }
 
@@ -507,16 +522,16 @@ public class MainController {
         searchHighlightedLines.clear();
         if (choice != null && !choice.trim().isEmpty()) {
             String query = choice.toUpperCase().trim();
-            for (SInstruction instr : instructionsTable.getItems()) {
+            for (SInstructionDTO instr : instructionsTable.getItems()) {
                 String queryUpper = query.toUpperCase();
-                String labelUpper = instr.getSLabel().toUpperCase();
-                String instrStrUpper = instr.getInstructionString().toUpperCase();
+                String labelUpper = instr.sLabel.toUpperCase();
+                String instrStrUpper = instr.instructionString.toUpperCase();
 
                 boolean match = labelUpper.matches("\\b" + Pattern.quote(queryUpper) + "\\b") ||
                         instrStrUpper.matches(".*\\b" + Pattern.quote(queryUpper) + "\\b.*");
 
                 if (match) {
-                    searchHighlightedLines.add(instr.getLine());
+                    searchHighlightedLines.add(instr.line);
                 }
             }
         }
@@ -534,10 +549,12 @@ public class MainController {
         instructionsTable.refresh();
     }
 
-    private void resetHighlightSelectionBox(SProgramView programView) {
+    private void resetHighlightSelectionBox(SProgramViewDTO programView) {
         List<String> variables = new ArrayList<>();
         List<String> labels = new ArrayList<>();
 
+        // TODO: make it a server request
+        /*
         // Separate items into Variables and Labels
         for (String item : programView.getInstructionsView().getVariablesUsed()) {
             variables.add(item);
@@ -545,6 +562,8 @@ public class MainController {
         for (String item : programView.getInstructionsView().getLabelsUsed()) {
             labels.add(item);
         }
+
+         */
 
         // Combine into ObservableList with headers
         ObservableList<String> comboItems = FXCollections.observableArrayList();
@@ -602,12 +621,12 @@ public class MainController {
     }
 
     // updates instructions UI with highlight selection
-    void updateInstructionsUI(SProgramView programView){
-
+    void updateInstructionsUI(SProgramViewDTO programView){
+        /*
         instructionsTable.getItems().clear();
         instructionsTable.refresh();
-        for(int i=1; i <= programView.getInstructionsView().size(); i++){
-            SInstruction instr = programView.getInstructionsView().getInstruction(i);
+        for(int i=1; i <= programView.sInstructionsDTOs.size(); i++){
+            SInstructionDTO instr = programView.sInstructionsDTOs.get(i);
             instructionsTable.getItems().add(instr);
         }
 
@@ -616,21 +635,29 @@ public class MainController {
         resetHighlightSelectionBox(programView);
         updateInstructionsTableSummary(programView);
 
+         */
+
     }
 
-    void updateHistoryTableUI(SProgramView programView){
+    void updateHistoryTableUI(SProgramViewDTO programView){
+        /*
         historyTable.getItems().clear();
         ArrayList<ExecutionHistory> history = engine.getHistory(programView.getName());
         for (ExecutionHistory executionHistory : history) {
             historyTable.getItems().add(executionHistory);
         }
+
+         */
     }
 
-    void updateInstructionsTableSummary(SProgramView programView){
+    void updateInstructionsTableSummary(SProgramViewDTO programView){
+        /*
         int count = programView.getInstructionsView().size();
         int synth_count = countSynthetic(programView.getInstructionsView());
         int basic = count - synth_count;
         instructionsCountLabel.setText("Instructions: " + count + " (Basic: " + basic + " / Synthetic: " + synth_count + " )");
+
+         */
     }
 
     @FXML
@@ -647,29 +674,39 @@ public class MainController {
 
     @FXML
     void onDegreeTextFieldAction() {
+        /*
         String text = chooseDegreeTextField.getText();
         int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();
         int text_deg = Integer.parseInt(text.trim());
         this.degree_selected = Math.min(text_deg, max_degree);
+
+         */
 
         updateUIOnExpansion();
 
     }
 
     void updateUIOnExpansion(){
+        /*
         breakPoints.clear();
         lineHighlighted = null;
-        SProgramView expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
+        // TODO: get expanded program from server
+        //SProgramViewDTO expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
         updateInstructionsUI(expanded);
         updateInputControllers();
+
+         */
     }
 
 
     void resetInputTable(){
+        /*
         List<String> input_variables = selectedProgramView.getInstructionsView().getInputVariablesUsed();
         inputTable.getItems().setAll(
                 input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
         );
+
+         */
     }
 
     void setInputTableValues(LinkedHashMap<String, Integer> variables) {
@@ -681,9 +718,15 @@ public class MainController {
     }
 
     void updateInputControllers(){
+        /*
         boolean not_loaded = !engine.isProgramLoaded();
         boolean debug = debugRadioButton.isSelected();
         int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
+
+         */
+        boolean not_loaded = true;
+        boolean debug = false;
+        int max_degree = 0;
         maxDegreeLabel.setText(String.format("%d", max_degree));
         newRunButton.setDisable(not_loaded || running);
         normalRadioButton.setDisable(not_loaded || running);
@@ -712,6 +755,7 @@ public class MainController {
 
     @FXML
     void onExecuteButtonClicked(MouseEvent event) {
+        /*
         ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(),
                 getInputVariablesFromUI(),
                 degree_selected,
@@ -731,10 +775,13 @@ public class MainController {
             updateHistoryTableUI(selectedProgramView);
 
         }
+
+         */
     }
 
     @FXML
     void onResumeClicked(MouseEvent event) {
+        /*
         // execute single step
         ExecutionContext result = engine.resumeLoadedRun(breakPoints);
 
@@ -747,11 +794,14 @@ public class MainController {
         highLightInstructionTableLine(result.getPC());
         updateInputControllers();
         updateHistoryTableUI(selectedProgramView);
+
+         */
     }
 
     @FXML
     void onStepOverClicked(MouseEvent event) {
 
+        /*
         // execute single step
         ExecutionContext result = engine.stepLoadedRun();
         // populate table with result variables (later it'll be the same with execution context
@@ -766,23 +816,34 @@ public class MainController {
             updateHistoryTableUI(selectedProgramView);
         }
 
+         */
+
     }
+
 
     @FXML
     void onBackStepClicked(MouseEvent event) {
+        // TODO: Implement and verify
+        /*
         ExecutionContext backstep = engine.backstepLoadedRun();
         updateProgramVariablesTable(backstep.getOrderedVariables(), true);
         cyclesMeterLabel.setText("Cycles: " + backstep.getCycles());
         highLightInstructionTableLine(backstep.getPC());
+
+         */
     }
 
     @FXML
     void onStopClicked(MouseEvent event) {
+        // TODO:: Implement and verify
+        /*
         running = false;
         engine.stopLoadedRun();
         clearInstructionTableHighlight();
         updateInputControllers();
         updateHistoryTableUI(selectedProgramView);
+
+         */
     }
 
     LinkedHashMap<String, Integer> getInputVariablesFromUI(){
@@ -826,10 +887,10 @@ public class MainController {
     }
 
 
-    public int countSynthetic(SInstructionsView instructions){
+    public int countSynthetic(SProgramViewDTO program){
         int count = 0;
-        for(SInstruction instr : instructions.getAllInstructions()){
-            if(Objects.equals(instr.getType(), "synthetic")){
+        for(SInstructionDTO instr : program.sInstructionsDTOs){
+            if(Objects.equals(instr.typeShort, "S")){
                 count++;
             }
         }
@@ -839,19 +900,19 @@ public class MainController {
 
     @FXML
     public void onReRunClicked(MouseEvent event) {
-        ExecutionHistory selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
         if(selectedHistory != null){
-            degree_selected = selectedHistory.getDegree();
+            degree_selected = selectedHistory.degree;
             updateUIOnExpansion();
-            setInputTableValues(selectedHistory.getInputVariables());
+            setInputTableValues(selectedHistory.inputVariables);
         }
     }
 
     @FXML
     public void onShowInfoClicked(MouseEvent event) {
-        ExecutionHistory selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
         if(selectedHistory != null){
-            new VariableTablePopup(selectedHistory.getVariables());
+            new VariableTablePopup(selectedHistory.variables);
         }
     }
 
@@ -893,12 +954,12 @@ public class MainController {
         });
     }
 
-    private void onBreakpointClicked(SInstruction instruction, boolean marked) {
+    private void onBreakpointClicked(SInstructionDTO instruction, boolean marked) {
         if(marked){
-            breakPoints.add(instruction.getLine());
+            breakPoints.add(instruction.line);
         }
         else{
-            breakPoints.remove(instruction.getLine());
+            breakPoints.remove(instruction.line);
         }
 
     }

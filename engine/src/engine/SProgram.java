@@ -29,6 +29,9 @@ public class SProgram implements Serializable, SProgramView {
     @XmlAttribute(name = "name", required = true)
     protected String name;
 
+    @XmlTransient
+    protected String uploader = "";
+
     public void validateProgram(HashSet<String> availableFunctions) throws Exception {
         if(getName() == null || getName().isEmpty()){
             throw new InvalidInstructionException("S-Program name is required");
@@ -102,4 +105,17 @@ public class SProgram implements Serializable, SProgramView {
     public String getUserString() {
         return "";
     }
+
+    public String getUploader(){
+        return uploader;
+    }
+
+    public void setUploader(String value){
+        this.uploader = value;
+        SFunctions functions = getSFunctions();
+        for (SFunction function : functions.getSFunction()) {
+            function.setUploader(value);
+        }
+    }
+
 }
