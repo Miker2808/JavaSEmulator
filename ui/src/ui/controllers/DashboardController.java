@@ -1,15 +1,17 @@
 package ui.controllers;
 
 import dto.DashboardDTO;
+import dto.SProgramViewStatsDTO;
+import dto.UserStatDTO;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -23,6 +25,8 @@ import ui.netcode.NetCode;
 import ui.storage.AppContext;
 
 import java.io.File;
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class DashboardController implements StatefulController {
@@ -34,6 +38,29 @@ public class DashboardController implements StatefulController {
     @FXML private TextField loadedFilePathTextField;
     @FXML private TextField creditsTextField;
     @FXML private Label availableCreditsLabel;
+
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> programAvgCreditsColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> programMaxDegreeColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, String> programNameColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> programNumInstColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> programRunsCountColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, String> programUploaderColumn;
+    @FXML private TableView<SProgramViewStatsDTO> programsTable;
+
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> functionMaxDegree;
+    @FXML private TableColumn<SProgramViewStatsDTO, String> functionNameColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, Number> functionNumInstColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, String> functionParentColumn;
+    @FXML private TableColumn<SProgramViewStatsDTO, String> functionUploaderColumn;
+    @FXML private TableView<SProgramViewStatsDTO> functionsTable;
+
+    @FXML private TableColumn<UserStatDTO, Number> userStatsAvailCreditsColumn;
+    @FXML private TableColumn<UserStatDTO, Number> userStatsCreditsSpentColumn;
+    @FXML private TableColumn<UserStatDTO, Number> userStatsFunctionsUploadedColumn;
+    @FXML private TableColumn<UserStatDTO, Number> userStatsProgramsUploadedColumn;
+    @FXML private TableColumn<UserStatDTO, Number> userStatsRunsCountColumn;
+    @FXML private TableColumn<UserStatDTO, String> userStatsUsernameColumn;
+    @FXML private TableView<UserStatDTO> usersTable;
 
     @Override
     public void setAppContext(AppContext context) {
@@ -48,7 +75,74 @@ public class DashboardController implements StatefulController {
     @FXML
     public void initialize(){
         initCreditsTextField();
+        initializeProgramStatsTable();
+        initializeFunctionStatsTable();
+        initializeUserStatsTable();
         startAutoRefresh();
+    }
+
+    private void initializeProgramStatsTable(){
+        functionMaxDegree.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().maxDegree)
+        );
+        functionNameColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().name)
+        );
+        functionNumInstColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num_instructions)
+        );
+        functionUploaderColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().uploader)
+        );
+        functionParentColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().parentProgram)
+        );
+        functionsTable.setItems(FXCollections.observableArrayList());
+    }
+
+    private void initializeFunctionStatsTable(){
+        programAvgCreditsColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().average_credits_cost)
+        );
+        programMaxDegreeColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().maxDegree)
+        );
+        programNameColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().name)
+        );
+        programNumInstColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num_instructions)
+        );
+        programRunsCountColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().numRuns)
+        );
+        programUploaderColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().uploader)
+        );
+
+        programsTable.setItems(FXCollections.observableArrayList());
+    }
+
+    private void initializeUserStatsTable(){
+        userStatsAvailCreditsColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().avail_credits)
+        );
+        userStatsCreditsSpentColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().credits_spent)
+        );
+        userStatsProgramsUploadedColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num_uploaded_programs)
+        );
+        userStatsFunctionsUploadedColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num_uploaded_functions)
+        );
+        userStatsRunsCountColumn.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num_runs)
+        );
+        userStatsUsernameColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().username)
+        );
+        functionsTable.setItems(FXCollections.observableArrayList());
     }
 
     private void initCreditsTextField(){
@@ -62,7 +156,7 @@ public class DashboardController implements StatefulController {
 
         TextFormatter<Integer> formatter = new TextFormatter<>(
                 new IntegerStringConverter(),
-                1, // default value
+                null,
                 filter
         );
 
@@ -106,7 +200,24 @@ public class DashboardController implements StatefulController {
         // update all UI elements
         usernameLabel.setText(appContext.getUsername());
         availableCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
+
+        updateTableKeepSelection(programsTable, dto.programStats);
+        updateTableKeepSelection(functionsTable, dto.functionStats);
+        updateTableKeepSelection(usersTable, dto.userStats);
+
     }
+
+    // updates table with list of objects but keeps selection at same index it was
+    private <T> void updateTableKeepSelection(TableView<T> table, List<T> newItems) {
+        int selectedIndex = table.getSelectionModel().getSelectedIndex();
+
+        table.getItems().setAll(newItems);
+
+        if (selectedIndex >= 0 && selectedIndex < table.getItems().size()) {
+            table.getSelectionModel().select(selectedIndex);
+        }
+    }
+
 
     @FXML
     void onClickedLoadProgramButton(MouseEvent event) {

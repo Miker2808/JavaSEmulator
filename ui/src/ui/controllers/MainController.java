@@ -82,8 +82,7 @@ public class MainController {
     @FXML
     private TableColumn<SInstructionDTO, String> instructionColumn;
 
-    @FXML
-    private Label instructionsCountLabel;
+    @FXML private Label instructionsCountLabel;
 
     // Expansion table
     @FXML

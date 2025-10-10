@@ -31,7 +31,6 @@ public class LoginController implements StatefulController{
     private void onLoginClicked() throws Exception {
         String username = usernameField.getText();
 
-
         if (username.isEmpty()) {
             InfoMessage.showInfoMessage("Missing credentials", "Username is required");
             return;

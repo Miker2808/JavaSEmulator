@@ -24,18 +24,22 @@
                <children>
                   <TableView fx:id="usersTable" prefHeight="300.0" prefWidth="400.0">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="C1" />
-                      <TableColumn prefWidth="75.0" text="C2" />
+                      <TableColumn fx:id="userStatsUsernameColumn" editable="false" prefWidth="61.0" text="Username" />
+                      <TableColumn fx:id="userStatsProgramsUploadedColumn" editable="false" prefWidth="66.0" text="Programs Uploaded" />
+                        <TableColumn fx:id="userStatsFunctionsUploadedColumn" editable="false" prefWidth="56.0" text="Functions Uploaded" />
+                        <TableColumn fx:id="userStatsAvailCreditsColumn" editable="false" prefWidth="56.0" text="Available Credits" />
+                        <TableColumn fx:id="userStatsCreditsSpentColumn" editable="false" prefWidth="60.0" text="Credits Spent" />
+                        <TableColumn fx:id="userStatsRunsCountColumn" editable="false" prefWidth="87.0" text="Runs Count" />
                     </columns>
                   </TableView>
                   <Button fx:id="unselectButton" mnemonicParsing="false" text="Unselect" StackPane.alignment="BOTTOM_RIGHT">
                      <StackPane.margin>
-                        <Insets bottom="10.0" right="10.0" />
+                        <Insets bottom="20.0" right="20.0" />
                      </StackPane.margin>
                   </Button>
                </children>
             </StackPane>
-            <TableView fx:id="userStatsTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
+            <TableView fx:id="executionHistoryTable" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="3">
               <columns>
                 <TableColumn prefWidth="75.0" text="C1" />
                 <TableColumn prefWidth="75.0" text="C2" />
@@ -45,13 +49,17 @@
                <children>
                   <TableView fx:id="programsTable">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="C1" />
-                      <TableColumn prefWidth="75.0" text="C2" />
+                      <TableColumn fx:id="programNameColumn" editable="false" prefWidth="100.0" text="Name" />
+                      <TableColumn fx:id="programUploaderColumn" editable="false" prefWidth="90.0" text="Uploader" />
+                        <TableColumn fx:id="programNumInstColumn" editable="false" prefWidth="120.0" text="Instructions Count" />
+                        <TableColumn fx:id="programMaxDegreeColumn" editable="false" text="Max Degree" />
+                        <TableColumn fx:id="programRunsCountColumn" editable="false" text="Runs Count" />
+                        <TableColumn fx:id="programAvgCreditsColumn" editable="false" prefWidth="110.0" text="Avg Credits Cost" />
                     </columns>
                   </TableView>
                   <Button fx:id="executeProgramButton" mnemonicParsing="false" text="Execute Program" StackPane.alignment="BOTTOM_RIGHT">
                      <StackPane.margin>
-                        <Insets bottom="10.0" right="10.0" />
+                        <Insets bottom="20.0" right="20.0" />
                      </StackPane.margin>
                   </Button>
                </children>
@@ -60,13 +68,16 @@
                <children>
                   <TableView fx:id="functionsTable" prefHeight="200.0" prefWidth="200.0">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="C1" />
-                      <TableColumn prefWidth="75.0" text="C2" />
+                      <TableColumn fx:id="functionNameColumn" editable="false" prefWidth="100.0" text="Name" />
+                      <TableColumn fx:id="functionParentColumn" editable="false" prefWidth="100.0" text="Program" />
+                        <TableColumn fx:id="functionUploaderColumn" editable="false" prefWidth="100.0" text="Uploader" />
+                        <TableColumn fx:id="functionNumInstColumn" editable="false" prefWidth="120.0" text="Instructions Count" />
+                        <TableColumn fx:id="functionMaxDegree" editable="false" prefWidth="75.0" text="Uploader" />
                     </columns>
                   </TableView>
                   <Button fx:id="executeFunctionButton" mnemonicParsing="false" text="Execute Function" StackPane.alignment="BOTTOM_RIGHT">
                      <StackPane.margin>
-                        <Insets bottom="10.0" right="10.0" />
+                        <Insets bottom="20.0" right="20.0" />
                      </StackPane.margin>
                   </Button>
                </children>
