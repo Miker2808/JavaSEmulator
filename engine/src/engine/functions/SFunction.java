@@ -28,9 +28,13 @@ public class SFunction implements Serializable, SProgramView {
     protected String userString;
     @XmlAttribute(name = "name", required = true)
     protected String name;
-    @XmlTransient
-    protected String uploader;
 
+    @XmlTransient
+    protected String uploader = "";
+    @XmlTransient
+    protected int num_runs = 0;
+    @XmlTransient
+    protected String parentProgram = "";
 
     public SInstructions getSInstructions() {
         sInstructions.updateInstructionsLines();
@@ -64,6 +68,12 @@ public class SFunction implements Serializable, SProgramView {
         this.name = value;
     }
 
+
+    @Override
+    public ProgramType getProgramType() {
+        return ProgramType.FUNCTION;
+    }
+
     public String getUploader() {
         return uploader;
     }
@@ -71,8 +81,23 @@ public class SFunction implements Serializable, SProgramView {
         this.uploader = value;
     }
 
-    @Override
-    public ProgramType getProgramType() {
-        return ProgramType.FUNCTION;
+    public int getNumRuns() {
+        return num_runs;
     }
+    public void setNumRuns(int value) {
+        this.num_runs = value;
+    }
+
+    public int getAverage_credits_cost() {
+        return 0;
+    }
+
+
+    public String getParentProgram() {
+        return parentProgram;
+    }
+    public void setParentProgram(String value) {
+        this.parentProgram = value;
+    }
+
 }

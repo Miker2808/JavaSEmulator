@@ -2,6 +2,7 @@ package Servlets;
 
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
+import engine.instruction.QuoteInstruction;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -12,11 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Scanner;
 
 import engine.Engine;
 import engine.SProgram;
@@ -60,20 +59,27 @@ public class FileUploadServlet extends HttpServlet {
 
             ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
 
-            SProgram program = Engine.loadFromXML(xmlStream);
-            program.setUploader(username);
+            SProgram program = Engine.loadFromXML(xmlStream); // unmarshal with jaxb
 
-            programsStorage.addAll(program);
+            programsStorage.validateProgramNotUsed(program); // Throws exception if function or program name is used
 
+            // get shared programs and function names
             HashSet<String> availableFunctions = programsStorage.getAvailableFunctionNames();
             availableFunctions.addAll(programsStorage.getAvailableProgramNames());
 
+            // validate if program is of valid syntax, and functions are available.
             program.validateProgram(availableFunctions);
 
+            // From here: program is valid, and can be stored
             // update user instance on how many programs and functions he uploaded
-            userInstance.setNumFilesUploaded(userInstance.getNumFilesUploaded() + 1);
+            userInstance.setNumProgramsUploaded(userInstance.getNumProgramsUploaded() + 1);
             userInstance.setNumFunctionsUploaded(userInstance.getNumFunctionsUploaded() + program.getSFunctions().getSFunction().size());
 
+            program.setUploader(username);
+            programsStorage.addAll(program);
+
+            // share updated available programs with QuoteInstruction
+            QuoteInstruction.setProgramViews(programsStorage.getFullProgramsView());
 
             sendPlain(response, HttpServletResponse.SC_OK, "Successfully uploaded file: " + filePart.getSubmittedFileName());
 

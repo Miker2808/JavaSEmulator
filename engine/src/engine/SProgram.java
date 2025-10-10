@@ -32,10 +32,24 @@ public class SProgram implements Serializable, SProgramView {
     @XmlTransient
     protected String uploader = "";
 
+    @XmlTransient
+    protected int num_runs = 0;
+
+    @XmlTransient
+    protected int average_credits_cost = 0;
+
+
     public void validateProgram(HashSet<String> availableFunctions) throws Exception {
         if(getName() == null || getName().isEmpty()){
             throw new InvalidInstructionException("S-Program name is required");
         }
+
+        // add current program and function as also available options
+        availableFunctions.add(getName());
+        for(SFunction func : getSFunctions().getSFunction()){
+            availableFunctions.add(func.getName());
+        }
+
         validateInstructions(getSInstructions(), availableFunctions);
         SFunctions functions = getSFunctions();
         for (SFunction function : functions.getSFunction()) {
@@ -63,8 +77,6 @@ public class SProgram implements Serializable, SProgramView {
         // find that all labels are used
         instructions.validateLabelsUsed();
     }
-
-
 
     public SInstructions getSInstructions() {
         sInstructions.updateInstructionsLines();
@@ -103,7 +115,7 @@ public class SProgram implements Serializable, SProgramView {
 
     @Override
     public String getUserString() {
-        return "";
+        return getName();
     }
 
     public String getUploader(){
@@ -117,5 +129,19 @@ public class SProgram implements Serializable, SProgramView {
             function.setUploader(value);
         }
     }
+
+    public int getNumRuns() {
+        return num_runs;
+    }
+    public void setNumRuns(int value) {
+        this.num_runs = value;
+    }
+    public int getAverage_credits_cost() {
+        return average_credits_cost;
+    }
+    public void setAverage_credits_cost(int value) {
+        this.average_credits_cost = value;
+    }
+    public String getParentProgram() { return ""; }
 
 }

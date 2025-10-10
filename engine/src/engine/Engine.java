@@ -7,7 +7,6 @@ import engine.functions.SFunction;
 import engine.functions.SFunctions;
 import engine.history.ExecutionHistory;
 import engine.history.ExecutionHistoryManager;
-import engine.instruction.QuoteInstruction;
 import engine.interpreter.SInterpreter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -48,30 +47,7 @@ public class Engine implements Serializable{
         return program;
     }
 
-    // populates Quote instruction with references to functions and main program
-    private ArrayList<SProgramView> getProgramViews(SProgram program) {
-        ArrayList<SProgramView> programViews = new ArrayList<>();
-        try {
-            programViews.add(program);
-            programViews.addAll(program.getSFunctions().getSFunction());
-        }catch (Exception ignored){}
-
-        return programViews;
-    }
-
-    public void loadProgram(SProgram program){
-        this.loadedProgram = program;
-    }
-
-    public boolean isProgramLoaded(){
-        return loadedProgram != null;
-    }
-
-    /**
-     Checks program_name and returns suitable function or main program if name fits
-     Defaults to main program on no find
-     Returns version expanded to degree
-     **/
+    // TODO: implement servlet version
     public SProgramView getExpandedProgram(String program_name, int degree){
 
         SFunctions functions = loadedProgram.getSFunctions();
@@ -85,7 +61,7 @@ public class Engine implements Serializable{
         return SProgramExpander.expand(loadedProgram, degree);
     }
 
-    // get in 0 degree same shit as above, default loadedProgram
+    // TODO: implement servlet version
     public SProgramView getSelectedProgram(String program_name){
 
         SFunctions functions = loadedProgram.getSFunctions();

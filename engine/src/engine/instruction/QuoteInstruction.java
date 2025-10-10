@@ -266,7 +266,7 @@ public class QuoteInstruction extends SInstruction {
 
         HashMap<String, String> reuse_map = getReuseMap(map, functionName, context);
 
-        SProgramView  functionView = getProgramView(functionName);
+        SProgramView functionView = getProgramView(functionName);
         ArrayList<SInstruction> copyFunctionRenamed = new ArrayList<>();
 
         for(SInstruction instr : functionView.getInstructionsView().getAllInstructions()){

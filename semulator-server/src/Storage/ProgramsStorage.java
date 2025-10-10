@@ -1,5 +1,7 @@
 package Storage;
 
+import DTOConverter.SProgramDTOConverter;
+import dto.SProgramViewStatsDTO;
 import engine.SProgram;
 import engine.SProgramView;
 import engine.functions.SFunction;
@@ -17,10 +19,10 @@ public class ProgramsStorage {
         functions = new HashMap<String, SFunction>();
     }
 
-    public Map<String, SProgram> getProgramsMap(){
+    protected Map<String, SProgram> getProgramsMap(){
         return this.programs;
     }
-    public Map<String, SFunction> getFunctionsMap(){
+    protected Map<String, SFunction> getFunctionsMap(){
         return this.functions;
     }
 
@@ -42,7 +44,7 @@ public class ProgramsStorage {
         return null;
     }
 
-    public void addProgram(SProgram program) throws Exception{
+    protected void addProgram(SProgram program) throws Exception{
         if(!this.programs.containsKey(program.getName())) {
             this.programs.put(program.getName(), program);
         }
@@ -50,8 +52,9 @@ public class ProgramsStorage {
             throw new Exception(String.format("Program name %s is already in use", program.getName()));
         }
     }
-    public void addFunction(SFunction function) throws Exception{
+    protected void addFunction(SFunction function, String parentName) throws Exception{
         if(!containsFunction(function.getName())) {
+            function.setParentProgram(parentName);
             this.functions.put(function.getName(), function);
         }
         else{
@@ -59,7 +62,7 @@ public class ProgramsStorage {
         }
     }
 
-    public void addFunctions(SFunctions functions) throws Exception{
+    protected void addFunctions(SFunctions functions, String parentName) throws Exception{
         for (SFunction func : functions.getSFunction()){
             if(containsFunction(func.getName())){
                 throw new Exception(String.format("Function name %s is already in use", func.getName()));
@@ -67,7 +70,7 @@ public class ProgramsStorage {
         }
 
         for (SFunction func : functions.getSFunction()) {
-            this.addFunction(func);
+            this.addFunction(func, parentName);
         }
     }
 
@@ -77,7 +80,7 @@ public class ProgramsStorage {
         if(containsProgram(program.getName())) {
             throw new Exception(String.format("Program name %s is already in use", program.getName()));
         }
-        addFunctions(program.getSFunctions());
+        addFunctions(program.getSFunctions(), program.getName());
         addProgram(program);
     }
 
@@ -87,6 +90,46 @@ public class ProgramsStorage {
 
     public boolean containsFunction(String functionName){
         return this.functions.containsKey(functionName);
+    }
+
+    // get all programs and functions as programview, returns in order of functions first, then programs
+    public ArrayList<SProgramView> getFullProgramsView(){
+        ArrayList<SProgramView> output = new ArrayList<>();
+        for(Map.Entry<String, SFunction> entry : this.functions.entrySet()){
+            output.add(entry.getValue());
+        }
+        for(Map.Entry<String, SProgram> entry : this.programs.entrySet()){
+            output.add(entry.getValue());
+        }
+        return output;
+    }
+
+    public ArrayList<SProgramViewStatsDTO> getFullProgramsStats(){
+        ArrayList<SProgramViewStatsDTO> output = new ArrayList<>();
+        for(SProgramView program : this.programs.values()){
+            output.add(SProgramDTOConverter.toStatsDTO(program));
+        }
+        return output;
+    }
+
+    public ArrayList<SProgramViewStatsDTO> getFullFunctionsStats(){
+        ArrayList<SProgramViewStatsDTO> output = new ArrayList<>();
+        for(SProgramView function : this.functions.values()){
+            output.add(SProgramDTOConverter.toStatsDTO(function));
+        }
+        return output;
+    }
+
+    public void validateProgramNotUsed(SProgram program) throws Exception{
+        for (SFunction func : program.getSFunctions().getSFunction()){
+            if(containsFunction(func.getName())){
+                throw new Exception(String.format("Function name %s is already in use", func.getName()));
+            }
+        }
+        if(containsProgram(program.getName())){
+            throw new Exception(String.format("Program name %s is already in use", program.getName()));
+        }
+
     }
 
 

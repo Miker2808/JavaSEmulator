@@ -1,16 +1,11 @@
 package dto;
 
-import java.util.ArrayList;
-
-public class SProgramViewDTO {
-    public ArrayList<SInstructionDTO> sInstructionsDTOs;
+public class SProgramViewStatsDTO {
     public String type;
     public String name;
     public String userstring;
     public String uploader;
     public String parentProgram;
-    public int current_degree;
-    public int num_instructions_synthetic;
     public int num_instructions;
     public int maxDegree;
     public int numRuns;

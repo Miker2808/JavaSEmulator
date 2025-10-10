@@ -1,17 +1,23 @@
 package Storage;
 
-import java.util.HashSet;
-import java.util.Set;
+import engine.SProgramView;
+import engine.history.ExecutionHistory;
+import engine.history.ExecutionHistoryManager;
+import engine.interpreter.SInterpreter;
 
 public class UserInstance {
     private String programSelected = "";
-    private Integer numFilesUploaded = 0;
+    private Integer numProgramsUploaded = 0;
     private Integer numFunctionsUploaded = 0;
     private Integer creditsAvailable = 0;
     private Integer creditsUsed = 0;
     private Integer totalRuns = 0;
     private Integer degree_selected = 0;
     private Boolean running = false;
+    private SInterpreter interpreter = null;
+    private SProgramView selectedProgram = null;
+    private ExecutionHistoryManager historyManager = new ExecutionHistoryManager();
+    private ExecutionHistory currentExecutionHistory = null;
 
     public UserInstance(){
 
@@ -25,7 +31,7 @@ public class UserInstance {
         this.degree_selected = degree_selected;
     }
 
-    public Boolean getRunning() {
+    public Boolean isRunning() {
         return running;
     }
 
@@ -33,12 +39,12 @@ public class UserInstance {
         this.running = running;
     }
 
-    public Integer getNumFilesUploaded() {
-        return numFilesUploaded;
+    public Integer getNumProgramsUploaded() {
+        return numProgramsUploaded;
     }
 
-    public void setNumFilesUploaded(Integer numFilesUploaded) {
-        this.numFilesUploaded = numFilesUploaded;
+    public void setNumProgramsUploaded(Integer numProgramsUploaded) {
+        this.numProgramsUploaded = numProgramsUploaded;
     }
     public Integer getNumFunctionsUploaded() {
         return numFunctionsUploaded;
@@ -81,6 +87,21 @@ public class UserInstance {
 
     public void setProgramSelected(String programSelected) {
         this.programSelected = programSelected;
+    }
+
+    public void setInterpreter(SInterpreter interpreter) {
+        this.interpreter = interpreter;
+    }
+    public SInterpreter getInterpreter(){
+        return interpreter;
+    }
+
+    public SProgramView getSelectedProgram(){
+        return selectedProgram;
+    }
+
+    public void setSelectedProgram(SProgramView selectedProgram){
+        this.selectedProgram = selectedProgram;
     }
 
 }
