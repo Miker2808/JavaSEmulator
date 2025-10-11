@@ -23,8 +23,6 @@ public class SInterpreter
         this.inputVariables = new HashMap<>(inputVariables);
         this.contextHistory = new ExecutionContextHistory(backstep_capacity);
         this.context = new ExecutionContext(sInstructions, inputVariables);
-
-
     }
 
     public static ExecutionContext staticRun(SInstructionsView instructions, HashMap<String, Integer> inputVariables){

@@ -1,6 +1,7 @@
 package ui.controllers;
 
 import dto.DashboardDTO;
+import dto.SProgramViewDTO;
 import dto.SProgramViewStatsDTO;
 import dto.UserStatDTO;
 import javafx.animation.Animation;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
 import okhttp3.Response;
+import ui.App;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
 import ui.elements.ProgressBarDialog;
@@ -248,15 +250,57 @@ public class DashboardController implements StatefulController {
 
     @FXML
     void onChargeCreditsClicked(MouseEvent event) {
-        int credits = Integer.parseInt(creditsTextField.getText());
-        try {
-            Response response = NetCode.chargeCredits(appContext.getUsername(), credits);
-            if(response.isSuccessful()) {
 
-            }
+        try {
+            int credits = Integer.parseInt(creditsTextField.getText());
+            Response response = NetCode.chargeCredits(appContext.getUsername(), credits);
+        }
+        catch(NumberFormatException num_e){
+            return;
         }
         catch(Exception e){
             InfoMessage.showInfoMessage("Failed to charge credits", "Network error");
+        }
+    }
+
+    @FXML
+    void onExecuteProgramClicked(MouseEvent event) {
+
+        SProgramViewStatsDTO selected = programsTable.getSelectionModel().getSelectedItem();
+        if(selected == null) return;
+        String program_name = programNameColumn.getCellObservableValue(selected).getValue();
+
+        try {
+            Response response = NetCode.selectProgram(appContext.getUsername(), program_name, "PROGRAM");
+            if(response.isSuccessful()) {
+                App.loadScreen("/fxml/main.fxml");
+            }
+            else{
+                InfoMessage.showInfoMessage("Failed to select program", response.body().string());
+            }
+        }
+        catch(Exception e){
+            InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
+        }
+    }
+
+    @FXML
+    void onExecuteFunctionClicked(MouseEvent event) {
+        SProgramViewStatsDTO selected = functionsTable.getSelectionModel().getSelectedItem();
+        if(selected == null) return;
+        String program_name = functionNameColumn.getCellObservableValue(selected).getValue();
+
+        try {
+            Response response = NetCode.selectProgram(appContext.getUsername(), program_name, "FUNCTION");
+            if(response.isSuccessful()) {
+                App.loadScreen("/fxml/main.fxml");
+            }
+            else{
+                InfoMessage.showInfoMessage("Failed to select function", response.body().string());
+            }
+        }
+        catch(Exception e){
+            InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
         }
     }
 }

@@ -28,6 +28,7 @@ public class Engine implements Serializable{
     private boolean running = false;
     private String current_running = "";
 
+
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
     public static SProgram loadFromXML(InputStream xmlStream) throws Exception {
@@ -72,12 +73,6 @@ public class Engine implements Serializable{
         }
 
         return loadedProgram;
-    }
-
-    // get names of possible programs
-    public ArrayList<String> getLoadedProgramNames(){
-        System.out.println("getLoadedProgramNames needs reimplementation!");
-        return null;
     }
 
     private ExecutionContext runStaticProgram(String program_name, LinkedHashMap<String, Integer> input, int degree){

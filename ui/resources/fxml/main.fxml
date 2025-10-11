@@ -3,8 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
+
 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="-Infinity" prefViewportHeight="800.0" prefViewportWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controllers.MainController">
    <content>
       <BorderPane>
@@ -21,13 +21,12 @@
                   <ColumnConstraints hgrow="ALWAYS" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="NEVER" />
                 <RowConstraints vgrow="ALWAYS" />
                 <RowConstraints percentHeight="30.0" vgrow="ALWAYS" />
               </rowConstraints>
                <children>
-                  <GridPane GridPane.rowIndex="2">
+                  <GridPane GridPane.rowIndex="1">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                      </columnConstraints>
@@ -42,8 +41,9 @@
                             <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="35.0" text="#" />
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
                               <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="50.0" text="Label" />
-                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="400.0" text="Instruction" />
-                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="45.0" text="Cycles" />
+                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="336.0" text="Instruction" />
+                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Cycles" />
+                              <TableColumn fx:id="genColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Gen" />
                           </columns>
                         </TableView>
                         <GridPane GridPane.rowIndex="1">
@@ -59,52 +59,20 @@
                         </GridPane>
                      </children>
                   </GridPane>
-                  <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
-                     <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="50.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                     </columnConstraints>
-                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="30.0" minHeight="35.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                     </rowConstraints>
-                     <children>
-                        <TableView fx:id="historyTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2147483647">
-                           <columns>
-                              <TableColumn fx:id="numHistoryColumn" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="70.0" text="#" />
-                              <TableColumn fx:id="degreeHistoryColumn" editable="false" minWidth="35.0" prefWidth="70.0" text="Degree" />
-                              <TableColumn fx:id="yHistoryColumn" editable="false" minWidth="40.0" prefWidth="70.0" text="Y" />
-                              <TableColumn fx:id="cyclesHistoryColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Cycles" />
-                           </columns>
-                        </TableView>
-                        <Button fx:id="showInfoButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onShowInfoClicked" text="Show Info" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
-                           <GridPane.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </GridPane.margin>
-                        </Button>
-                        <Button fx:id="reRunButton" disable="true" layoutX="10.0" layoutY="207.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onReRunClicked" text="Re-Run" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <GridPane.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </GridPane.margin>
-                        </Button>
-                     </children>
-                  </GridPane>
-                  <GridPane hgap="3.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.rowSpan="2">
+                  <GridPane hgap="3.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowSpan="3">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="25.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                       <RowConstraints minHeight="100.0" />
+                        <RowConstraints />
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                     </rowConstraints>
                      <children>
                         <Label text="Debugger \ Execution" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                            <font>
-                              <Font name="System Bold" size="14.0" />
+                              <Font size="14.0" />
                            </font>
                         </Label>
                         <GridPane hgap="5.0" vgap="3.0" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
@@ -162,25 +130,41 @@
                               <Insets />
                            </GridPane.margin>
                         </GridPane>
-                        <GridPane hgap="5.0" GridPane.rowIndex="2">
+                        <GridPane hgap="5.0" GridPane.rowIndex="3">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                           </columnConstraints>
                            <children>
-                              <TableView fx:id="inputTable" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <columns>
-                                  <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" text="Variable" />
-                                  <TableColumn fx:id="inputTableValueColumn" minWidth="40.0" onEditCommit="#onEditCommitInputColumn" prefWidth="75.0" text="Input" />
-                                </columns>
-                              </TableView>
+                              <GridPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints maxHeight="40.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <TableView fx:id="inputTable" editable="true" prefHeight="200.0" prefWidth="200.0">
+                                      <columns>
+                                        <TableColumn fx:id="inputTableVariableColumn" editable="false" minWidth="40.0" prefWidth="60.0" text="Variable" />
+                                        <TableColumn fx:id="inputTableValueColumn" minWidth="40.0" onEditCommit="#onEditCommitInputColumn" prefWidth="75.0" text="Input" />
+                                      </columns>
+                                    </TableView>
+                                    <Button fx:id="backDashboardButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onBackToDashboardClicked" text="Back to Dashboard" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+                                       <GridPane.margin>
+                                          <Insets top="5.0" />
+                                       </GridPane.margin>
+                                    </Button>
+                                 </children>
+                              </GridPane>
                               <GridPane GridPane.rowIndex="1">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                  <RowConstraints minHeight="10.0" percentHeight="8.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
                                     <TableView fx:id="programVariablesTable" prefHeight="200.0" prefWidth="200.0">
@@ -201,62 +185,105 @@
                               <RowConstraints vgrow="ALWAYS" />
                            </rowConstraints>
                         </GridPane>
+                        <GridPane GridPane.rowIndex="2">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Architecture Selection" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="Gen I">
+                                       <font>
+                                          <Font name="AdobePiStd" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" selected="true">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="archiGenGroup" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" layoutX="10.0" layoutY="40.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="Gen II">
+                                       <font>
+                                          <Font name="AdobePiStd" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" layoutX="96.0" layoutY="40.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="Gen III">
+                                       <font>
+                                          <Font name="AdobePiStd" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" layoutX="182.0" layoutY="40.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="Gen IV">
+                                       <font>
+                                          <Font name="AdobePiStd" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </GridPane>
                      </children>
                   </GridPane>
-                  <GridPane alignment="CENTER" hgap="3.0" GridPane.rowIndex="1">
+                  <GridPane alignment="CENTER" hgap="3.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                       <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
                         <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
+                        <ColumnConstraints maxWidth="65.0" minWidth="65.0" prefWidth="65.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <ChoiceBox fx:id="programSelectionChoiceBox" maxWidth="1.7976931348623157E308" minWidth="50.0" GridPane.hgrow="ALWAYS" />
-                        <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                        <Label fx:id="maxDegreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
-                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="5" GridPane.hgrow="NEVER" />
-                        <Label fx:id="degreeLabel1" alignment="CENTER" contentDisplay="CENTER" layoutX="327.0" layoutY="15.0" text="/" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+                        <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.hgrow="ALWAYS" />
+                        <Label fx:id="maxDegreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
+                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="4" GridPane.hgrow="NEVER" />
+                        <Label fx:id="degreeLabel1" alignment="CENTER" contentDisplay="CENTER" layoutX="327.0" layoutY="15.0" text="/" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="2" />
+                        <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="1" />
                         <ComboBox fx:id="highlightSelectionBox" maxWidth="1.7976931348623157E308" minWidth="50.0" promptText="Highlight Selection" GridPane.columnIndex="6" />
                      </children>
                   </GridPane>
-                  <HBox alignment="CENTER_LEFT" nodeOrientation="LEFT_TO_RIGHT" spacing="10.0" GridPane.columnSpan="2147483647">
-                     <children>
-                        <Button fx:id="loadProgramButton" accessibleHelp="Load S-Emulator program file (.xml)" mnemonicParsing="false" onMouseClicked="#onClickedLoadProgramButton" prefHeight="25.0" prefWidth="120.0" text="Load Program File">
-                           <HBox.margin>
-                              <Insets />
-                           </HBox.margin>
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Button>
-                        <TextField fx:id="loadedFilePathTextField" editable="false" text="No file loaded" HBox.hgrow="ALWAYS">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </TextField>
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </HBox>
-                  <TableView fx:id="historyChainTable" minHeight="100.0" minWidth="100.0" GridPane.rowIndex="3">
+                  <TableView fx:id="historyChainTable" minHeight="100.0" minWidth="100.0" GridPane.rowIndex="2">
                     <columns>
-                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="35.0" text="#" />
-                        <TableColumn fx:id="historyChainType" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
-                        <TableColumn fx:id="historyChainLabel" editable="false" minWidth="40.0" prefWidth="40.0" text="Label" />
+                      <TableColumn fx:id="historyChainLine" editable="false" maxWidth="500.0" minWidth="30.0" prefWidth="35.0" sortable="false" text="#" />
+                        <TableColumn fx:id="historyChainType" editable="false" minWidth="35.0" prefWidth="50.0" sortable="false" text="Type" />
+                        <TableColumn fx:id="historyChainLabel" editable="false" minWidth="40.0" prefWidth="40.0" sortable="false" text="Label" />
                         <TableColumn fx:id="historyChainInstruction" editable="false" minWidth="100.0" prefWidth="325.0" sortable="false" text="Instruction" />
                         <TableColumn fx:id="historyChainCycles" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Cycles" />
+                        <TableColumn fx:id="historyChangeGen" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Gen" />
                     </columns>
                   </TableView>
                </children>
@@ -266,54 +293,32 @@
             <GridPane BorderPane.alignment="CENTER">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.33" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.33" prefWidth="100.0" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints minHeight="15.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label text="S-Emulator" GridPane.valignment="CENTER">
+                  <Label text="S-Emulator Execution" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                      <font>
-                        <Font name="System Bold" size="15.0" />
+                        <Font size="15.0" />
                      </font>
-                     <textFill>
-                        <LinearGradient endX="1.0" endY="1.0" startX="1.0" startY="0.35545023696682465">
-                           <stops>
-                              <Stop>
-                                 <color>
-                                    <Color red="1.0" green="0.4100719392299652" />
-                                 </color>
-                              </Stop>
-                              <Stop offset="1.0">
-                                 <color>
-                                    <Color red="1.0" green="1.0" blue="1.0" />
-                                 </color>
-                              </Stop>
-                           </stops>
-                        </LinearGradient>
-                     </textFill>
                   </Label>
-                  <MenuButton maxHeight="20.0" maxWidth="75.0" minHeight="20.0" minWidth="75.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="75.0" text="Settings" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                  <Label fx:id="userNameLabel" text="User Name">
                      <font>
-                        <Font name="System Bold" size="10.0" />
+                        <Font size="15.0" />
                      </font>
-                     <items>
-                        <CheckMenuItem fx:id="animationsMenuCheck" mnemonicParsing="false" text="Animations" />
-                        <Menu mnemonicParsing="false" text="Theme">
-                           <items>
-                              <RadioMenuItem mnemonicParsing="false" selected="true" text="Default">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="themeRadioMenu" />
-                                 </toggleGroup>
-                              </RadioMenuItem>
-                              <RadioMenuItem mnemonicParsing="false" text="Modern" toggleGroup="$themeRadioMenu" />
-                              <RadioMenuItem mnemonicParsing="false" text="Dark" toggleGroup="$themeRadioMenu" />
-                              <RadioMenuItem mnemonicParsing="false" text="Blue" toggleGroup="$themeRadioMenu" />
-                           </items>
-                        </Menu>
-                     </items>
-                  </MenuButton>
+                  </Label>
+                  <Label fx:id="availCreditsLabel" layoutX="10.0" layoutY="15.0" text="Available Credits: 0" GridPane.columnIndex="2" GridPane.halignment="RIGHT">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
                </children>
+               <BorderPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </BorderPane.margin>
             </GridPane>
          </top>
       </BorderPane>

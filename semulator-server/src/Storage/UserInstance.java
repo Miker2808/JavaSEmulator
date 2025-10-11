@@ -7,17 +7,16 @@ import engine.interpreter.SInterpreter;
 
 public class UserInstance {
     private String programSelected = "";
+    private String programType = "";
+    private Integer degree_selected = 0;
     private Integer numProgramsUploaded = 0;
     private Integer numFunctionsUploaded = 0;
     private Integer creditsAvailable = 0;
     private Integer creditsUsed = 0;
     private Integer totalRuns = 0;
-    private Integer degree_selected = 0;
+
     private Boolean running = false;
     private SInterpreter interpreter = null;
-    private SProgramView selectedProgram = null;
-    private ExecutionHistoryManager historyManager = new ExecutionHistoryManager();
-    private ExecutionHistory currentExecutionHistory = null;
 
     public UserInstance(){
 
@@ -96,12 +95,11 @@ public class UserInstance {
         return interpreter;
     }
 
-    public SProgramView getSelectedProgram(){
-        return selectedProgram;
+    public String getProgramType() {
+        return programType;
     }
-
-    public void setSelectedProgram(SProgramView selectedProgram){
-        this.selectedProgram = selectedProgram;
+    public void setProgramType(String programType) {
+        this.programType = programType;
     }
 
 }

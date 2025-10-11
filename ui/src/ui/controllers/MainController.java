@@ -1,11 +1,10 @@
 package ui.controllers;
 
-import dto.ExecutionHistoryDTO;
-import dto.SProgramViewDTO;
+import dto.*;
 
-import dto.SInstructionDTO;
-
-import javafx.animation.ScaleTransition;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -17,14 +16,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
+import ui.App;
+import ui.StatefulController;
 import ui.elements.CustomAnimations;
 import ui.elements.InfoMessage;
 import ui.elements.ProgressBarDialog;
-import ui.elements.VariableTablePopup;
+import ui.netcode.NetCode;
+import ui.storage.AppContext;
 import ui.storage.VariableRow;
 
 import java.io.File;
@@ -34,9 +35,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class MainController {
+public class MainController implements StatefulController {
+    private AppContext appContext;
+    private Stage stage;
 
-    SProgramViewDTO selectedProgramView = null;
+    ExecutionDTO executionDTO = null;
+    private String selectedProgramName = null;
 
     private Integer degree_selected = 0;
     private Boolean running = false;
@@ -44,72 +48,35 @@ public class MainController {
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
 
-    private Stage stage;
+    @FXML private Button collapseButton;
+    @FXML private Button expandButton;
+    @FXML private Label maxDegreeLabel;
+    @FXML private ComboBox<String> highlightSelectionBox;
+    @FXML private TextField chooseDegreeTextField;
+    @FXML private Label availCreditsLabel;
+    @FXML private Label userNameLabel;
 
-    @FXML private ToggleGroup themeRadioMenu;
-    @FXML
-    private CheckMenuItem animationsMenuCheck;
-    @FXML
-    private ChoiceBox<String> programSelectionChoiceBox;
-    @FXML
-    private Button collapseButton;
-    @FXML
-    private Button expandButton;
-    @FXML
-    private Label maxDegreeLabel;
-    @FXML
-    private ComboBox<String> highlightSelectionBox;
-    @FXML
-    private Button loadProgramButton;
-    @FXML
-    private TextField loadedFilePathTextField;
-    @FXML
-    private TextField chooseDegreeTextField;
 
 // instructions table
-    @FXML
-    private TableView<SInstructionDTO> instructionsTable;
-    @FXML
-    private TableColumn<SInstructionDTO, String> breakPointColumn;
-    @FXML
-    private TableColumn<SInstructionDTO, Number> lineColumn;
-    @FXML
-    private TableColumn<SInstructionDTO, String> typeColumn;
-    @FXML
-    private TableColumn<SInstructionDTO, String> cyclesColumn;
-    @FXML
-    private TableColumn<SInstructionDTO, String> labelColumn;
-    @FXML
-    private TableColumn<SInstructionDTO, String> instructionColumn;
-
-    @FXML private Label instructionsCountLabel;
+    @FXML private TableView<SInstructionDTO> instructionsTable;
+    @FXML private TableColumn<SInstructionDTO, String> breakPointColumn;
+    @FXML private TableColumn<SInstructionDTO, Number> lineColumn;
+    @FXML private TableColumn<SInstructionDTO, String> typeColumn;
+    @FXML private TableColumn<SInstructionDTO, String> cyclesColumn;
+    @FXML private TableColumn<SInstructionDTO, String> labelColumn;
+    @FXML private TableColumn<SInstructionDTO, String> instructionColumn;
+    @FXML private TableColumn<SInstructionDTO, String> genColumn;
 
     // Expansion table
-    @FXML
-    private TableView<SInstructionDTO> historyChainTable;
-    @FXML
-    private TableColumn<SInstructionDTO, Number> historyChainLine;
-    @FXML
-    private TableColumn<SInstructionDTO, String> historyChainType;
-    @FXML
-    private TableColumn<SInstructionDTO, String> historyChainCycles;
-    @FXML
-    private TableColumn<SInstructionDTO, String> historyChainLabel;
-    @FXML
-    private TableColumn<SInstructionDTO, String> historyChainInstruction;
+    @FXML private TableView<SInstructionDTO> historyChainTable;
+    @FXML private TableColumn<SInstructionDTO, Number> historyChainLine;
+    @FXML private TableColumn<SInstructionDTO, String> historyChainType;
+    @FXML private TableColumn<SInstructionDTO, String> historyChainCycles;
+    @FXML private TableColumn<SInstructionDTO, String> historyChainLabel;
+    @FXML private TableColumn<SInstructionDTO, String> historyChainInstruction;
+    @FXML private TableColumn<SInstructionDTO, String> historyChangeGen;
 
-    // History Table
-    @FXML
-    private TableView<ExecutionHistoryDTO> historyTable;
-    @FXML
-    private TableColumn<ExecutionHistoryDTO, Number> numHistoryColumn;
-    @FXML
-    private TableColumn<ExecutionHistoryDTO, Number> degreeHistoryColumn;
-    @FXML
-    private TableColumn<ExecutionHistoryDTO, Number> yHistoryColumn;
-    @FXML
-    private TableColumn<ExecutionHistoryDTO, Number> cyclesHistoryColumn;
-
+    @FXML private Label instructionsCountLabel;
 
     // Debugger / Execution Section
     // Buttons
@@ -132,7 +99,7 @@ public class MainController {
     @FXML
     private RadioButton debugRadioButton;
 
-    // tables
+    // Input Table
     @FXML
     private TableView<VariableRow> inputTable;
     @FXML
@@ -140,7 +107,7 @@ public class MainController {
     @FXML
     private TableColumn<VariableRow, String> inputTableVariableColumn;
 
-    // program variable state table
+    // Run Variables Table
     @FXML
     private TableView<VariableRow> programVariablesTable;
     @FXML
@@ -148,10 +115,13 @@ public class MainController {
     @FXML
     private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
-    // History buttons
-    @FXML private Button showInfoButton;
-    @FXML private Button reRunButton;
 
+    @Override
+    public void setAppContext(AppContext context) {
+        this.appContext = context;
+    }
+
+    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -161,40 +131,68 @@ public class MainController {
 // ** Initializers **
     @FXML
     public void initialize() {
-        initializeTheme();
         initializeInstructionTable();
         initializeHighlightSelectionBox();
         initializedExpansionsTable();
         initializeInputTable();
         initializeProgramVariablesTable();
-        initializeProgramSelectionChoiceBox();
-        initializeHistoryTable();
-        applySlideAnimation(resumeButton, animationsMenuCheck, Duration.millis(500));
-        applySlideAnimation(stepOverButton, animationsMenuCheck, Duration.millis(500));
-        applySlideAnimation(stopButton, animationsMenuCheck, Duration.millis(500));
-        applySlideAnimation(backstepButton, animationsMenuCheck, Duration.millis(500));
         collapseButton.setDisable(true);
         expandButton.setDisable(true);
         initializeChooseDegreeTextField();
-        CustomAnimations.animateButton(loadProgramButton, animationsMenuCheck);
+        startAutoRefresh();
     }
 
-    @FXML
-    private void initializeTheme() {
-        themeRadioMenu.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            if (newToggle == null) return;
+    private void startAutoRefresh() {
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(500), event -> refreshExecutionAsync())
+        );
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
 
-            RadioMenuItem selected = (RadioMenuItem) newToggle;
-            String theme = selected.getText();
+    private void refreshExecutionAsync() {
+        Task<ExecutionDTO> task = new Task<>() {
+            @Override
+            protected ExecutionDTO call() throws Exception {
+                if (appContext == null) return null;
 
-            switch (theme) {
-                case "Default" -> applyTheme(null);
-                case "Dark" -> applyTheme("/dark.css");
-                case "Blue" -> applyTheme("/blue.css");
-                case "Modern" -> applyTheme("/modern.css");
+                return NetCode.getExecutionDTO(appContext.getUsername());
             }
+        };
+
+        task.setOnSucceeded(e -> {
+            ExecutionDTO dto = task.getValue();
+            if (dto == null) return; // null is safe, skip update
+
+            refreshExecutionUI(dto);
         });
+
+        task.setOnFailed(e -> { /* intentionally empty */ });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
+
+    // update all UI elements
+    private void refreshExecutionUI(ExecutionDTO dto) {
+        userNameLabel.setText(appContext.getUsername());
+        availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
+        maxDegreeLabel.setText(String.format("%d", dto.maxDegree));
+        updateTableKeepSelection(instructionsTable, dto.sInstructionsDTOs);
+
+    }
+
+    private <T> void updateTableKeepSelection(TableView<T> table, List<T> newItems) {
+        int selectedIndex = table.getSelectionModel().getSelectedIndex();
+
+        table.getItems().setAll(newItems);
+
+        if (selectedIndex >= 0 && selectedIndex < table.getItems().size()) {
+            table.getSelectionModel().select(selectedIndex);
+        }
+    }
+
 
     private void initializeInstructionTable(){
         //lineColumn "#" — dynamic row numbering
@@ -218,6 +216,9 @@ public class MainController {
         // instructionColumn — string from getInstructionString()
         instructionColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().instructionString)
+        );
+        genColumn.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().generation)
         );
 
         // prepare table list
@@ -253,41 +254,6 @@ public class MainController {
 
     }
 
-    private void initializeHistoryTable(){
-        numHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().num)
-        );
-        degreeHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().degree)
-        );
-        yHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().y)
-        );
-        cyclesHistoryColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().cycles)
-        );
-
-        // prepare table list
-        historyTable.setItems(FXCollections.observableArrayList());
-
-        historyTable.setRowFactory(tv -> new TableRow<ExecutionHistoryDTO>() {
-            @Override
-            protected void updateItem(ExecutionHistoryDTO item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setStyle("");
-                }
-            }
-        });
-
-        historyTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            showInfoButton.setDisable(newSel == null);
-            reRunButton.setDisable((newSel == null) || running);
-        });
-
-    }
-
     private void initializedExpansionsTable(){
         //  lineColumn "#" — dynamic row numbering
         historyChainLine.setCellValueFactory(cell ->
@@ -311,6 +277,7 @@ public class MainController {
         historyChainInstruction.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().instructionString)
         );
+
 
         // prepare table list
         historyChainTable.setItems(FXCollections.observableArrayList());
@@ -345,12 +312,6 @@ public class MainController {
 
             updateSearchHighlights(newV);
             instructionsTable.refresh();
-        });
-    }
-
-    private void initializeProgramSelectionChoiceBox(){
-        programSelectionChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            reloadSelectedProgram();
         });
     }
 
@@ -434,22 +395,6 @@ public class MainController {
             if (cssUrl != null) {
                 scene.getStylesheets().add(cssUrl.toExternalForm());
             }
-        }
-    }
-
-    @FXML
-    void onClickedLoadProgramButton(MouseEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile = fileChooser.showOpenDialog(loadProgramButton.getScene().getWindow());
-
-        if (selectedFile != null) {
-
-            String path = selectedFile.getAbsolutePath();
-            if(!path.endsWith(".xml")) {
-                InfoMessage.showInfoMessage("Failed to load XML file", "File name doesnt end with .xml");
-                return;
-            }
-            loadProgramFromPath(path);
         }
     }
 
@@ -721,23 +666,21 @@ public class MainController {
         int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
 
          */
-        boolean not_loaded = true;
+        int max_degree = executionDTO.maxDegree;
         boolean debug = false;
-        int max_degree = 0;
         maxDegreeLabel.setText(String.format("%d", max_degree));
-        newRunButton.setDisable(not_loaded || running);
-        normalRadioButton.setDisable(not_loaded || running);
-        debugRadioButton.setDisable(not_loaded || running);
-        stopButton.setDisable(not_loaded || !(debug && running));
-        backstepButton.setDisable(not_loaded || !(debug && running));
-        stepOverButton.setDisable(not_loaded || !(debug && running));
-        resumeButton.setDisable(not_loaded || !(debug && running));
-        expandButton.setDisable(not_loaded || running || (degree_selected == max_degree));
-        collapseButton.setDisable(not_loaded || running || (degree_selected == 0));
-        chooseDegreeTextField.setDisable(not_loaded || running);
-        executeButton.setDisable(not_loaded || running);
-        inputTable.setDisable(not_loaded || running);
-        programSelectionChoiceBox.setDisable(not_loaded || running);
+        newRunButton.setDisable(running);
+        normalRadioButton.setDisable(running);
+        debugRadioButton.setDisable(running);
+        stopButton.setDisable(!(debug && running));
+        backstepButton.setDisable(!(debug && running));
+        stepOverButton.setDisable(!(debug && running));
+        resumeButton.setDisable(!(debug && running));
+        expandButton.setDisable(running || (degree_selected == max_degree));
+        collapseButton.setDisable(running || (degree_selected == 0));
+        chooseDegreeTextField.setDisable(running);
+        executeButton.setDisable(running);
+        inputTable.setDisable(running);
 
     }
 
@@ -856,6 +799,8 @@ public class MainController {
         return input_variables;
     }
 
+    // Updates variables table from hashmap,
+    // if highlight is True, highlights all rows with changed values
     public void updateProgramVariablesTable(LinkedHashMap<String, Integer> result, boolean highlight) {
         Map<String, Integer> oldValues = programVariablesTable.getItems().stream()
                 .collect(Collectors.toMap(VariableRow::getVariable, VariableRow::getValue));
@@ -883,7 +828,7 @@ public class MainController {
         });
     }
 
-
+    /*
     public int countSynthetic(SProgramViewDTO program){
         int count = 0;
         for(SInstructionDTO instr : program.sInstructionsDTOs){
@@ -892,64 +837,8 @@ public class MainController {
             }
         }
         return count;
-
     }
-
-    @FXML
-    public void onReRunClicked(MouseEvent event) {
-        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
-        if(selectedHistory != null){
-            degree_selected = selectedHistory.degree;
-            updateUIOnExpansion();
-            setInputTableValues(selectedHistory.inputVariables);
-        }
-    }
-
-    @FXML
-    public void onShowInfoClicked(MouseEvent event) {
-        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
-        if(selectedHistory != null){
-            new VariableTablePopup(selectedHistory.variables);
-        }
-    }
-
-    private void applySlideAnimation(Button button, CheckMenuItem condition, Duration duration) {
-        // initial state if button is disabled
-        if (condition.isSelected()) {
-            button.setScaleY(0);
-        } else {
-            button.setScaleX(1);
-            button.setScaleY(1);
-        }
-
-        button.disabledProperty().addListener((obs, wasDisabled, isDisabled) -> {
-            if(condition.isSelected()) {
-                ScaleTransition st = new ScaleTransition(duration, button);
-                if (isDisabled) {
-                    st.setToY(0);
-                } else {
-                    st.setToY(1);
-                }
-                st.play();
-            }
-        });
-
-        condition.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            if(!isSelected) {
-                ScaleTransition st = new ScaleTransition(duration, button);
-                st.setToY(1);
-                st.setToX(1);
-                st.play();
-            }
-            else {
-                if(button.isDisabled()) {
-                    ScaleTransition st = new ScaleTransition(duration, button);
-                    st.setToY(0);
-                    st.play();
-                }
-            }
-        });
-    }
+    */
 
     private void onBreakpointClicked(SInstructionDTO instruction, boolean marked) {
         if(marked){
@@ -959,6 +848,15 @@ public class MainController {
             breakPoints.remove(instruction.line);
         }
 
+    }
+
+    @FXML
+    private void onBackToDashboardClicked(MouseEvent event) {
+        try {
+            App.loadScreen("/fxml/dashboard.fxml");
+        } catch (Exception e) {
+            InfoMessage.showInfoMessage("Failed to load dashboard", e.getMessage());
+        }
     }
 
 }

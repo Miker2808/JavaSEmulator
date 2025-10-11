@@ -11,7 +11,6 @@ public class SInstructionDTO {
     public int cycles;
     public String cyclesStr;
     public int line;
-    public int credits;
     public String generation;
 
 }

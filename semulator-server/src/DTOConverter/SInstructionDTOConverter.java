@@ -13,7 +13,6 @@ public class SInstructionDTOConverter {
         dto.cycles = instruction.getCycles();
         dto.cyclesStr = instruction.getCyclesStr();
         dto.line = instruction.getLine();
-        dto.credits = instruction.getCredits();
         dto.generation = instruction.getGenStr();
         dto.typeShort = instruction.getTypeShort();
         dto.sLabel = instruction.getSLabel();

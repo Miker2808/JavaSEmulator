@@ -34,7 +34,13 @@ public class ProgramsStorage {
         return new HashSet<>(this.functions.keySet());
     }
 
-    public SProgramView getProgramView(String programName){
+    public SProgramView getProgramView(String programName, String type){
+        if(type.equals("PROGRAM")){
+            if(programs.containsKey(programName)){
+                return programs.get(programName);
+            }
+        }
+
         if(this.functions.containsKey(programName)){
             return this.functions.get(programName);
         }

@@ -57,7 +57,7 @@
                         <TableColumn fx:id="programAvgCreditsColumn" editable="false" prefWidth="110.0" text="Avg Credits Cost" />
                     </columns>
                   </TableView>
-                  <Button fx:id="executeProgramButton" mnemonicParsing="false" text="Execute Program" StackPane.alignment="BOTTOM_RIGHT">
+                  <Button fx:id="executeProgramButton" mnemonicParsing="false" onMouseClicked="#onExecuteProgramClicked" text="Execute Program" StackPane.alignment="BOTTOM_RIGHT">
                      <StackPane.margin>
                         <Insets bottom="20.0" right="20.0" />
                      </StackPane.margin>
@@ -75,7 +75,7 @@
                         <TableColumn fx:id="functionMaxDegree" editable="false" prefWidth="75.0" text="Uploader" />
                     </columns>
                   </TableView>
-                  <Button fx:id="executeFunctionButton" mnemonicParsing="false" text="Execute Function" StackPane.alignment="BOTTOM_RIGHT">
+                  <Button fx:id="executeFunctionButton" mnemonicParsing="false" onMouseClicked="#onExecuteFunctionClicked" text="Execute Function" StackPane.alignment="BOTTOM_RIGHT">
                      <StackPane.margin>
                         <Insets bottom="20.0" right="20.0" />
                      </StackPane.margin>
