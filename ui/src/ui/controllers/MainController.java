@@ -1,7 +1,9 @@
 package ui.controllers;
 
-import dto.*;
-
+import dto.ExecutionDTO;
+import dto.SInstructionDTO;
+import dto.SProgramDTO;
+import dto.SProgramViewDTO;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -21,14 +23,11 @@ import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
 import ui.App;
 import ui.StatefulController;
-import ui.elements.CustomAnimations;
 import ui.elements.InfoMessage;
-import ui.elements.ProgressBarDialog;
 import ui.netcode.NetCode;
 import ui.storage.AppContext;
 import ui.storage.VariableRow;
 
-import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,9 +38,7 @@ public class MainController implements StatefulController {
     private AppContext appContext;
     private Stage stage;
 
-    ExecutionDTO executionDTO = null;
-    private String selectedProgramName = null;
-
+    private Integer max_degree = 0;
     private Integer degree_selected = 0;
     private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
@@ -55,7 +52,6 @@ public class MainController implements StatefulController {
     @FXML private TextField chooseDegreeTextField;
     @FXML private Label availCreditsLabel;
     @FXML private Label userNameLabel;
-
 
 // instructions table
     @FXML private TableView<SInstructionDTO> instructionsTable;
@@ -80,45 +76,32 @@ public class MainController implements StatefulController {
 
     // Debugger / Execution Section
     // Buttons
-    @FXML
-    private Button newRunButton;
-    @FXML
-    private Label cyclesMeterLabel;
-    @FXML
-    private Button executeButton;
-    @FXML
-    private Button resumeButton;
-    @FXML
-    private Button stepOverButton;
-    @FXML
-    private Button backstepButton;
-    @FXML
-    private Button stopButton;
-    @FXML
-    private RadioButton normalRadioButton;
-    @FXML
-    private RadioButton debugRadioButton;
+    @FXML private Button newRunButton;
+    @FXML private Label cyclesMeterLabel;
+    @FXML private Button executeButton;
+    @FXML private Button resumeButton;
+    @FXML private Button stepOverButton;
+    @FXML private Button backstepButton;
+    @FXML private Button stopButton;
+    @FXML private RadioButton normalRadioButton;
+    @FXML private RadioButton debugRadioButton;
 
     // Input Table
-    @FXML
-    private TableView<VariableRow> inputTable;
-    @FXML
-    private TableColumn<VariableRow, Integer> inputTableValueColumn;
-    @FXML
-    private TableColumn<VariableRow, String> inputTableVariableColumn;
+    @FXML private TableView<VariableRow> inputTable;
+    @FXML private TableColumn<VariableRow, Integer> inputTableValueColumn;
+    @FXML private TableColumn<VariableRow, String> inputTableVariableColumn;
 
     // Run Variables Table
-    @FXML
-    private TableView<VariableRow> programVariablesTable;
-    @FXML
-    private TableColumn<VariableRow, Integer> programVariablesTableValueColumn;
-    @FXML
-    private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
+    @FXML private TableView<VariableRow> programVariablesTable;
+    @FXML private TableColumn<VariableRow, Integer> programVariablesTableValueColumn;
+    @FXML private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
+    @FXML private Label programNameLabel;
 
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
+        initializeUI(); // appContext needs to be defined before initialize is called.
     }
 
     @Override
@@ -128,18 +111,30 @@ public class MainController implements StatefulController {
 
     public MainController() {}
 
+    private <T> void updateTableKeepSelection(TableView<T> table, List<T> newItems) {
+        int selectedIndex = table.getSelectionModel().getSelectedIndex();
+
+        table.getItems().setAll(newItems);
+
+        if (selectedIndex >= 0 && selectedIndex < table.getItems().size()) {
+            table.getSelectionModel().select(selectedIndex);
+        }
+    }
+
 // ** Initializers **
     @FXML
-    public void initialize() {
+    public void initializeUI() {
         initializeInstructionTable();
         initializeHighlightSelectionBox();
         initializedExpansionsTable();
         initializeInputTable();
         initializeProgramVariablesTable();
-        collapseButton.setDisable(true);
-        expandButton.setDisable(true);
         initializeChooseDegreeTextField();
+        updateUIOnExpansion();
         startAutoRefresh();
+
+        collapseButton.setDisable(true);
+        expandButton.setDisable(max_degree == 0);
     }
 
     private void startAutoRefresh() {
@@ -178,21 +173,8 @@ public class MainController implements StatefulController {
     private void refreshExecutionUI(ExecutionDTO dto) {
         userNameLabel.setText(appContext.getUsername());
         availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
-        maxDegreeLabel.setText(String.format("%d", dto.maxDegree));
-        updateTableKeepSelection(instructionsTable, dto.sInstructionsDTOs);
 
     }
-
-    private <T> void updateTableKeepSelection(TableView<T> table, List<T> newItems) {
-        int selectedIndex = table.getSelectionModel().getSelectedIndex();
-
-        table.getItems().setAll(newItems);
-
-        if (selectedIndex >= 0 && selectedIndex < table.getItems().size()) {
-            table.getSelectionModel().select(selectedIndex);
-        }
-    }
-
 
     private void initializeInstructionTable(){
         //lineColumn "#" — dynamic row numbering
@@ -278,10 +260,10 @@ public class MainController implements StatefulController {
                 new SimpleStringProperty(cell.getValue().instructionString)
         );
 
-
         // prepare table list
         historyChainTable.setItems(FXCollections.observableArrayList());
 
+        // add listener to request expansion list when instructionsTable line is selected
         instructionsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel == null) {
                 historyChainTable.getItems().clear();
@@ -398,67 +380,6 @@ public class MainController implements StatefulController {
         }
     }
 
-    private void loadProgramFromPath(String path) {
-        Task<Void> loadTask = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                File xmlFile = new File(path);
-                //engine.loadFromXML(xmlFile);
-                return null;
-            }
-        };
-
-        loadTask.setOnSucceeded(event -> {
-            initOnLoad(path);
-        });
-
-        loadTask.setOnFailed(event -> {
-            Throwable exception = loadTask.getException();
-            InfoMessage.showInfoMessage("Failed to load XML file", exception.getMessage());
-        });
-
-        // Show progress dialog and run task
-        new ProgressBarDialog(.3f).start();
-        Thread taskThread = new Thread(loadTask);
-        taskThread.setDaemon(true);
-        taskThread.start();
-    }
-
-    // properties to update on successful load
-    private void initOnLoad(String path){
-
-        // TODO: change to request from server instead.
-        /*
-        loadedFilePathTextField.setStyle("-fx-control-inner-background: lightgreen;");
-        loadedFilePathTextField.setText(path);
-        programSelectionChoiceBox.getItems().setAll(engine.getLoadedProgramNames());
-        programSelectionChoiceBox.getSelectionModel().selectFirst();
-        reloadSelectedProgram();
-
-         */
-    }
-
-    // properties to update on program change
-    private void reloadSelectedProgram(){
-        degree_selected = 0;
-        running = false;
-
-        // TODO: request program from UI
-        /*
-        String selected_program = programSelectionChoiceBox.getSelectionModel().getSelectedItem();
-        selectedProgramView = engine.getSelectedProgram(selected_program);
-        updateInstructionsUI(selectedProgramView);
-        resetInputTable();
-        programVariablesTable.getItems().clear();
-        resetHighlightSelectionBox(selectedProgramView);
-        updateUIOnExpansion();
-        updateHistoryTableUI(selectedProgramView);
-
-         */
-
-
-    }
-
     // Called when search filter changes
     private void updateSearchHighlights(String choice) {
         searchHighlightedLines.clear();
@@ -491,22 +412,8 @@ public class MainController implements StatefulController {
         instructionsTable.refresh();
     }
 
-    private void resetHighlightSelectionBox(SProgramViewDTO programView) {
-        List<String> variables = new ArrayList<>();
-        List<String> labels = new ArrayList<>();
-
-        // TODO: make it a server request
-        /*
-        // Separate items into Variables and Labels
-        for (String item : programView.getInstructionsView().getVariablesUsed()) {
-            variables.add(item);
-        }
-        for (String item : programView.getInstructionsView().getLabelsUsed()) {
-            labels.add(item);
-        }
-
-         */
-
+    // updates search highlight selection box with available variables and labels
+    private void resetHighlightSelectionBox(List<String> variables, List<String> labels) {
         // Combine into ObservableList with headers
         ObservableList<String> comboItems = FXCollections.observableArrayList();
         comboItems.add("Clear");
@@ -592,14 +499,11 @@ public class MainController implements StatefulController {
          */
     }
 
-    void updateInstructionsTableSummary(SProgramViewDTO programView){
-        /*
-        int count = programView.getInstructionsView().size();
-        int synth_count = countSynthetic(programView.getInstructionsView());
+    void updateInstructionsTableSummary(SProgramDTO programDTO){
+        int count = programDTO.sInstructionsDTOs.size();
+        int synth_count = countSynthetic(programDTO);
         int basic = count - synth_count;
         instructionsCountLabel.setText("Instructions: " + count + " (Basic: " + basic + " / Synthetic: " + synth_count + " )");
-
-         */
     }
 
     @FXML
@@ -616,39 +520,50 @@ public class MainController implements StatefulController {
 
     @FXML
     void onDegreeTextFieldAction() {
-        /*
+
         String text = chooseDegreeTextField.getText();
-        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();
+        int max_degree = Integer.parseInt(maxDegreeLabel.getText());
         int text_deg = Integer.parseInt(text.trim());
         this.degree_selected = Math.min(text_deg, max_degree);
-
-         */
 
         updateUIOnExpansion();
 
     }
 
     void updateUIOnExpansion(){
-        /*
+
         breakPoints.clear();
         lineHighlighted = null;
-        // TODO: get expanded program from server
-        //SProgramViewDTO expanded = engine.getExpandedProgram(programSelectionChoiceBox.getValue(), degree_selected);
-        updateInstructionsUI(expanded);
+        SProgramDTO programDTO;
+        try {
+            programDTO = NetCode.getSProgramDTO(appContext.getUsername(), degree_selected);
+        }
+        catch (Exception e) {
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+            return;
+        }
+
+        programNameLabel.setText(programDTO.programName);
+        degree_selected = programDTO.current_degree;
+        max_degree = programDTO.maxDegree;
+        maxDegreeLabel.setText(String.format("%d", max_degree));
+
+        updateInputTable(programDTO.inputVariables);
+        resetHighlightSelectionBox(programDTO.variablesUsed, programDTO.labelsUsed);
+        updateTableKeepSelection(instructionsTable, programDTO.sInstructionsDTOs);
+        chooseDegreeTextField.setText("" + degree_selected);
+
         updateInputControllers();
 
-         */
     }
 
 
-    void resetInputTable(){
-        /*
-        List<String> input_variables = selectedProgramView.getInstructionsView().getInputVariablesUsed();
+    void updateInputTable(List<String> input_variables){
         inputTable.getItems().setAll(
                 input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
         );
 
-         */
+
     }
 
     void setInputTableValues(LinkedHashMap<String, Integer> variables) {
@@ -660,15 +575,9 @@ public class MainController implements StatefulController {
     }
 
     void updateInputControllers(){
-        /*
-        boolean not_loaded = !engine.isProgramLoaded();
-        boolean debug = debugRadioButton.isSelected();
-        int max_degree = selectedProgramView.getInstructionsView().getMaxDegree();;
-
-         */
-        int max_degree = executionDTO.maxDegree;
+        int max_degree = this.max_degree;
         boolean debug = false;
-        maxDegreeLabel.setText(String.format("%d", max_degree));
+
         newRunButton.setDisable(running);
         normalRadioButton.setDisable(running);
         debugRadioButton.setDisable(running);
@@ -828,17 +737,17 @@ public class MainController implements StatefulController {
         });
     }
 
-    /*
-    public int countSynthetic(SProgramViewDTO program){
+
+    public int countSynthetic(SProgramDTO programDTO){
         int count = 0;
-        for(SInstructionDTO instr : program.sInstructionsDTOs){
+        for(SInstructionDTO instr : programDTO.sInstructionsDTOs){
             if(Objects.equals(instr.typeShort, "S")){
                 count++;
             }
         }
         return count;
     }
-    */
+
 
     private void onBreakpointClicked(SInstructionDTO instruction, boolean marked) {
         if(marked){

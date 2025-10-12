@@ -1,4 +1,4 @@
-package Servlets;
+package Servlets.DashboardServlets;
 
 import Storage.UserInstance;
 import jakarta.servlet.ServletContext;

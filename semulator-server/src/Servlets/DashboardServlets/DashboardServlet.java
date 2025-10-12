@@ -1,14 +1,11 @@
-package Servlets;
+package Servlets.DashboardServlets;
 
 import DTOConverter.UserStatDTOConverter;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import dto.DashboardDTO;
-import dto.SProgramViewDTO;
 import dto.UserStatDTO;
-import engine.SProgramView;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

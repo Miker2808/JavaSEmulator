@@ -41,9 +41,9 @@
                             <TableColumn fx:id="lineColumn" editable="false" minWidth="30.0" prefWidth="35.0" text="#" />
                             <TableColumn fx:id="typeColumn" editable="false" minWidth="35.0" prefWidth="50.0" text="Type" />
                               <TableColumn fx:id="labelColumn" editable="false" minWidth="45.0" prefWidth="50.0" text="Label" />
-                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="336.0" text="Instruction" />
-                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Cycles" />
-                              <TableColumn fx:id="genColumn" editable="false" minWidth="45.0" prefWidth="70.0" text="Gen" />
+                              <TableColumn fx:id="instructionColumn" editable="false" minWidth="100.0" prefWidth="323.0" text="Instruction" />
+                              <TableColumn fx:id="cyclesColumn" editable="false" minWidth="45.0" prefWidth="72.0" text="Cycles" />
+                              <TableColumn fx:id="genColumn" editable="false" minWidth="45.0" prefWidth="58.0" text="Gen" />
                           </columns>
                         </TableView>
                         <GridPane GridPane.rowIndex="1">
@@ -206,7 +206,7 @@
                                  <children>
                                     <Label alignment="CENTER" contentDisplay="CENTER" text="Gen I">
                                        <font>
-                                          <Font name="AdobePiStd" size="12.0" />
+                                          <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <RadioButton contentDisplay="TOP" mnemonicParsing="false" selected="true">
@@ -220,7 +220,7 @@
                                  <children>
                                     <Label alignment="CENTER" contentDisplay="CENTER" text="Gen II">
                                        <font>
-                                          <Font name="AdobePiStd" size="12.0" />
+                                          <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
@@ -230,7 +230,7 @@
                                  <children>
                                     <Label alignment="CENTER" contentDisplay="CENTER" text="Gen III">
                                        <font>
-                                          <Font name="AdobePiStd" size="12.0" />
+                                          <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
@@ -240,7 +240,7 @@
                                  <children>
                                     <Label alignment="CENTER" contentDisplay="CENTER" text="Gen IV">
                                        <font>
-                                          <Font name="AdobePiStd" size="12.0" />
+                                          <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
@@ -252,28 +252,30 @@
                   </GridPane>
                   <GridPane alignment="CENTER" hgap="3.0">
                     <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="60.0" />
                       <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                         <ColumnConstraints hgrow="NEVER" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" />
                         <ColumnConstraints maxWidth="65.0" minWidth="65.0" />
-                        <ColumnConstraints maxWidth="65.0" minWidth="65.0" prefWidth="65.0" />
+                        <ColumnConstraints maxWidth="50.0" minWidth="0.0" prefWidth="50.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.hgrow="ALWAYS" />
-                        <Label fx:id="maxDegreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
-                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="4" GridPane.hgrow="NEVER" />
-                        <Label fx:id="degreeLabel1" alignment="CENTER" contentDisplay="CENTER" layoutX="327.0" layoutY="15.0" text="/" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                        <Button fx:id="collapseButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onCollapseButtonClicked" text="Collapse" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                        <Label fx:id="maxDegreeLabel" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER" />
+                        <Button fx:id="expandButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#onExpandButtonClicked" text="Expand" GridPane.columnIndex="5" GridPane.hgrow="NEVER" />
+                        <Label fx:id="degreeLabel1" alignment="CENTER" contentDisplay="CENTER" layoutX="327.0" layoutY="15.0" text="/" textAlignment="CENTER" GridPane.columnIndex="3" GridPane.halignment="CENTER">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
-                        <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="1" />
-                        <ComboBox fx:id="highlightSelectionBox" maxWidth="1.7976931348623157E308" minWidth="50.0" promptText="Highlight Selection" GridPane.columnIndex="6" />
+                        <TextField fx:id="chooseDegreeTextField" alignment="CENTER" disable="true" onAction="#onDegreeTextFieldAction" text="0" GridPane.columnIndex="2" />
+                        <ComboBox fx:id="highlightSelectionBox" maxWidth="1.7976931348623157E308" minWidth="50.0" promptText="Highlight Selection" GridPane.columnIndex="7" />
+                        <Label fx:id="programNameLabel" text="Program Name" />
                      </children>
                   </GridPane>
                   <TableView fx:id="historyChainTable" minHeight="100.0" minWidth="100.0" GridPane.rowIndex="2">

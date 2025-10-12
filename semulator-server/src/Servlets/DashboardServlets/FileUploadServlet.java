@@ -1,4 +1,4 @@
-package Servlets;
+package Servlets.DashboardServlets;
 
 import Storage.ProgramsStorage;
 import Storage.UserInstance;

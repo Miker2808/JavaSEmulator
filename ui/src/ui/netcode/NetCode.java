@@ -3,6 +3,7 @@ package ui.netcode;
 import com.google.gson.Gson;
 import dto.DashboardDTO;
 import dto.ExecutionDTO;
+import dto.SProgramDTO;
 import okhttp3.*;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 public class NetCode {
     private static final String URL = "http://localhost:8080/semulator-server";
+    private static final Gson gson = new Gson();
 
     public static Response login(String username) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -92,10 +94,31 @@ public class NetCode {
 
         if(response.isSuccessful()) {
             String json = response.body().string();
-            Gson gson = new Gson();
             return gson.fromJson(json, ExecutionDTO.class);
         }
+        else{
+            throw new IOException(response.body().string());
+        }
+    }
 
+    public static SProgramDTO getSProgramDTO(String username, Integer degree) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        String url = String.format("%s/execution/get-program?user=%s&degree=%d", URL, username, degree);
+
+        Map<String, String> data = new HashMap<>();
+        String json = gson.toJson(data);
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        Response response = client.newCall(request).execute();
+
+        if(response.isSuccessful()) {
+            String jsonString = response.body().string();
+            return gson.fromJson(jsonString, SProgramDTO.class);
+        }
         else{
             throw new IOException(response.body().string());
         }
@@ -107,8 +130,7 @@ public class NetCode {
 
         Map<String, String> data = new HashMap<>();
         data.put("program", program);
-        data.put("type", type); // Function or Program
-        Gson gson = new Gson();
+        data.put("type", type); // "FUNCTION" or "PROGRAM"
         String json = gson.toJson(data);
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         RequestBody body = RequestBody.create(json, JSON);

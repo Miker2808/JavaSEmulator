@@ -1,4 +1,4 @@
-package Servlets;
+package Servlets.ExecutionServlets;
 
 
 import DTOConverter.SInstructionDTOConverter;
@@ -69,24 +69,11 @@ public class ExecutionServlet extends HttpServlet {
             usersProgram = SProgramExpander.expand(usersProgram, userInstance.getDegreeSelected());
         }
 
-        dto.sInstructionsDTOs = new ArrayList<>();
-
-        SInstructionsView instructionsView = usersProgram.getInstructionsView();
-        for(SInstruction instr : instructionsView.getAllInstructions()){
-            dto.sInstructionsDTOs.add(SInstructionDTOConverter.convertToDTO(instr));
-        }
-
         dto.cycles = 0; // TODO: set cycles from interpreter in userInstance
         dto.running = userInstance.isRunning();
         dto.runPCHighlight = null;
-        dto.maxDegree = max_degree;
-        dto.degree = userInstance.getDegreeSelected();
         dto.programName = userInstance.getProgramSelected();
         dto.credits = userInstance.getCreditsAvailable();
-        dto.searchHighlight = new ArrayList<>();
-        dto.expansionHistoryDTO = new ArrayList<>();
-        dto.inputVariables = new ArrayList<>();
-        dto.inputValues = new ArrayList<>();
         dto.runVariables = new LinkedHashMap<>();
 
         return dto;
