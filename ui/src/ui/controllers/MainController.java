@@ -70,7 +70,7 @@ public class MainController implements StatefulController {
     @FXML private TableColumn<SInstructionDTO, String> historyChainCycles;
     @FXML private TableColumn<SInstructionDTO, String> historyChainLabel;
     @FXML private TableColumn<SInstructionDTO, String> historyChainInstruction;
-    @FXML private TableColumn<SInstructionDTO, String> historyChangeGen;
+    @FXML private TableColumn<SInstructionDTO, String> historyChainGeneration;
 
     @FXML private Label instructionsCountLabel;
 
@@ -260,6 +260,10 @@ public class MainController implements StatefulController {
                 new SimpleStringProperty(cell.getValue().instructionString)
         );
 
+        historyChainGeneration.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().generation)
+        );
+
         // prepare table list
         historyChainTable.setItems(FXCollections.observableArrayList());
 
@@ -269,20 +273,16 @@ public class MainController implements StatefulController {
                 historyChainTable.getItems().clear();
                 return;
             }
-            // TODO: request chain from server
-            /*
-            List<SInstructionDTO> chain = new ArrayList<>();
-            SInstructionDTO current = newSel.getParent();  // start from parent, not self
 
-            // walk up to root
-            while (current != null) {
-                chain.add(current);
-                current = current.getParent();
+            List<SInstructionDTO> expansionHistory = new ArrayList<>();
+            try {
+                expansionHistory = NetCode.getExpansionHistoryDTO(appContext.getUsername(), degree_selected, newSel.line);
             }
+            catch (Exception e) {
+                InfoMessage.showInfoMessage("Failure", e.getMessage());
+            }
+            historyChainTable.getItems().setAll(expansionHistory);
 
-            historyChainTable.getItems().setAll(chain);
-
-             */
         });
     }
 

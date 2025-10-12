@@ -41,9 +41,6 @@ public class QuoteInstruction extends SInstruction {
 
         setFunctionName(getArgument(argFunctionName));
         setFunctionArguments(getArgument(argFunctionArgumentsName));
-
-        this.setCredits(1000);
-        this.setGeneration(4);
     }
 
     public QuoteInstruction(String sVariable, String sLabel, String functionName, String functionArgumentsStr){
@@ -56,9 +53,6 @@ public class QuoteInstruction extends SInstruction {
         this.setFunctionName(functionName);
         this.setFunctionArguments(functionArgumentsStr);
         this.setDegree(getDegree());
-
-        this.setCredits(1000);
-        this.setGeneration(4);
     }
 
     public QuoteInstruction(QuoteInstruction other) {
@@ -69,9 +63,6 @@ public class QuoteInstruction extends SInstruction {
         setDegree(other.getDegree());
         setFunctionName(other.getFunctionName());
         setFunctionArguments(other.getFunctionArguments());
-
-        this.setCredits(other.getCredits());
-        this.setGeneration(other.getGeneration());
     }
 
     @Override

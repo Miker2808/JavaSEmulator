@@ -1,14 +1,18 @@
 package ui.netcode;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import dto.DashboardDTO;
 import dto.ExecutionDTO;
+import dto.SInstructionDTO;
 import dto.SProgramDTO;
 import okhttp3.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NetCode {
@@ -140,6 +144,30 @@ public class NetCode {
                 .method("POST", body)
                 .build();
         return client.newCall(request).execute();
+    }
+
+    public static List<SInstructionDTO> getExpansionHistoryDTO(String username, Integer degree, Integer line) throws IOException{
+        OkHttpClient client = new OkHttpClient();
+        String url = String.format("%s/execution/get-expansion-history?user=%s&degree=%d&line=%d", URL, username, degree, line);
+
+        Map<String, String> data = new HashMap<>();
+        String json = gson.toJson(data);
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        Response response = client.newCall(request).execute();
+
+        if(response.isSuccessful()) {
+            String jsonString = response.body().string();
+            Type type = new TypeToken<List<SInstructionDTO>>() {}.getType();
+            return gson.fromJson(jsonString, type);
+        }
+        else{
+            throw new IOException(response.body().string());
+        }
     }
 
 

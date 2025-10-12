@@ -19,9 +19,6 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
         setArgumentLabel(getArgument(argumentLabelName));
         setFunctionArguments(getArgument(argFunctionArgumentsName));
         setFunctionName(getArgument(argFunctionName));
-
-        this.setCredits(1000);
-        this.setGeneration(4);
     }
 
     JumpEqualFunctionInstruction(JumpEqualFunctionInstruction other) {
@@ -33,9 +30,6 @@ public class JumpEqualFunctionInstruction extends QuoteInstruction {
         setFunctionName(other.getFunctionName());
         setFunctionArguments(other.getFunctionArguments());
         setArgumentLabel(other.getArgumentLabel());
-
-        this.setCredits(other.getCredits());
-        setGeneration(other.getGeneration());
     }
 
     @Override

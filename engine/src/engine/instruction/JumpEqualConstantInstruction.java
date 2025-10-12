@@ -21,9 +21,6 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setDegree(3);
         this.setArgumentConst(getArgument(argConstName));
         this.setArgumentLabel(getArgument(argLabelName));
-
-        this.setCredits(500);
-        this.setGeneration(3);
     }
 
     public JumpEqualConstantInstruction( String variable, String label, String JEConstantLabel, String constantValue) {
@@ -37,9 +34,6 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setArgumentConst(constantValue);
         this.setArgumentLabel(JEConstantLabel);
 
-        this.setCredits(500);
-        this.setGeneration(3);
-
     }
 
     public JumpEqualConstantInstruction(JumpEqualConstantInstruction other) {
@@ -49,9 +43,6 @@ public class JumpEqualConstantInstruction extends SInstruction {
         this.setDegree(other.getDegree());
         this.setArgumentLabel(other.getArgumentLabel());
         this.setArgumentConst(other.getArgumentConst());
-
-        this.setCredits(other.getCredits());
-        this.setGeneration(other.getGeneration());
     }
 
     @Override

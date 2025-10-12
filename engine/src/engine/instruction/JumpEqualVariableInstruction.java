@@ -22,9 +22,6 @@ public class JumpEqualVariableInstruction extends SInstruction {
         this.setDegree(3);
         this.setArgumentVariable(getArgument(argVarName));
         this.setArgumentLabel(getArgument(argLabelName));
-
-        this.setCredits(500);
-        this.setGeneration(3);
     }
 
     public JumpEqualVariableInstruction( String variable,
@@ -38,9 +35,6 @@ public class JumpEqualVariableInstruction extends SInstruction {
         this.setDegree(3);
         this.setArgumentVariable(variableName.trim());
         this.setArgumentLabel(JEVariableLabel.trim());
-
-        this.setCredits(500);
-        this.setGeneration(3);
     }
 
     public JumpEqualVariableInstruction(JumpEqualVariableInstruction other) {
@@ -50,9 +44,6 @@ public class JumpEqualVariableInstruction extends SInstruction {
         this.setDegree(other.getDegree());
         this.setArgumentLabel(other.getArgumentLabel());
         this.setArgumentVariable(other.getArgumentVariable());
-
-        this.setCredits(other.getCredits());
-        this.setGeneration(other.getGeneration());
     }
 
     @Override

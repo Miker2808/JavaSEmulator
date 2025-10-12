@@ -18,9 +18,6 @@ public class GotoLabelInstruction extends SInstruction {
         this.setType("synthetic");
         this.setDegree(1);
         this.setArgumentLabel(getArgument(argName));
-
-        this.setCredits(100);
-        this.setGeneration(2);
     }
 
     public GotoLabelInstruction( String label, String gotoLabel) {
@@ -32,9 +29,6 @@ public class GotoLabelInstruction extends SInstruction {
         this.setCycles(1);
         this.setType("synthetic");
         this.setDegree(1);
-
-        this.setCredits(100);
-        this.setGeneration(2);
     }
 
     public GotoLabelInstruction(GotoLabelInstruction other){
@@ -43,8 +37,6 @@ public class GotoLabelInstruction extends SInstruction {
         this.setType(other.getType());
         this.setDegree(other.getDegree());
         this.setArgumentLabel(other.getArgumentLabel());
-        this.setCredits(other.getCredits());
-        this.setGeneration(other.getGeneration());
     }
 
     @Override

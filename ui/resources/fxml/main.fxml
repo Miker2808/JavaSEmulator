@@ -285,7 +285,7 @@
                         <TableColumn fx:id="historyChainLabel" editable="false" minWidth="40.0" prefWidth="40.0" sortable="false" text="Label" />
                         <TableColumn fx:id="historyChainInstruction" editable="false" minWidth="100.0" prefWidth="325.0" sortable="false" text="Instruction" />
                         <TableColumn fx:id="historyChainCycles" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Cycles" />
-                        <TableColumn fx:id="historyChangeGen" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Gen" />
+                        <TableColumn fx:id="historyChainGeneration" editable="false" minWidth="45.0" prefWidth="45.0" sortable="false" text="Gen" />
                     </columns>
                   </TableView>
                </children>

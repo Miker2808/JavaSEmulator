@@ -37,8 +37,6 @@ public class SInstruction implements Serializable {
     private int degree; //
     private int cycles; // number of cycles for the program
     private int line;
-    private int credits;
-    private int generation;
 
     // parent stuff
     private int parent_line; // line of instruction in a program
@@ -56,8 +54,6 @@ public class SInstruction implements Serializable {
         cycles = 0;
         parent = null;
         parent_line = 0; // unassigned
-        credits = 5;
-        generation = 1;
     }
 
     // copy constructor
@@ -70,8 +66,6 @@ public class SInstruction implements Serializable {
         this.parent = other.getParent();
         this.degree = other.getDegree();
         this.parent_line = other.getParentLine();
-        this.credits = other.getCredits();
-
         this.sVariableSmart = other.sVariableSmart;
     }
 
@@ -303,23 +297,17 @@ public class SInstruction implements Serializable {
         return sVariableSmart;
     }
 
-    public int getCredits(){
-        return credits;
-    }
-
-    public void setCredits(int value){
-        this.credits = value;
-    }
-
-    public void setGeneration(int value){
-        this.generation = value;
-    }
     public int getGeneration(){
-        return this.generation;
+        return switch (this.getInstructionName()){
+            case NEUTRAL, INCREASE, DECREASE, JUMP_NOT_ZERO -> 1;
+            case ZERO_VARIABLE, CONSTANT_ASSIGNMENT, GOTO_LABEL -> 2;
+            case ASSIGNMENT, JUMP_ZERO, JUMP_EQUAL_CONSTANT, JUMP_EQUAL_VARIABLE -> 3;
+            default -> 4;
+        };
     }
 
     public String getGenStr(){
-        return switch (this.generation) {
+        return switch (this.getGeneration()) {
             case 1 -> "I";
             case 2 -> "II";
             case 3 -> "III";
