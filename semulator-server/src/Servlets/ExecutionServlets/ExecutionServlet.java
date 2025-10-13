@@ -1,15 +1,12 @@
 package Servlets.ExecutionServlets;
 
 
-import DTOConverter.SInstructionDTOConverter;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;
 import dto.ExecutionDTO;
-import engine.SInstructionsView;
 import engine.SProgramView;
 import engine.expander.SProgramExpander;
-import engine.instruction.SInstruction;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,14 +14,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet("/execution")
 public class ExecutionServlet extends HttpServlet {
     private final Gson gson = new Gson();
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -42,7 +37,7 @@ public class ExecutionServlet extends HttpServlet {
         UserInstance userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User not found");
+            sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
             return;
         }
 
@@ -65,9 +60,7 @@ public class ExecutionServlet extends HttpServlet {
         SProgramView usersProgram = programsStorage.getProgramView(userInstance.getProgramSelected(),  userInstance.getProgramType());
         int max_degree = usersProgram.getInstructionsView().getMaxDegree();
 
-        if(userInstance.getDegreeSelected() > 0){
-            usersProgram = SProgramExpander.expand(usersProgram, userInstance.getDegreeSelected());
-        }
+        usersProgram = SProgramExpander.expand(usersProgram, userInstance.getDegreeSelected());
 
         dto.cycles = 0; // TODO: set cycles from interpreter in userInstance
         dto.running = userInstance.isRunning();

@@ -1,5 +1,6 @@
 package Servlets.DashboardServlets;
 
+import Exceptions.UserNotFoundException;
 import Storage.UserInstance;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,7 +30,6 @@ public class CreditsServlet extends HttpServlet {
             return;
         }
 
-
         ServletContext context = getServletContext();
         Map<String, UserInstance> userMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
         if(userMap.containsKey(username)){
@@ -51,9 +51,14 @@ public class CreditsServlet extends HttpServlet {
             response.getWriter().write(credits_available + "");
         }
         else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("Username doesn't exist");
+            sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
         }
+    }
+
+    private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
+        response.setStatus(statusCode);
+        response.setContentType("text/plain");
+        response.getWriter().write(message);
     }
 
 }

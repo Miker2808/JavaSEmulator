@@ -21,10 +21,16 @@ public class App extends Application{
 
     }
 
-    public static void loadScreen(String fxmlPath) throws Exception {
+    public static void loadScreen(String fxmlPath) {
         FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
-        Parent root = loader.load();
-
+        Parent root = null;
+        try {
+            root = loader.load();
+        }
+        catch (Exception e) {
+            System.out.println("loadScreen exception");
+            return;
+        }
         Object controller = loader.getController();
         if (controller instanceof StatefulController) {
             StatefulController c = (StatefulController) controller;

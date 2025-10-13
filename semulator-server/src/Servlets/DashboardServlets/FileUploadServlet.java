@@ -40,7 +40,7 @@ public class FileUploadServlet extends HttpServlet {
         Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
         UserInstance userInstance = userInstanceMap.get(username);
         if(userInstance == null){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User not found");
+            sendPlain(response, HttpServletResponse.SC_GONE, "User not found");
             return;
         }
 

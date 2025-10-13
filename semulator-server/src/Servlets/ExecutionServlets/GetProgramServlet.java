@@ -1,6 +1,7 @@
 package Servlets.ExecutionServlets;
 
 import DTOConverter.SInstructionDTOConverter;
+import Exceptions.UserNotFoundException;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;
@@ -35,6 +36,9 @@ public class GetProgramServlet extends HttpServlet {
 
         try{
             validateRequest(request);
+        }
+        catch (UserNotFoundException e){
+            sendPlain(response, HttpServletResponse.SC_GONE, e.getMessage());
         }
         catch(Exception e){
             sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
@@ -71,7 +75,7 @@ public class GetProgramServlet extends HttpServlet {
             throw new Exception("Invalid request parameters");
         }
         if (userInstance == null) {
-            throw new Exception("User instance not found");
+            throw new UserNotFoundException("User instance not found");
         }
 
     }

@@ -21,7 +21,6 @@ public class StartupListener implements ServletContextListener {
 
         Map<String, UserInstance> userInstanceMap = new HashMap<String, UserInstance>();
         context.setAttribute("userInstanceMap", userInstanceMap);
-
     }
 
     @Override

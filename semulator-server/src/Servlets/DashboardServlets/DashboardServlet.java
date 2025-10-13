@@ -39,7 +39,7 @@ public class DashboardServlet extends HttpServlet {
         UserInstance userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User not found");
+            sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
             return;
         }
 
@@ -55,7 +55,6 @@ public class DashboardServlet extends HttpServlet {
 
     private DashboardDTO getDashboardDTO(HttpServletRequest request, UserInstance userInstance) throws IOException {
 
-        // TODO: get all dashboard stuff, for now only username and credits
         DashboardDTO dto = new DashboardDTO();
         dto.credits = userInstance.getCreditsAvailable();
         dto.userStats = getUserStatsDTO();
@@ -64,6 +63,8 @@ public class DashboardServlet extends HttpServlet {
         ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
         dto.programStats = programsStorage.getFullProgramsStats();
         dto.functionStats = programsStorage.getFullFunctionsStats();
+
+        // TODO: add history
 
         return dto;
 
@@ -99,7 +100,7 @@ public class DashboardServlet extends HttpServlet {
         UserInstance userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User not found");
+            sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
             return;
         }
 
@@ -118,7 +119,7 @@ public class DashboardServlet extends HttpServlet {
             userInstance.setProgramType(type);
         }
         else{
-            throw new IOException("Program was not found");
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Program not found");
         }
         sendPlain(response, HttpServletResponse.SC_OK, "Success");
 

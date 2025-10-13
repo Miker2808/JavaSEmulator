@@ -20,6 +20,7 @@ import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
 import okhttp3.Response;
 import ui.App;
+import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
 import ui.elements.ProgressBarDialog;
@@ -28,12 +29,14 @@ import ui.storage.AppContext;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class DashboardController implements StatefulController {
     private AppContext appContext;
     private Stage stage;
+    private Timeline refreshPullTimeline;
 
     @FXML private Label usernameLabel;
     @FXML private Button loadFileButton;
@@ -67,6 +70,7 @@ public class DashboardController implements StatefulController {
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
+        initializeUI();
     }
 
     @Override
@@ -75,7 +79,7 @@ public class DashboardController implements StatefulController {
     }
 
     @FXML
-    public void initialize(){
+    public void initializeUI(){
         initCreditsTextField();
         initializeProgramStatsTable();
         initializeFunctionStatsTable();
@@ -167,11 +171,11 @@ public class DashboardController implements StatefulController {
 
 
     private void startAutoRefresh() {
-        Timeline timeline = new Timeline(
+        refreshPullTimeline = new Timeline(
                 new KeyFrame(Duration.millis(500), event -> refreshDashboardAsync())
         );
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        refreshPullTimeline.setCycleCount(Animation.INDEFINITE);
+        refreshPullTimeline.play();
     }
 
     private void refreshDashboardAsync() {
@@ -191,7 +195,16 @@ public class DashboardController implements StatefulController {
             refreshDashboard(dto);
         });
 
-        task.setOnFailed(e -> { /* intentionally empty */ });
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            if (Objects.requireNonNull(ex) instanceof NetworkException ne) {
+                if (ne.getHttpCode() == 410) {
+                    refreshPullTimeline.stop();
+                    InfoMessage.showInfoMessage("Server reset", ne.getMessage());
+                    App.loadScreen("/fxml/login.fxml");
+                }
+            }
+        });
 
         Thread thread = new Thread(task);
         thread.setDaemon(true);
@@ -253,7 +266,7 @@ public class DashboardController implements StatefulController {
 
         try {
             int credits = Integer.parseInt(creditsTextField.getText());
-            Response response = NetCode.chargeCredits(appContext.getUsername(), credits);
+            NetCode.chargeCredits(appContext.getUsername(), credits);
         }
         catch(NumberFormatException num_e){
             return;

@@ -1,9 +1,6 @@
 package ui.controllers;
 
-import dto.ExecutionDTO;
-import dto.SInstructionDTO;
-import dto.SProgramDTO;
-import dto.SProgramViewDTO;
+import dto.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -21,7 +18,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
+import okhttp3.Response;
 import ui.App;
+import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
 import ui.netcode.NetCode;
@@ -37,13 +36,15 @@ import java.util.stream.Collectors;
 public class MainController implements StatefulController {
     private AppContext appContext;
     private Stage stage;
-
+    private Timeline refreshPullTimeline;
     private Integer max_degree = 0;
     private Integer degree_selected = 0;
     private Boolean running = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
+
+    @FXML ToggleGroup archiGenGroup;
 
     @FXML private Button collapseButton;
     @FXML private Button expandButton;
@@ -138,11 +139,11 @@ public class MainController implements StatefulController {
     }
 
     private void startAutoRefresh() {
-        Timeline timeline = new Timeline(
+        refreshPullTimeline = new Timeline(
                 new KeyFrame(Duration.millis(500), event -> refreshExecutionAsync())
         );
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+        refreshPullTimeline.setCycleCount(Animation.INDEFINITE);
+        refreshPullTimeline.play();
     }
 
     private void refreshExecutionAsync() {
@@ -158,11 +159,20 @@ public class MainController implements StatefulController {
         task.setOnSucceeded(e -> {
             ExecutionDTO dto = task.getValue();
             if (dto == null) return; // null is safe, skip update
-
             refreshExecutionUI(dto);
         });
 
-        task.setOnFailed(e -> { /* intentionally empty */ });
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+
+            if (Objects.requireNonNull(ex) instanceof NetworkException ne) {
+                if (ne.getHttpCode() == 410) {
+                    refreshPullTimeline.stop();
+                    InfoMessage.showInfoMessage("Server reset", ne.getMessage());
+                    App.loadScreen("/fxml/login.fxml");
+                }
+            }
+        });
 
         Thread thread = new Thread(task);
         thread.setDaemon(true);
@@ -469,35 +479,6 @@ public class MainController implements StatefulController {
         event.getTableView().refresh();
     }
 
-    // updates instructions UI with highlight selection
-    void updateInstructionsUI(SProgramViewDTO programView){
-        /*
-        instructionsTable.getItems().clear();
-        instructionsTable.refresh();
-        for(int i=1; i <= programView.sInstructionsDTOs.size(); i++){
-            SInstructionDTO instr = programView.sInstructionsDTOs.get(i);
-            instructionsTable.getItems().add(instr);
-        }
-
-        chooseDegreeTextField.setText("" + degree_selected);
-
-        resetHighlightSelectionBox(programView);
-        updateInstructionsTableSummary(programView);
-
-         */
-
-    }
-
-    void updateHistoryTableUI(SProgramViewDTO programView){
-        /*
-        historyTable.getItems().clear();
-        ArrayList<ExecutionHistory> history = engine.getHistory(programView.getName());
-        for (ExecutionHistory executionHistory : history) {
-            historyTable.getItems().add(executionHistory);
-        }
-
-         */
-    }
 
     void updateInstructionsTableSummary(SProgramDTO programDTO){
         int count = programDTO.sInstructionsDTOs.size();
@@ -553,6 +534,8 @@ public class MainController implements StatefulController {
         updateTableKeepSelection(instructionsTable, programDTO.sInstructionsDTOs);
         chooseDegreeTextField.setText("" + degree_selected);
 
+        updateInstructionsTableSummary(programDTO);
+
         updateInputControllers();
 
     }
@@ -590,11 +573,13 @@ public class MainController implements StatefulController {
         chooseDegreeTextField.setDisable(running);
         executeButton.setDisable(running);
         inputTable.setDisable(running);
-
     }
 
     @FXML
     void onNewRunClicked(MouseEvent event) {
+
+        // TODO: implement server request
+
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
         running = false;
@@ -604,6 +589,21 @@ public class MainController implements StatefulController {
 
     @FXML
     void onExecuteButtonClicked(MouseEvent event) {
+        int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "execute";
+            dto.debug = debugRadioButton.isSelected();
+            dto.generation = selected_generation;
+            dto.breakpoints = breakPoints;
+            dto.inputVariables = getInputVariablesFromUI();
+
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
+
         /*
         ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(),
                 getInputVariablesFromUI(),
@@ -630,6 +630,21 @@ public class MainController implements StatefulController {
 
     @FXML
     void onResumeClicked(MouseEvent event) {
+
+        int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "resume";
+            dto.debug = debugRadioButton.isSelected();
+            dto.generation = selected_generation;
+            dto.breakpoints = breakPoints;
+            dto.inputVariables = getInputVariablesFromUI();
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
+
         /*
         // execute single step
         ExecutionContext result = engine.resumeLoadedRun(breakPoints);
@@ -649,6 +664,16 @@ public class MainController implements StatefulController {
 
     @FXML
     void onStepOverClicked(MouseEvent event) {
+
+        int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "stepover";
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
 
         /*
         // execute single step
@@ -672,6 +697,16 @@ public class MainController implements StatefulController {
 
     @FXML
     void onBackStepClicked(MouseEvent event) {
+
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "backstep";
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
+
         // TODO: Implement and verify
         /*
         ExecutionContext backstep = engine.backstepLoadedRun();
@@ -684,6 +719,16 @@ public class MainController implements StatefulController {
 
     @FXML
     void onStopClicked(MouseEvent event) {
+
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "stop";
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
+
         // TODO:: Implement and verify
         /*
         running = false;
@@ -761,11 +806,8 @@ public class MainController implements StatefulController {
 
     @FXML
     private void onBackToDashboardClicked(MouseEvent event) {
-        try {
-            App.loadScreen("/fxml/dashboard.fxml");
-        } catch (Exception e) {
-            InfoMessage.showInfoMessage("Failed to load dashboard", e.getMessage());
-        }
+        App.loadScreen("/fxml/dashboard.fxml");
+
     }
 
 }

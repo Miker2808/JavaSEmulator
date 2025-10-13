@@ -209,7 +209,7 @@
                                           <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" selected="true">
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" userData="1">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="archiGenGroup" />
                                        </toggleGroup>
@@ -223,7 +223,7 @@
                                           <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" userData="2"/>
                                  </children>
                               </VBox>
                               <VBox alignment="CENTER" layoutX="96.0" layoutY="40.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
@@ -233,7 +233,7 @@
                                           <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" userData="3"/>
                                  </children>
                               </VBox>
                               <VBox alignment="CENTER" layoutX="182.0" layoutY="40.0" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
@@ -243,7 +243,7 @@
                                           <Font name="System Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" toggleGroup="$archiGenGroup" />
+                                    <RadioButton contentDisplay="TOP" mnemonicParsing="false" selected="true" toggleGroup="$archiGenGroup" userData="4"/>
                                  </children>
                               </VBox>
                            </children>

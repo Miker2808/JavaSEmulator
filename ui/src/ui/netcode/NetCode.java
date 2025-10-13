@@ -2,18 +2,14 @@ package ui.netcode;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import dto.DashboardDTO;
-import dto.ExecutionDTO;
-import dto.SInstructionDTO;
-import dto.SProgramDTO;
+import dto.*;
 import okhttp3.*;
+import ui.NetworkException;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NetCode {
     private static final String URL = "http://localhost:8080/semulator-server";
@@ -80,9 +76,8 @@ public class NetCode {
             Gson gson = new Gson();
             return gson.fromJson(json, DashboardDTO.class);
         }
-
         else{
-            throw new IOException(response.body().string());
+            throw new NetworkException(response.code(), response.body().string());
         }
     }
 
@@ -101,7 +96,7 @@ public class NetCode {
             return gson.fromJson(json, ExecutionDTO.class);
         }
         else{
-            throw new IOException(response.body().string());
+            throw new NetworkException(response.code(), response.body().string());
         }
     }
 
@@ -124,7 +119,7 @@ public class NetCode {
             return gson.fromJson(jsonString, SProgramDTO.class);
         }
         else{
-            throw new IOException(response.body().string());
+            throw new NetworkException(response.code(), response.body().string());
         }
     }
 
@@ -143,6 +138,7 @@ public class NetCode {
                 .url(url)
                 .method("POST", body)
                 .build();
+
         return client.newCall(request).execute();
     }
 
@@ -166,8 +162,26 @@ public class NetCode {
             return gson.fromJson(jsonString, type);
         }
         else{
-            throw new IOException(response.body().string());
+            throw new NetworkException(response.code(), response.body().string());
         }
+    }
+
+    public static Response sendExecutionCommand(String username, ExecutionRequestDTO dto) throws IOException
+    {
+        OkHttpClient client = new OkHttpClient();
+        String url = String.format("%s/execution/execute?user=%s", URL, username);
+
+        Type type = new TypeToken<ExecutionRequestDTO>() {}.getType();
+        String json = gson.toJson(dto, type);
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(json, JSON);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .method("POST", body)
+                .build();
+
+        return client.newCall(request).execute();
     }
 
 

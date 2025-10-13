@@ -21,13 +21,13 @@ import java.util.Set;
 
 
 public class Engine implements Serializable{
-    private SProgram loadedProgram = null;
-    private ExecutionHistoryManager historyManager = new ExecutionHistoryManager();
+    private final ExecutionHistoryManager historyManager;
     private ExecutionHistory currentExecutionHistory = null;
     private SInterpreter interpreter;
     private boolean running = false;
-    private String current_running = "";
-
+    public Engine(ExecutionHistoryManager history_manager) {
+        this.historyManager = new ExecutionHistoryManager();
+    }
 
     // loads XML file for SProgram. raises exception on invalid
     // overrides current loaded program on successful load
@@ -48,50 +48,18 @@ public class Engine implements Serializable{
         return program;
     }
 
-    // TODO: implement servlet version
-    public SProgramView getExpandedProgram(String program_name, int degree){
-
-        SFunctions functions = loadedProgram.getSFunctions();
-        for( SFunction func : functions.getSFunction()){
-            if(func.getName().equals(program_name)){
-                return SProgramExpander.expand(func, degree);
-            }
-        }
-
-        // Default to main program
-        return SProgramExpander.expand(loadedProgram, degree);
-    }
-
-    // TODO: implement servlet version
-    public SProgramView getSelectedProgram(String program_name){
-
-        SFunctions functions = loadedProgram.getSFunctions();
-        for( SFunction func : functions.getSFunction()){
-            if(func.getName().equals(program_name)){
-                return func;
-            }
-        }
-
-        return loadedProgram;
-    }
-
-    private ExecutionContext runStaticProgram(String program_name, LinkedHashMap<String, Integer> input, int degree){
+    /*
+    private ExecutionContext runStaticProgram(SProgramView selectedProgram, LinkedHashMap<String, Integer> input){
         // default main program
-        SProgramView expanded = getExpandedProgram(program_name, degree);
-        ExecutionContext context = SInterpreter.staticRun(expanded.getInstructionsView(), input);
-        historyManager.addExecutionHistory(program_name, new ExecutionHistory(input, context, degree));
+        ExecutionContext context = SInterpreter.staticRun(selectedProgram.getInstructionsView(), input);
+        historyManager.addExecutionHistory(selectedProgram.getName(), new ExecutionHistory(input, context, selectedDegree));
 
         return context;
     }
 
-    public ExecutionContext runProgram(String program_name, LinkedHashMap<String, Integer> input, int degree, boolean debug, Set<Integer> breakpoints){
-        current_running = program_name;
-        if(!debug){
-            running = false;
-            return runStaticProgram(program_name, input, degree);
-        }
-        SProgramView expanded = getExpandedProgram(program_name, degree);
-        this.interpreter = new SInterpreter(expanded.getInstructionsView(), input);
+    public ExecutionContext runProgram(LinkedHashMap<String, Integer> input, int degree, boolean debug, Set<Integer> breakpoints){
+
+        this.interpreter = new SInterpreter(selectedProgram.getInstructionsView(), input);
         currentExecutionHistory = new ExecutionHistory(input, degree);
         return resumeLoadedRun(breakpoints);
     }
@@ -101,7 +69,7 @@ public class Engine implements Serializable{
         currentExecutionHistory.setContext(context);
         if(context.getExit()){
             running = false;
-            historyManager.addExecutionHistory(current_running, currentExecutionHistory);
+            historyManager.addExecutionHistory(selectedProgram.getName(), currentExecutionHistory);
         }
         return context;
     }
@@ -137,12 +105,7 @@ public class Engine implements Serializable{
 
         return historyManager.getExecutionHistory(program_name);
     }
-
-
-
-
-
-
+    */
 
 
 }

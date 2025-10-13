@@ -16,7 +16,11 @@ public class UserInstance {
     private Integer totalRuns = 0;
 
     private Boolean running = false;
+    private Boolean stop = false;
+    private Boolean debug = false;
+    private String exceptionString = "";
     private SInterpreter interpreter = null;
+    private ExecutionHistoryManager historyManager = new ExecutionHistoryManager();
 
     public UserInstance(){
 
@@ -91,6 +95,7 @@ public class UserInstance {
     public void setInterpreter(SInterpreter interpreter) {
         this.interpreter = interpreter;
     }
+
     public SInterpreter getInterpreter(){
         return interpreter;
     }
@@ -102,4 +107,32 @@ public class UserInstance {
         this.programType = programType;
     }
 
+    public void setExceptionString(String message){
+        this.exceptionString = message;
+    }
+    public String getExceptionString(){
+        return exceptionString;
+    }
+
+    public ExecutionHistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
+    public void setHistoryManager(ExecutionHistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
+
+    public void setStop(Boolean stop) {
+        this.stop = stop;
+    }
+    public Boolean getStop() {
+        return stop;
+    }
+
+    public void setDebug(Boolean debug) {
+        this.debug = debug;
+    }
+    public Boolean getDebug() {
+        return debug;
+    }
 }

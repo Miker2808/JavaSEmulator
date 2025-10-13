@@ -13,8 +13,8 @@ public class SInterpreter
     private SInstructionsView sInstructions;
     private ExecutionContext context;
     private HashMap<String, Integer> inputVariables;
-    private ExecutionContextHistory contextHistory;
-    private final int backstep_capacity = 20;
+    private ExecutionContextHistory contextHistory; // used for backstepping, not for user
+    private final int backstep_capacity = 50;
     private int steps = 0;
     private boolean new_run = true;
 
