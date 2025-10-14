@@ -40,6 +40,7 @@ public class MainController implements StatefulController {
     private Integer max_degree = 0;
     private Integer degree_selected = 0;
     private Boolean running = false;
+    private Boolean computing = false;
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
@@ -135,7 +136,6 @@ public class MainController implements StatefulController {
         initializeChooseDegreeTextField();
         updateUIOnExpansion();
         startAutoRefresh();
-
         collapseButton.setDisable(true);
         expandButton.setDisable(max_degree == 0);
     }
@@ -194,7 +194,9 @@ public class MainController implements StatefulController {
         if (dto.runPCHighlight != null) sb.append("PC: ").append(dto.runPCHighlight).append("\n");
         runInfoTextArea.setText(sb.toString());
 
-        cyclesMeterLabel.setText(String.format("Cycles: %d", dto.cycles));
+        if(dto.cycles != null) {
+            cyclesMeterLabel.setText(String.format("Cycles: %d", dto.cycles));
+        }
 
         if(dto.running && dto.runPCHighlight != null) {
             highLightInstructionTableLine(dto.runPCHighlight);
@@ -205,6 +207,8 @@ public class MainController implements StatefulController {
         if(dto.runVariables != null){
             updateProgramVariablesTable(dto.runVariables, true);
         }
+
+        updateInputControllers();
 
     }
 
@@ -599,12 +603,21 @@ public class MainController implements StatefulController {
 
     @FXML
     void onNewRunClicked(MouseEvent event) {
-
-        // TODO: implement server request
-
+        newRunButton.setDisable(true);
+        try{
+            ExecutionRequestDTO dto = new ExecutionRequestDTO();
+            dto.command = "new_run";
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
+                }
+            }
+        }
+        catch (Exception e){
+            InfoMessage.showInfoMessage("Error", e.getMessage());
+        }
         cyclesMeterLabel.setText("Cycles: 0");
         programVariablesTable.getItems().clear();
-        running = false;
         clearInstructionTableHighlight();
         updateInputControllers();
     }
@@ -612,6 +625,7 @@ public class MainController implements StatefulController {
     @FXML
     void onExecuteButtonClicked(MouseEvent event) {
         int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        executeButton.setDisable(true);
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "execute";
@@ -623,7 +637,7 @@ public class MainController implements StatefulController {
             try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
 
                 if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.message());
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
                 }
             }
         }
@@ -659,6 +673,7 @@ public class MainController implements StatefulController {
     void onResumeClicked(MouseEvent event) {
 
         int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        resumeButton.setDisable(true);
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "resume";
@@ -669,7 +684,7 @@ public class MainController implements StatefulController {
             try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
 
                 if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.message());
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
                 }
             }
         }
@@ -696,14 +711,13 @@ public class MainController implements StatefulController {
 
     @FXML
     void onStepOverClicked(MouseEvent event) {
-
-        int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        stepOverButton.setDisable(true);
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stepover";
             try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
                 if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.message());
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
                 }
             }
         }
@@ -733,13 +747,13 @@ public class MainController implements StatefulController {
 
     @FXML
     void onBackStepClicked(MouseEvent event) {
-
+        backstepButton.setDisable(true);
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "backstep";
             try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
                 if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.message());
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
                 }
             }
         }
@@ -759,13 +773,13 @@ public class MainController implements StatefulController {
 
     @FXML
     void onStopClicked(MouseEvent event) {
-
+        stopButton.setDisable(true);
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stop";
             try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
                 if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.message());
+                    InfoMessage.showInfoMessage("Failure", response.body().string());
                 }
             }
         }

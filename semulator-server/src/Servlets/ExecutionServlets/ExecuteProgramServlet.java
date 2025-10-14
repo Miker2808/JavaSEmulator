@@ -65,23 +65,31 @@ public class ExecuteProgramServlet extends HttpServlet {
 
         executionRequestDTO = gson.fromJson(reader, ExecutionRequestDTO.class);
 
+        if (userInstance.isComputing()) {
+            sendPlain(response, 429, "User instance is busy computing");
+            return;
+        }
+
         // Sends OK unless altered by the switch
         sendPlain(response, HttpServletResponse.SC_OK, String.format("Command '%s' called", executionRequestDTO.command));
 
         switch(executionRequestDTO.command){
+            case "new_run" -> newRunCommand(response);
             case "execute" -> executeCommand(response);
+            case "stepover" -> stepoverCommand(response);
+            case "backstep" -> backstepCommand(response);
+            case "stop" -> stopCommand(response);
         }
+    }
+
+    private void newRunCommand(HttpServletResponse response) throws IOException {
+        userInstance.setInterpreter(null);
     }
 
     private void executeCommand(HttpServletResponse response) throws IOException {
 
         userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(), executionRequestDTO.inputVariables));
         userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram, executionRequestDTO.inputVariables, userInstance.getDegreeSelected()));
-
-        if (userInstance.isComputing()) {
-            sendPlain(response, 429, "User instance is busy computing");
-            return;
-        }
 
         ExecutionPool.submitTask(userInstance, () -> {
             Set<Integer> breakpoints = new HashSet<>();
@@ -99,6 +107,18 @@ public class ExecuteProgramServlet extends HttpServlet {
             }
         });
 
+    }
+
+    private void stepoverCommand(HttpServletResponse response) throws IOException {
+        // TODO: implement
+    }
+
+    private void backstepCommand(HttpServletResponse response) throws IOException {
+        // TODO: implement
+    }
+
+    private void stopCommand(HttpServletResponse response) throws IOException {
+        // TODO: implement
     }
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
