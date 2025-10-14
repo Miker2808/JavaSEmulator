@@ -1,3 +1,5 @@
+package ExecutionPool;
+
 import Storage.UserInstance;
 
 import java.util.concurrent.*;
@@ -9,18 +11,22 @@ public class ExecutionPool {
             Runtime.getRuntime().availableProcessors() * 2
     );
 
-    // Submit a new emulator execution job
+    // Submit a new execution job
     public static void submitTask(UserInstance userInstance, Runnable taskLogic) {
         pool.submit(() -> {
+            userInstance.setComputing(true);
             try {
-                userInstance.setRunning(true);
-                taskLogic.run(); // Perform long computation
+                taskLogic.run();
                 userInstance.setExceptionString("");
             } catch (Exception e) {
                 userInstance.setExceptionString(e.getMessage());
             }
-            userInstance.setRunning(false);
+            userInstance.setComputing(false);
 
         });
+    }
+
+    public static void shutdown() {
+        pool.shutdown();
     }
 }

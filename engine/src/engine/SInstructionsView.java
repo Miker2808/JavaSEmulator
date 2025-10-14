@@ -33,4 +33,6 @@ public interface SInstructionsView {
 
     List<SInstruction> getAllInstructions();
 
+    int getRequiredGen();
+
 }

@@ -25,7 +25,9 @@ public class Engine implements Serializable{
     private ExecutionHistory currentExecutionHistory = null;
     private SInterpreter interpreter;
     private boolean running = false;
-    public Engine(ExecutionHistoryManager history_manager) {
+
+
+    public Engine(SProgramView selectedProgram) {
         this.historyManager = new ExecutionHistoryManager();
     }
 
@@ -52,7 +54,7 @@ public class Engine implements Serializable{
     private ExecutionContext runStaticProgram(SProgramView selectedProgram, LinkedHashMap<String, Integer> input){
         // default main program
         ExecutionContext context = SInterpreter.staticRun(selectedProgram.getInstructionsView(), input);
-        historyManager.addExecutionHistory(selectedProgram.getName(), new ExecutionHistory(input, context, selectedDegree));
+        historyManager.addExecutionHistory(selectedProgram.getName(), new ExecutionHistory(selectedProgram, input, context, selectedDegree));
 
         return context;
     }
@@ -104,6 +106,10 @@ public class Engine implements Serializable{
     public ArrayList<ExecutionHistory> getHistory(String program_name){
 
         return historyManager.getExecutionHistory(program_name);
+    }
+
+    public Boolean isRunning(){
+        return running;
     }
     */
 

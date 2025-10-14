@@ -6,6 +6,7 @@ import Storage.UserInstance;
 import com.google.gson.Gson;
 import dto.ExecutionDTO;
 import engine.SProgramView;
+import engine.execution.ExecutionContext;
 import engine.expander.SProgramExpander;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 @WebServlet("/execution")
 public class ExecutionServlet extends HttpServlet {
@@ -41,7 +43,7 @@ public class ExecutionServlet extends HttpServlet {
             return;
         }
 
-        ExecutionDTO executionDTO = getExecutionDTO(request, userInstance);
+        ExecutionDTO executionDTO = getExecutionDTO(userInstance);
 
         String dto_json = gson.toJson(executionDTO);
 
@@ -52,23 +54,20 @@ public class ExecutionServlet extends HttpServlet {
 
     }
 
-    private ExecutionDTO getExecutionDTO(HttpServletRequest request, UserInstance userInstance) throws IOException {
+    private ExecutionDTO getExecutionDTO(UserInstance userInstance) throws IOException {
         ExecutionDTO dto = new ExecutionDTO();
-        ServletContext context = getServletContext();
-        ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
 
-        SProgramView usersProgram = programsStorage.getProgramView(userInstance.getProgramSelected(),  userInstance.getProgramType());
-        int max_degree = usersProgram.getInstructionsView().getMaxDegree();
-
-        usersProgram = SProgramExpander.expand(usersProgram, userInstance.getDegreeSelected());
-
-        dto.cycles = 0; // TODO: set cycles from interpreter in userInstance
-        dto.running = userInstance.isRunning();
-        dto.runPCHighlight = null;
         dto.programName = userInstance.getProgramSelected();
         dto.credits = userInstance.getCreditsAvailable();
-        dto.runVariables = new LinkedHashMap<>();
-
+        dto.computing = userInstance.isComputing();
+        dto.running = false; // default to false
+        if(userInstance.getInterpreter() != null) {
+            dto.running = userInstance.getInterpreter().isRunning();
+            dto.cycles = userInstance.getInterpreter().getCycles();
+            dto.steps = userInstance.getInterpreter().getSteps();
+            dto.runPCHighlight = userInstance.getInterpreter().getPC();
+            dto.runVariables = userInstance.getInterpreter().getOrderedVariables();
+        }
         return dto;
     }
 

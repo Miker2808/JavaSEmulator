@@ -46,6 +46,8 @@ public class MainController implements StatefulController {
 
     @FXML ToggleGroup archiGenGroup;
 
+    @FXML TextArea runInfoTextArea;
+
     @FXML private Button collapseButton;
     @FXML private Button expandButton;
     @FXML private Label maxDegreeLabel;
@@ -182,7 +184,27 @@ public class MainController implements StatefulController {
     // update all UI elements
     private void refreshExecutionUI(ExecutionDTO dto) {
         userNameLabel.setText(appContext.getUsername());
+        running = dto.running;
         availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
+
+        StringBuilder sb = new StringBuilder();
+        if (dto.running != null) sb.append("Running: ").append(dto.running).append("\n");
+        if (dto.computing != null) sb.append("Computing: ").append(dto.computing).append("\n");
+        if (dto.steps != null) sb.append("Steps: ").append(dto.steps).append("\n");
+        if (dto.runPCHighlight != null) sb.append("PC: ").append(dto.runPCHighlight).append("\n");
+        runInfoTextArea.setText(sb.toString());
+
+        cyclesMeterLabel.setText(String.format("Cycles: %d", dto.cycles));
+
+        if(dto.running && dto.runPCHighlight != null) {
+            highLightInstructionTableLine(dto.runPCHighlight);
+        }
+        else{
+            clearInstructionTableHighlight();
+        }
+        if(dto.runVariables != null){
+            updateProgramVariablesTable(dto.runVariables, true);
+        }
 
     }
 
@@ -598,7 +620,12 @@ public class MainController implements StatefulController {
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
 
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.message());
+                }
+            }
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -639,7 +666,12 @@ public class MainController implements StatefulController {
             dto.generation = selected_generation;
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.message());
+                }
+            }
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -669,7 +701,11 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stepover";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.message());
+                }
+            }
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -701,7 +737,11 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "backstep";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.message());
+                }
+            }
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -723,7 +763,11 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stop";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
+                if (!response.isSuccessful()) {
+                    InfoMessage.showInfoMessage("Failure", response.message());
+                }
+            }
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());

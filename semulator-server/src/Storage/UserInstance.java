@@ -1,6 +1,6 @@
 package Storage;
 
-import engine.SProgramView;
+import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.history.ExecutionHistoryManager;
 import engine.interpreter.SInterpreter;
@@ -15,12 +15,14 @@ public class UserInstance {
     private Integer creditsUsed = 0;
     private Integer totalRuns = 0;
 
-    private Boolean running = false;
+    private Boolean computing = false; // is user instance physically computing something (thread pool currently working on user request)
     private Boolean stop = false;
     private Boolean debug = false;
-    private String exceptionString = "";
+    private String exceptionString = ""; // if exception was raised from thread pool, message will appear here
+
     private SInterpreter interpreter = null;
     private ExecutionHistoryManager historyManager = new ExecutionHistoryManager();
+    private ExecutionHistory currentExecutionHistory = null;
 
     public UserInstance(){
 
@@ -34,14 +36,6 @@ public class UserInstance {
         this.degree_selected = degree_selected;
     }
 
-    public Boolean isRunning() {
-        return running;
-    }
-
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
-
     public Integer getNumProgramsUploaded() {
         return numProgramsUploaded;
     }
@@ -49,15 +43,19 @@ public class UserInstance {
     public void setNumProgramsUploaded(Integer numProgramsUploaded) {
         this.numProgramsUploaded = numProgramsUploaded;
     }
+
     public Integer getNumFunctionsUploaded() {
         return numFunctionsUploaded;
     }
+
     public void setNumFunctionsUploaded(Integer numFunctionsUploaded) {
         this.numFunctionsUploaded = numFunctionsUploaded;
     }
+
     public Integer getCreditsAvailable() {
         return creditsAvailable;
     }
+
     public void setCreditsAvailable(Integer creditsAvailable) {
         this.creditsAvailable = creditsAvailable;
     }
@@ -69,6 +67,7 @@ public class UserInstance {
     public Integer getCreditsUsed() {
         return creditsUsed;
     }
+
     public void setCreditsUsed(Integer creditsUsed) {
         this.creditsUsed = creditsUsed;
     }
@@ -80,6 +79,7 @@ public class UserInstance {
     public Integer getTotalRuns() {
         return totalRuns;
     }
+
     public void setTotalRuns(Integer totalRuns) {
         this.totalRuns = totalRuns;
     }
@@ -134,5 +134,19 @@ public class UserInstance {
     }
     public Boolean getDebug() {
         return debug;
+    }
+
+    public void setCurrentExecutionHistory(ExecutionHistory currentExecutionHistory) {
+        this.currentExecutionHistory = currentExecutionHistory;
+    }
+    public ExecutionHistory getCurrentExecutionHistory() {
+        return currentExecutionHistory;
+    }
+
+    public void setComputing(Boolean computing) {
+        this.computing = computing;
+    }
+    public Boolean isComputing() {
+        return computing;
     }
 }

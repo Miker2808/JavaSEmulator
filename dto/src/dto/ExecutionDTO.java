@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 public class ExecutionDTO {
     public LinkedHashMap<String, Integer> runVariables;
     public Integer runPCHighlight;
-    public Integer cycles;
+    public Long cycles;
     public String programName;
     public Integer credits;
     public Boolean running;
+    public Boolean computing;
+    public Long steps;
 }

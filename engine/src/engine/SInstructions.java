@@ -241,5 +241,17 @@ public class SInstructions implements Serializable, SInstructionsView {
         return sInstruction.size();
     }
 
+    public int getRequiredGen(){
+        int max_generation = 1;
+        for (int line = 1; line <= size(); line++){
+            SInstruction instr = this.getInstruction(line);
+            int curr_gen = instr.getGeneration();
+            if(curr_gen > max_generation){
+                max_generation = instr.getGeneration();
+            }
+        }
+        return max_generation;
+    }
+
 
 }

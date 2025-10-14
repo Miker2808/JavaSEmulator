@@ -4,6 +4,7 @@ import engine.SInstructionsView;
 import engine.execution.ExecutionContext;
 import engine.execution.ExecutionContextHistory;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -15,7 +16,7 @@ public class SInterpreter
     private HashMap<String, Integer> inputVariables;
     private ExecutionContextHistory contextHistory; // used for backstepping, not for user
     private final int backstep_capacity = 50;
-    private int steps = 0;
+    private long steps = 0;
     private boolean new_run = true;
 
     public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables){
@@ -44,10 +45,11 @@ public class SInterpreter
         if(!context.getExit() && context.getPC() <= num_lines) {
             sInstructions.getInstruction(context.getPC()).execute(context);
         }
-        if(!(context.getPC() <= num_lines)){
+        if(!(context.getPC() <= num_lines) || (steps >= Long.MAX_VALUE - 1)){
             context.setExit(true);
         }
         steps++;
+
         return context;
     }
 
@@ -64,8 +66,8 @@ public class SInterpreter
         return context;
     }
 
-    protected ExecutionContext reRunToSteps(int steps){
-        int curr_steps = 0;
+    protected ExecutionContext reRunToSteps(long steps){
+        long curr_steps = 0;
         ExecutionContext context = new ExecutionContext(sInstructions, inputVariables);
         while(curr_steps < steps){
             if(steps - curr_steps < backstep_capacity) {
@@ -79,7 +81,7 @@ public class SInterpreter
     }
 
     public ExecutionContext runToBreakPoint(Set<Integer> breakpoints){
-        int curr_steps = 0;
+        long curr_steps = 0;
         while(!context.getExit()){
 
             if(breakpoints != null){
@@ -114,11 +116,19 @@ public class SInterpreter
         return context.getExit();
     }
 
-    public int getCycles(){
+    public long getCycles(){
         return context.getCycles();
     }
-    public int getSteps(){
+    public long getSteps(){
         return steps;
+    }
+
+    public int getPC(){
+        return context.getPC();
+    }
+
+    public Boolean isRunning(){
+        return !context.getExit();
     }
 
 }

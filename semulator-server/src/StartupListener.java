@@ -8,6 +8,8 @@ import jakarta.servlet.annotation.WebListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import ExecutionPool.ExecutionPool;
+
 @WebListener
 public class StartupListener implements ServletContextListener {
 
@@ -25,5 +27,6 @@ public class StartupListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        ExecutionPool.shutdown();
     }
 }

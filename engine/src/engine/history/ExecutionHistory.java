@@ -1,5 +1,6 @@
 package engine.history;
 
+import engine.SProgramView;
 import engine.execution.ExecutionContext;
 
 import java.io.Serializable;
@@ -12,19 +13,39 @@ public class ExecutionHistory implements Serializable {
     private int y;
     private int cycles;
     private int num;
+    private String programName;
+    private String type;
+    private String generation;
 
-    public ExecutionHistory(LinkedHashMap<String, Integer> inputVariables, int degree)
+    public ExecutionHistory(SProgramView program, LinkedHashMap<String, Integer> inputVariables, int degree)
     {
         this.inputVariables = new LinkedHashMap<>(inputVariables);
         this.degree = degree;
+        this.programName = program.getName();
+        this.type = String.valueOf(program.getProgramType());
+        this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
+
     }
-    public ExecutionHistory(LinkedHashMap<String, Integer> inputVariables, ExecutionContext executionContext, int degree)
+    public ExecutionHistory(SProgramView program, LinkedHashMap<String, Integer> inputVariables, ExecutionContext executionContext, int degree)
     {
         this.inputVariables = new LinkedHashMap<>(inputVariables);
         this.variables = new LinkedHashMap<>(executionContext.getOrderedVariables());
         this.cycles = executionContext.getCycles();
         this.degree = degree;
         this.y = variables.get("y");
+        this.programName = program.getName();
+        this.type = String.valueOf(program.getProgramType());
+        this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
+    }
+
+    protected String setGeneration(int gen){
+        return switch (gen) {
+            case 1 -> "I";
+            case 2 -> "II";
+            case 3 -> "III";
+            case 4 -> "IV";
+            default -> "";
+        };
     }
 
     public int getNum(){
