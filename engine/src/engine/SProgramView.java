@@ -10,7 +10,7 @@ public interface SProgramView {
     int getNumRuns();
     int getAverage_credits_cost();
     String getParentProgram();
-
+    void setNumRuns(int value);
     enum ProgramType {
         PROGRAM,
         FUNCTION

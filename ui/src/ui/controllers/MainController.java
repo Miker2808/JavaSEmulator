@@ -184,14 +184,24 @@ public class MainController implements StatefulController {
     // update all UI elements
     private void refreshExecutionUI(ExecutionDTO dto) {
         userNameLabel.setText(appContext.getUsername());
-        running = dto.running;
+
         availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
 
         StringBuilder sb = new StringBuilder();
-        if (dto.running != null) sb.append("Running: ").append(dto.running).append("\n");
-        if (dto.computing != null) sb.append("Computing: ").append(dto.computing).append("\n");
+        if (Boolean.TRUE.equals(dto.running)) {
+            sb.append("Running\n");
+        }
+        if (Boolean.TRUE.equals(dto.computing)){
+            sb.append("Computing\n");
+
+        }
         if (dto.steps != null) sb.append("Steps: ").append(dto.steps).append("\n");
         if (dto.runPCHighlight != null) sb.append("PC: ").append(dto.runPCHighlight).append("\n");
+
+
+        running = dto.running;
+        computing = dto.computing;
+
         runInfoTextArea.setText(sb.toString());
 
         if(dto.cycles != null) {
@@ -201,9 +211,7 @@ public class MainController implements StatefulController {
         if(dto.running && dto.runPCHighlight != null) {
             highLightInstructionTableLine(dto.runPCHighlight);
         }
-        else{
-            clearInstructionTableHighlight();
-        }
+
         if(dto.runVariables != null){
             updateProgramVariablesTable(dto.runVariables, true);
         }
@@ -571,8 +579,6 @@ public class MainController implements StatefulController {
         inputTable.getItems().setAll(
                 input_variables.stream().map(v -> new VariableRow(v, 0)).toList()
         );
-
-
     }
 
     void setInputTableValues(LinkedHashMap<String, Integer> variables) {
@@ -585,15 +591,15 @@ public class MainController implements StatefulController {
 
     void updateInputControllers(){
         int max_degree = this.max_degree;
-        boolean debug = false;
+        boolean debug = debugRadioButton.isSelected();
 
         newRunButton.setDisable(running);
         normalRadioButton.setDisable(running);
         debugRadioButton.setDisable(running);
-        stopButton.setDisable(!(debug && running));
-        backstepButton.setDisable(!(debug && running));
-        stepOverButton.setDisable(!(debug && running));
-        resumeButton.setDisable(!(debug && running));
+        stopButton.setDisable(!(running && debug) || computing);
+        backstepButton.setDisable(!(running && debug) || computing);
+        stepOverButton.setDisable(!(running && debug) || computing);
+        resumeButton.setDisable(!(running && debug) || computing);
         expandButton.setDisable(running || (degree_selected == max_degree));
         collapseButton.setDisable(running || (degree_selected == 0));
         chooseDegreeTextField.setDisable(running);
@@ -607,10 +613,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "new_run";
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
         }
         catch (Exception e){
@@ -634,11 +640,10 @@ public class MainController implements StatefulController {
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
 
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
         }
         catch (Exception e){
@@ -681,12 +686,12 @@ public class MainController implements StatefulController {
             dto.generation = selected_generation;
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
+
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -715,10 +720,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stepover";
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()){
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
         }
         catch (Exception e){
@@ -751,24 +756,17 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "backstep";
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
+
+
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
-
-        // TODO: Implement and verify
-        /*
-        ExecutionContext backstep = engine.backstepLoadedRun();
-        updateProgramVariablesTable(backstep.getOrderedVariables(), true);
-        cyclesMeterLabel.setText("Cycles: " + backstep.getCycles());
-        highLightInstructionTableLine(backstep.getPC());
-
-         */
     }
 
     @FXML
@@ -777,25 +775,18 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stop";
-            try (Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto)) {
-                if (!response.isSuccessful()) {
-                    InfoMessage.showInfoMessage("Failure", response.body().string());
-                }
+            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+            String responseBody = response.body().string();
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", responseBody);
             }
+
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
 
-        // TODO:: Implement and verify
-        /*
-        running = false;
-        engine.stopLoadedRun();
         clearInstructionTableHighlight();
-        updateInputControllers();
-        updateHistoryTableUI(selectedProgramView);
-
-         */
     }
 
     LinkedHashMap<String, Integer> getInputVariablesFromUI(){

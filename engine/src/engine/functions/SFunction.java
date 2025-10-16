@@ -99,5 +99,4 @@ public class SFunction implements Serializable, SProgramView {
     public void setParentProgram(String value) {
         this.parentProgram = value;
     }
-
 }

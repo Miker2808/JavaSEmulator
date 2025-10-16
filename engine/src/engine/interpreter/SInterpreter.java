@@ -116,6 +116,10 @@ public class SInterpreter
         return context.getExit();
     }
 
+    public void Stop(){
+        context.setExit(true);
+    }
+
     public long getCycles(){
         return context.getCycles();
     }

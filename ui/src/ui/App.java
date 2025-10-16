@@ -51,7 +51,6 @@ public class App extends Application{
     }
 
     public static void main(String[] args) {
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         launch(args);
     }
 

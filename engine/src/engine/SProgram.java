@@ -144,4 +144,8 @@ public class SProgram implements Serializable, SProgramView {
     }
     public String getParentProgram() { return ""; }
 
+    public void addNumRuns(int value){
+        this.num_runs += value;
+    }
+
 }

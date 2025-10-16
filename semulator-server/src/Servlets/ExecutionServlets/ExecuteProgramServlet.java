@@ -30,6 +30,7 @@ public class ExecuteProgramServlet extends HttpServlet {
     UserInstance userInstance;
     HttpServletResponse response;
     SProgramView usersProgram;
+    boolean credits_exhausted = false;
 
 
     @Override
@@ -76,6 +77,7 @@ public class ExecuteProgramServlet extends HttpServlet {
         switch(executionRequestDTO.command){
             case "new_run" -> newRunCommand(response);
             case "execute" -> executeCommand(response);
+            case "resume" -> resumeCommand(response);
             case "stepover" -> stepoverCommand(response);
             case "backstep" -> backstepCommand(response);
             case "stop" -> stopCommand(response);
@@ -88,8 +90,14 @@ public class ExecuteProgramServlet extends HttpServlet {
 
     private void executeCommand(HttpServletResponse response) throws IOException {
 
+        if(userInstance.getInterpreter() != null && userInstance.getInterpreter().isRunning()){
+            sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is already running");
+            return;
+        }
+
         userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(), executionRequestDTO.inputVariables));
         userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram, executionRequestDTO.inputVariables, userInstance.getDegreeSelected()));
+        usersProgram.setNumRuns(usersProgram.getNumRuns() + 1);
 
         ExecutionPool.submitTask(userInstance, () -> {
             Set<Integer> breakpoints = new HashSet<>();
@@ -106,19 +114,58 @@ public class ExecuteProgramServlet extends HttpServlet {
                         userInstance.getCurrentExecutionHistory());
             }
         });
+    }
 
+    private void resumeCommand(HttpServletResponse response) throws IOException {
+        if(userInstance.getInterpreter() == null || !userInstance.getInterpreter().isRunning()){
+            sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is not running");
+            return;
+        }
+
+        ExecutionPool.submitTask(userInstance, () -> {
+
+            ExecutionContext exec_context = userInstance.getInterpreter().runToBreakPoint(executionRequestDTO.breakpoints);
+            userInstance.getCurrentExecutionHistory().setContext(exec_context);
+
+            if (exec_context.getExit()) {
+                userInstance.getHistoryManager().addExecutionHistory(
+                        usersProgram.getName(),
+                        userInstance.getCurrentExecutionHistory());
+            }
+        });
     }
 
     private void stepoverCommand(HttpServletResponse response) throws IOException {
-        // TODO: implement
+        if(userInstance.getInterpreter() == null || !userInstance.getInterpreter().isRunning()){
+            sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is not running");
+            return;
+        }
+
+        ExecutionContext context = userInstance.getInterpreter().step(true);
+        userInstance.getCurrentExecutionHistory().setContext(context);
+        if(context.getExit()){
+            userInstance.getHistoryManager().addExecutionHistory(usersProgram.getName(), userInstance.getCurrentExecutionHistory());
+        }
     }
 
     private void backstepCommand(HttpServletResponse response) throws IOException {
-        // TODO: implement
+
+        if(userInstance.getInterpreter() == null || !userInstance.getInterpreter().isRunning()){
+            sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is not running");
+            return;
+        }
+
+        ExecutionContext context = userInstance.getInterpreter().backstep();
+        userInstance.getCurrentExecutionHistory().setContext(context);
     }
 
     private void stopCommand(HttpServletResponse response) throws IOException {
-        // TODO: implement
+        if(userInstance.getInterpreter() == null || !userInstance.getInterpreter().isRunning()){
+            sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is not running");
+            return;
+        }
+        userInstance.getInterpreter().Stop();
+        userInstance.getHistoryManager().addExecutionHistory(usersProgram.getName(), userInstance.getCurrentExecutionHistory());
     }
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
