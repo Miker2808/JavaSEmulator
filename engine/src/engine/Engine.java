@@ -1,10 +1,6 @@
 
 package engine;
 
-import engine.execution.ExecutionContext;
-import engine.expander.SProgramExpander;
-import engine.functions.SFunction;
-import engine.functions.SFunctions;
 import engine.history.ExecutionHistory;
 import engine.history.ExecutionHistoryManager;
 import engine.interpreter.SInterpreter;
@@ -12,12 +8,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 
 public class Engine implements Serializable{

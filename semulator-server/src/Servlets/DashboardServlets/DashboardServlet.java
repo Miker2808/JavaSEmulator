@@ -3,6 +3,7 @@ package Servlets.DashboardServlets;
 import DTOConverter.UserStatDTOConverter;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
+import com.google.gson.Gson;
 import dto.DashboardDTO;
 import dto.UserStatDTO;
 import jakarta.servlet.ServletContext;
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-
-import com.google.gson.Gson;
 
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {

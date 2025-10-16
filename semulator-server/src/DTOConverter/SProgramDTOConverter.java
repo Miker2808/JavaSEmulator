@@ -1,8 +1,6 @@
 package DTOConverter;
 
 
-import Storage.UserInstance;
-import dto.ExecutionDTO;
 import dto.SProgramViewDTO;
 import dto.SProgramViewStatsDTO;
 import engine.SInstructionsView;

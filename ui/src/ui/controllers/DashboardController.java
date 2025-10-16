@@ -1,7 +1,6 @@
 package ui.controllers;
 
 import dto.DashboardDTO;
-import dto.SProgramViewDTO;
 import dto.SProgramViewStatsDTO;
 import dto.UserStatDTO;
 import javafx.animation.Animation;
@@ -23,14 +22,12 @@ import ui.App;
 import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
-import ui.elements.ProgressBarDialog;
 import ui.netcode.NetCode;
 import ui.storage.AppContext;
 
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class DashboardController implements StatefulController {

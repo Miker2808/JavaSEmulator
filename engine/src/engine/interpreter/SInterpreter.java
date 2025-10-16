@@ -4,7 +4,6 @@ import engine.SInstructionsView;
 import engine.execution.ExecutionContext;
 import engine.execution.ExecutionContextHistory;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;

@@ -7,7 +7,10 @@ import engine.SProgramView;
 import engine.functions.SFunction;
 import engine.functions.SFunctions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class ProgramsStorage {
 

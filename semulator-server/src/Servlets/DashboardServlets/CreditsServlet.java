@@ -1,6 +1,5 @@
 package Servlets.DashboardServlets;
 
-import Exceptions.UserNotFoundException;
 import Storage.UserInstance;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;

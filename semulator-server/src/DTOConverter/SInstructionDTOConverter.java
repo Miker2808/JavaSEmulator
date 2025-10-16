@@ -1,7 +1,7 @@
 package DTOConverter;
 
-import engine.instruction.SInstruction;
 import dto.SInstructionDTO;
+import engine.instruction.SInstruction;
 
 public class SInstructionDTOConverter {
 

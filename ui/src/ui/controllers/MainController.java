@@ -1,6 +1,9 @@
 package ui.controllers;
 
-import dto.*;
+import dto.ExecutionDTO;
+import dto.ExecutionRequestDTO;
+import dto.SInstructionDTO;
+import dto.SProgramDTO;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -15,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
@@ -44,6 +48,7 @@ public class MainController implements StatefulController {
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
+    private Boolean init = false;
 
     @FXML ToggleGroup archiGenGroup;
 
@@ -101,6 +106,8 @@ public class MainController implements StatefulController {
     @FXML private TableColumn<VariableRow, String> programVariablesTableVariableColumn;
 
     @FXML private Label programNameLabel;
+
+    @FXML private GridPane genSelectionGrid;
 
     @Override
     public void setAppContext(AppContext context) {
@@ -563,7 +570,10 @@ public class MainController implements StatefulController {
         max_degree = programDTO.maxDegree;
         maxDegreeLabel.setText(String.format("%d", max_degree));
 
-        updateInputTable(programDTO.inputVariables);
+        if(inputTable.getItems().isEmpty()) {
+            updateInputTable(programDTO.inputVariables);
+        }
+
         resetHighlightSelectionBox(programDTO.variablesUsed, programDTO.labelsUsed);
         updateTableKeepSelection(instructionsTable, programDTO.sInstructionsDTOs);
         chooseDegreeTextField.setText("" + degree_selected);
@@ -593,13 +603,15 @@ public class MainController implements StatefulController {
         int max_degree = this.max_degree;
         boolean debug = debugRadioButton.isSelected();
 
-        newRunButton.setDisable(running);
-        normalRadioButton.setDisable(running);
-        debugRadioButton.setDisable(running);
         stopButton.setDisable(!(running && debug) || computing);
         backstepButton.setDisable(!(running && debug) || computing);
         stepOverButton.setDisable(!(running && debug) || computing);
         resumeButton.setDisable(!(running && debug) || computing);
+
+        newRunButton.setDisable(running);
+        normalRadioButton.setDisable(running);
+        debugRadioButton.setDisable(running);
+        genSelectionGrid.setDisable(running);
         expandButton.setDisable(running || (degree_selected == max_degree));
         collapseButton.setDisable(running || (degree_selected == 0));
         chooseDegreeTextField.setDisable(running);

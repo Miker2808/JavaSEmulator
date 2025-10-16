@@ -9,7 +9,9 @@ import ui.NetworkException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NetCode {
     private static final String URL = "http://localhost:8080/semulator-server";

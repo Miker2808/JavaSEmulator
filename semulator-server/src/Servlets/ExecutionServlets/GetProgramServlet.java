@@ -5,14 +5,12 @@ import Exceptions.UserNotFoundException;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;
-import dto.ExecutionDTO;
 import dto.SProgramDTO;
 import engine.SInstructionsView;
 import engine.SProgramView;
 import engine.expander.SProgramExpander;
 import engine.instruction.SInstruction;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet("/execution/get-program")

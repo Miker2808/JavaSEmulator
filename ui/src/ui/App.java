@@ -6,12 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import okhttp3.OkHttpClient;
-import ui.controllers.MainController;
 import ui.storage.AppContext;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class App extends Application{
     private static Stage primaryStage;
@@ -27,7 +22,7 @@ public class App extends Application{
 
     public static void loadScreen(String fxmlPath) {
         FXMLLoader loader = new FXMLLoader(App.class.getResource(fxmlPath));
-        Parent root = null;
+        Parent root;
         try {
             root = loader.load();
         }

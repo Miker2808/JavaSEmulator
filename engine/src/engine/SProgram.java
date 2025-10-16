@@ -8,9 +8,7 @@ import engine.validator.InvalidFunctionException;
 import jakarta.xml.bind.annotation.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {

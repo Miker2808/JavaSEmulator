@@ -4,7 +4,6 @@ import ExecutionPool.ExecutionPool;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import dto.ExecutionRequestDTO;
 import engine.SProgramView;
 import engine.execution.ExecutionContext;
@@ -19,8 +18,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @WebServlet("/execution/execute")
 public class ExecuteProgramServlet extends HttpServlet {

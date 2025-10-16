@@ -1,6 +1,5 @@
 package Storage;
 
-import engine.execution.ExecutionContext;
 import engine.history.ExecutionHistory;
 import engine.history.ExecutionHistoryManager;
 import engine.interpreter.SInterpreter;
