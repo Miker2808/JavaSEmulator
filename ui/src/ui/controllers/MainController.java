@@ -23,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import ui.App;
 import ui.NetworkException;
@@ -34,6 +35,8 @@ import ui.storage.VariableRow;
 
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -118,6 +121,7 @@ public class MainController implements StatefulController {
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         initializeUI(); // appContext needs to be defined before initialize is called.
     }
 
@@ -141,6 +145,7 @@ public class MainController implements StatefulController {
 // ** Initializers **
     @FXML
     public void initializeUI() {
+        onNewRunClicked(null);
         initializeInstructionTable();
         initializeHighlightSelectionBox();
         initializedExpansionsTable();
@@ -157,6 +162,8 @@ public class MainController implements StatefulController {
                 updateInstructionsTableSummary(programDTO);
             }
         });
+
+
     }
 
     private void startAutoRefresh() {
@@ -181,6 +188,8 @@ public class MainController implements StatefulController {
             ExecutionDTO dto = task.getValue();
             if (dto == null) return;
             refreshExecutionUI(dto);
+
+
         });
 
         task.setOnFailed(e -> {
@@ -213,9 +222,12 @@ public class MainController implements StatefulController {
         else if(dto.state.equals(RunState.COMPLETE)) {
             sb.append("Completed\n");
         }
-        else if(dto.state.equals(RunState.ABORTED)) {
-            sb.append("Aborted\n");
+        else if(dto.state.equals(RunState.ABORTED)){
+            refreshPullTimeline.stop();
+            InfoMessage.showInfoMessage("Insufficient balance", "Program was aborted due to insufficient credit balance");
+            App.loadScreen("/fxml/dashboard.fxml");
         }
+
         if (Boolean.TRUE.equals(dto.computing)){
             sb.append("Computing\n");
 

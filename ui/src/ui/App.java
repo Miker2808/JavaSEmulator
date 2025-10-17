@@ -20,7 +20,7 @@ public class App extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+
         loadScreen("/fxml/login.fxml");
 
     }

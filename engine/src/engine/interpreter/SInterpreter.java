@@ -59,7 +59,7 @@ public class SInterpreter
         }
 
         long credits_used = context.getCycles() - prev_cycles;
-        if(credits_used > this.creditsConsumed.get()) {
+        if(credits_used > this.creditsAvail.get()) {
             context.setExit(true);
             this.state = RunState.ABORTED;
         }
