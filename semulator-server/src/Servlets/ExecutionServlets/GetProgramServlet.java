@@ -101,6 +101,7 @@ public class GetProgramServlet extends HttpServlet {
         dto.labelsUsed = usersProgram.getInstructionsView().getLabelsUsed();
         dto.inputVariables = usersProgram.getInstructionsView().getInputVariablesUsed();
         dto.programName = usersProgram.getName();
+        dto.architectureSummary = usersProgram.getInstructionsView().getArchitectureStats();
 
         return dto;
     }

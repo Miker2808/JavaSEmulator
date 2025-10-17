@@ -6,7 +6,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 import ui.storage.AppContext;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App extends Application{
     private static Stage primaryStage;
@@ -16,6 +20,7 @@ public class App extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         loadScreen("/fxml/login.fxml");
 
     }

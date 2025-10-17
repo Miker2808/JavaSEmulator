@@ -151,4 +151,11 @@ public class UserInstance {
     public Boolean isComputing() {
         return computing;
     }
+
+    public AtomicLong getCreditsAvailRef(){
+        return this.creditsAvailable;
+    }
+    public AtomicLong getCreditsUsedRef(){
+        return this.creditsUsed;
+    }
 }

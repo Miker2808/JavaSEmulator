@@ -4,6 +4,7 @@ import dto.ExecutionDTO;
 import dto.ExecutionRequestDTO;
 import dto.SInstructionDTO;
 import dto.SProgramDTO;
+import enums.RunState;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -48,7 +49,8 @@ public class MainController implements StatefulController {
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
-    private Boolean init = false;
+
+    private SProgramDTO programDTO;
 
     @FXML ToggleGroup archiGenGroup;
 
@@ -82,6 +84,10 @@ public class MainController implements StatefulController {
     @FXML private TableColumn<SInstructionDTO, String> historyChainGeneration;
 
     @FXML private Label instructionsCountLabel;
+    @FXML private Label genILabel;
+    @FXML private Label genIILabel;
+    @FXML private Label genIIILabel;
+    @FXML private Label genIVLabel;
 
     // Debugger / Execution Section
     // Buttons
@@ -145,6 +151,12 @@ public class MainController implements StatefulController {
         startAutoRefresh();
         collapseButton.setDisable(true);
         expandButton.setDisable(max_degree == 0);
+
+        archiGenGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+            if (newToggle != null) {
+                updateInstructionsTableSummary(programDTO);
+            }
+        });
     }
 
     private void startAutoRefresh() {
@@ -167,7 +179,7 @@ public class MainController implements StatefulController {
 
         task.setOnSucceeded(e -> {
             ExecutionDTO dto = task.getValue();
-            if (dto == null) return; // null is safe, skip update
+            if (dto == null) return;
             refreshExecutionUI(dto);
         });
 
@@ -195,8 +207,14 @@ public class MainController implements StatefulController {
         availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
 
         StringBuilder sb = new StringBuilder();
-        if (Boolean.TRUE.equals(dto.running)) {
+        if (dto.state.equals(RunState.RUNNING)) {
             sb.append("Running\n");
+        }
+        else if(dto.state.equals(RunState.COMPLETE)) {
+            sb.append("Completed\n");
+        }
+        else if(dto.state.equals(RunState.ABORTED)) {
+            sb.append("Aborted\n");
         }
         if (Boolean.TRUE.equals(dto.computing)){
             sb.append("Computing\n");
@@ -206,7 +224,7 @@ public class MainController implements StatefulController {
         if (dto.runPCHighlight != null) sb.append("PC: ").append(dto.runPCHighlight).append("\n");
 
 
-        running = dto.running;
+        running = dto.state.equals(RunState.RUNNING);
         computing = dto.computing;
 
         runInfoTextArea.setText(sb.toString());
@@ -215,7 +233,7 @@ public class MainController implements StatefulController {
             cyclesMeterLabel.setText(String.format("Cycles: %d", dto.cycles));
         }
 
-        if(dto.running && dto.runPCHighlight != null) {
+        if(running && dto.runPCHighlight != null) {
             highLightInstructionTableLine(dto.runPCHighlight);
         }
 
@@ -347,7 +365,6 @@ public class MainController implements StatefulController {
             instructionsTable.refresh();
         });
     }
-
 
     void initializeProgramVariablesTable(){
         programVariablesTableVariableColumn.setCellValueFactory(new PropertyValueFactory<>("variable"));
@@ -526,6 +543,21 @@ public class MainController implements StatefulController {
         int synth_count = countSynthetic(programDTO);
         int basic = count - synth_count;
         instructionsCountLabel.setText("Instructions: " + count + " (Basic: " + basic + " / Synthetic: " + synth_count + " )");
+        updateGenText(genILabel, "I",1, programDTO.architectureSummary.get(1));
+        updateGenText(genIILabel, "II",2, programDTO.architectureSummary.get(2));
+        updateGenText(genIIILabel, "III",3, programDTO.architectureSummary.get(3));
+        updateGenText(genIVLabel, "IV",4, programDTO.architectureSummary.get(4));
+    }
+
+    void updateGenText(Label label, String genStr, int gen, int count){
+        label.setText(String.format(" Gen %s: %d ", genStr, count));
+        int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+        if(gen > selected_generation && count > 0){
+            label.setStyle("-fx-background-color: rgba(255,54,54,0.84);");
+        }
+        else{
+            label.setStyle("-fx-background-color: transparent;");
+        }
     }
 
     @FXML
@@ -556,9 +588,8 @@ public class MainController implements StatefulController {
 
         breakPoints.clear();
         lineHighlighted = null;
-        SProgramDTO programDTO;
         try {
-            programDTO = NetCode.getSProgramDTO(appContext.getUsername(), degree_selected);
+            this.programDTO = NetCode.getSProgramDTO(appContext.getUsername(), degree_selected);
         }
         catch (Exception e) {
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -654,36 +685,16 @@ public class MainController implements StatefulController {
 
             Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
             String responseBody = response.body().string();
+
             if (!response.isSuccessful()) {
                 InfoMessage.showInfoMessage("Failure", responseBody);
             }
+            response.close();
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
 
-        /*
-        ExecutionContext result = engine.runProgram(programSelectionChoiceBox.getValue(),
-                getInputVariablesFromUI(),
-                degree_selected,
-                debugRadioButton.isSelected(),
-                breakPoints);
-        running = !result.getExit();
-
-        if(debugRadioButton.isSelected()) {
-            highLightInstructionTableLine(result.getPC());
-        }
-
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        updateProgramVariablesTable(result.getOrderedVariables(), false);
-        updateInputControllers();
-
-        if(result.getExit()){
-            updateHistoryTableUI(selectedProgramView);
-
-        }
-
-         */
     }
 
     @FXML
@@ -700,30 +711,17 @@ public class MainController implements StatefulController {
             dto.inputVariables = getInputVariablesFromUI();
             Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
             String responseBody = response.body().string();
+
             if (!response.isSuccessful()) {
                 InfoMessage.showInfoMessage("Failure", responseBody);
             }
+            response.close();
 
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
 
-        /*
-        // execute single step
-        ExecutionContext result = engine.resumeLoadedRun(breakPoints);
-
-        running = !result.getExit();
-
-        // populate table with result variables (later it'll be the same with execution context
-        updateProgramVariablesTable(result.getOrderedVariables(), true);
-
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        highLightInstructionTableLine(result.getPC());
-        updateInputControllers();
-        updateHistoryTableUI(selectedProgramView);
-
-         */
     }
 
     @FXML
@@ -734,30 +732,15 @@ public class MainController implements StatefulController {
             dto.command = "stepover";
             Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
             String responseBody = response.body().string();
-            if (!response.isSuccessful()){
+
+            if (!response.isSuccessful()) {
                 InfoMessage.showInfoMessage("Failure", responseBody);
             }
+            response.close();
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
-
-        /*
-        // execute single step
-        ExecutionContext result = engine.stepLoadedRun();
-        // populate table with result variables (later it'll be the same with execution context
-
-        updateProgramVariablesTable(result.getOrderedVariables(), true);
-
-        cyclesMeterLabel.setText("Cycles: " + result.getCycles());
-        highLightInstructionTableLine(result.getPC());
-        if(result.getExit()){
-            running = false;
-            updateInputControllers();
-            updateHistoryTableUI(selectedProgramView);
-        }
-
-         */
 
     }
 
@@ -770,10 +753,11 @@ public class MainController implements StatefulController {
             dto.command = "backstep";
             Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
             String responseBody = response.body().string();
+
             if (!response.isSuccessful()) {
                 InfoMessage.showInfoMessage("Failure", responseBody);
             }
-
+            response.close();
 
         }
         catch (Exception e){
@@ -789,9 +773,11 @@ public class MainController implements StatefulController {
             dto.command = "stop";
             Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
             String responseBody = response.body().string();
+
             if (!response.isSuccessful()) {
                 InfoMessage.showInfoMessage("Failure", responseBody);
             }
+            response.close();
 
         }
         catch (Exception e){

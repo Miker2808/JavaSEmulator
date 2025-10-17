@@ -4,6 +4,7 @@ package Servlets.ExecutionServlets;
 import Storage.UserInstance;
 import com.google.gson.Gson;
 import dto.ExecutionDTO;
+import enums.RunState;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -54,9 +55,9 @@ public class ExecutionServlet extends HttpServlet {
         dto.programName = userInstance.getProgramSelected();
         dto.credits = userInstance.getCreditsAvailable();
         dto.computing = userInstance.isComputing();
-        dto.running = false; // default to false
+        dto.state = RunState.IDLE;
         if(userInstance.getInterpreter() != null) {
-            dto.running = userInstance.getInterpreter().isRunning();
+            dto.state = userInstance.getInterpreter().getState();
             dto.cycles = userInstance.getInterpreter().getCycles();
             dto.steps = userInstance.getInterpreter().getSteps();
             dto.runPCHighlight = userInstance.getInterpreter().getPC();

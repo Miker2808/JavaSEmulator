@@ -3,10 +3,12 @@ package engine.interpreter;
 import engine.SInstructionsView;
 import engine.execution.ExecutionContext;
 import engine.execution.ExecutionContextHistory;
+import enums.RunState;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SInterpreter
 {
@@ -17,12 +19,17 @@ public class SInterpreter
     private final int backstep_capacity = 50;
     private long steps = 0;
     private boolean new_run = true;
+    private RunState state = RunState.RUNNING;
+    private AtomicLong creditsAvail;
+    private AtomicLong creditsConsumed;
 
-    public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables){
+    public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables, AtomicLong creditsAvail, AtomicLong creditsConsumed){
         this.sInstructions = sInstructions;
         this.inputVariables = new HashMap<>(inputVariables);
         this.contextHistory = new ExecutionContextHistory(backstep_capacity);
         this.context = new ExecutionContext(sInstructions, inputVariables);
+        this.creditsAvail = creditsAvail;
+        this.creditsConsumed = creditsConsumed;
     }
 
     public static ExecutionContext staticRun(SInstructionsView instructions, HashMap<String, Integer> inputVariables){
@@ -38,15 +45,29 @@ public class SInterpreter
     // Runs a single step in execution
     public ExecutionContext step(boolean keephistory){
         int num_lines = sInstructions.size();
+        int prev_cycles = context.getCycles();
         if(keephistory) {
             contextHistory.push(context);
         }
         if(!context.getExit() && context.getPC() <= num_lines) {
             sInstructions.getInstruction(context.getPC()).execute(context);
         }
+
         if(!(context.getPC() <= num_lines) || (steps >= Long.MAX_VALUE - 1)){
             context.setExit(true);
+            this.state = RunState.COMPLETE;
         }
+
+        long credits_used = context.getCycles() - prev_cycles;
+        if(credits_used > this.creditsConsumed.get()) {
+            context.setExit(true);
+            this.state = RunState.ABORTED;
+        }
+
+        long credits_consume = Math.min(credits_used, this.creditsAvail.get());
+        this.creditsAvail.addAndGet(-1 * credits_consume);
+        this.creditsConsumed.addAndGet(credits_consume);
+
         steps++;
 
         return context;
@@ -100,13 +121,6 @@ public class SInterpreter
 
     }
 
-    public ExecutionContext getExecutionContext(){
-        return context;
-    }
-    public void setExecutionContext(ExecutionContext context){
-        this.context = context;
-    }
-
     public LinkedHashMap<String, Integer> getOrderedVariables(){
         return context.getOrderedVariables();
     }
@@ -116,6 +130,7 @@ public class SInterpreter
     }
 
     public void Stop(){
+        this.state = RunState.COMPLETE;
         context.setExit(true);
     }
 
@@ -134,4 +149,7 @@ public class SInterpreter
         return !context.getExit();
     }
 
+    public RunState getState(){
+        return state;
+    }
 }

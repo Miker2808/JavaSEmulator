@@ -12,6 +12,7 @@ import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -253,5 +254,19 @@ public class SInstructions implements Serializable, SInstructionsView {
         return max_generation;
     }
 
+    public Map<Integer, Integer> getArchitectureStats(){
+        Map<Integer, Integer> map = new LinkedHashMap<>();
+        for (int i = 1; i <= 4; i++) {
+            map.put(i, 0);
+        }
+
+        for (int line = 1; line <= size(); line++){
+            SInstruction instr = this.getInstruction(line);
+            int gen = instr.getGeneration();
+            map.put(gen, map.get(gen) + 1);
+
+        }
+        return map;
+    }
 
 }

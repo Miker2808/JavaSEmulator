@@ -3,7 +3,9 @@ package engine;
 import engine.instruction.InvalidInstructionException;
 import engine.instruction.SInstruction;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface SInstructionsView {
     int getMaxDegree();
@@ -34,5 +36,7 @@ public interface SInstructionsView {
     List<SInstruction> getAllInstructions();
 
     int getRequiredGen();
+
+    Map<Integer, Integer> getArchitectureStats();
 
 }

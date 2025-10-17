@@ -124,8 +124,15 @@ public class ExecuteProgramServlet extends HttpServlet {
 
         if(validateExecute(response)) return;
 
-        userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(), executionRequestDTO.inputVariables));
-        userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram, executionRequestDTO.inputVariables, userInstance.getDegreeSelected()));
+        userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(),
+                                                        executionRequestDTO.inputVariables,
+                                                        userInstance.getCreditsAvailRef(),
+                                                        userInstance.getCreditsUsedRef()
+                                                    ));
+
+        userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram,
+                executionRequestDTO.inputVariables,
+                userInstance.getDegreeSelected()));
 
         original_program.addNumRuns(1);
         userInstance.setTotalRuns(userInstance.getTotalRuns() + 1);

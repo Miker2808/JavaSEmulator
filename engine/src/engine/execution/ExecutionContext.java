@@ -113,7 +113,6 @@ public class ExecutionContext {
     }
 
     public LinkedHashMap<String, Integer> getOrderedVariables(){
-        //return buildOrderedMap(variables);
         return variablesSmartMap.getOrderedMap();
     }
 
