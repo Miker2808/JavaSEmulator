@@ -7,6 +7,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -128,10 +129,10 @@ public class DashboardController implements StatefulController {
 
     private void initializeUserStatsTable(){
         userStatsAvailCreditsColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().avail_credits)
+                new SimpleLongProperty(cell.getValue().avail_credits)
         );
         userStatsCreditsSpentColumn.setCellValueFactory(cell ->
-                new SimpleIntegerProperty(cell.getValue().credits_spent)
+                new SimpleLongProperty(cell.getValue().credits_spent)
         );
         userStatsProgramsUploadedColumn.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().num_uploaded_programs)

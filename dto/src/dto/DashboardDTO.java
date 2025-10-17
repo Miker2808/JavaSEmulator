@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class DashboardDTO {
 
-    public int credits;
+    public long credits;
     public ArrayList<UserStatDTO> userStats;
     public ArrayList<ExecutionHistoryDTO> executionHistory;
     public ArrayList<SProgramViewStatsDTO> programStats;

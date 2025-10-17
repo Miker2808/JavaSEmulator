@@ -8,7 +8,7 @@ public class ExecutionDTO {
     public Integer runPCHighlight;
     public Long cycles;
     public String programName;
-    public Integer credits;
+    public Long credits;
     public Boolean running;
     public Boolean computing;
     public Long steps;

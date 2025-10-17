@@ -115,11 +115,11 @@ public class SProgram implements Serializable, SProgramView {
     public String getUserString() {
         return getName();
     }
-
+    @Override
     public String getUploader(){
         return uploader;
     }
-
+    @Override
     public void setUploader(String value){
         this.uploader = value;
         SFunctions functions = getSFunctions();
@@ -127,21 +127,25 @@ public class SProgram implements Serializable, SProgramView {
             function.setUploader(value);
         }
     }
-
+    @Override
     public int getNumRuns() {
         return num_runs;
     }
+    @Override
     public void setNumRuns(int value) {
         this.num_runs = value;
     }
+    @Override
     public int getAverage_credits_cost() {
         return average_credits_cost;
     }
+    @Override
     public void setAverage_credits_cost(int value) {
         this.average_credits_cost = value;
     }
+    @Override
     public String getParentProgram() { return ""; }
-
+    @Override
     public void addNumRuns(int value){
         this.num_runs += value;
     }

@@ -30,8 +30,8 @@ public class ExecuteProgramServlet extends HttpServlet {
     UserInstance userInstance;
     HttpServletResponse response;
     SProgramView usersProgram;
+    SProgramView original_program;
     boolean credits_exhausted = false;
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -55,9 +55,9 @@ public class ExecuteProgramServlet extends HttpServlet {
 
         ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
         // get the program, as it was uploaded
-        usersProgram = programsStorage.getProgramView(userInstance.getProgramSelected(),  userInstance.getProgramType());
+        original_program = programsStorage.getProgramView(userInstance.getProgramSelected(),  userInstance.getProgramType());
         // assign expanded version based on degree
-        usersProgram = SProgramExpander.expand(usersProgram, userInstance.getDegreeSelected());
+        usersProgram = SProgramExpander.expand(original_program, userInstance.getDegreeSelected());
         handleExecution(request, response);
     }
 
@@ -88,16 +88,49 @@ public class ExecuteProgramServlet extends HttpServlet {
         userInstance.setInterpreter(null);
     }
 
-    private void executeCommand(HttpServletResponse response) throws IOException {
+    private boolean validateExecute(HttpServletResponse response) throws IOException {
+        int requiredGen = usersProgram.getInstructionsView().getRequiredGen();
+        String genStr = genToStr(requiredGen);
+        int runCost = runCostsMap(executionRequestDTO.generation) + original_program.getAverage_credits_cost();
 
         if(userInstance.getInterpreter() != null && userInstance.getInterpreter().isRunning()){
             sendPlain(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "User instance is already running");
-            return;
+            return true;
         }
+
+        if(executionRequestDTO.generation < requiredGen){
+            String message = String.format("Program requires generation of at least %s to execute", genStr);
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, message);
+            return true;
+        }
+
+        if(userInstance.getCreditsAvailable() < runCost){
+            String message = String.format("At least %d credits required to execute at gen %s",
+                    runCost, genStr);
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, message);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateAverageCredits(int credits_cost){
+        int num_runs =  original_program.getNumRuns();
+        int avg_credits = original_program.getAverage_credits_cost();
+        original_program.setAverage_credits_cost(avg_credits + (credits_cost -  avg_credits)/num_runs);
+    }
+
+    private void executeCommand(HttpServletResponse response) throws IOException {
+
+        if(validateExecute(response)) return;
 
         userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(), executionRequestDTO.inputVariables));
         userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram, executionRequestDTO.inputVariables, userInstance.getDegreeSelected()));
-        usersProgram.setNumRuns(usersProgram.getNumRuns() + 1);
+
+        original_program.addNumRuns(1);
+        userInstance.setTotalRuns(userInstance.getTotalRuns() + 1);
+        userInstance.addCreditsAvailable(-1 * runCostsMap(executionRequestDTO.generation));
+        userInstance.addCreditsUsed(runCostsMap(executionRequestDTO.generation));
 
         ExecutionPool.submitTask(userInstance, () -> {
             Set<Integer> breakpoints = new HashSet<>();
@@ -109,6 +142,7 @@ public class ExecuteProgramServlet extends HttpServlet {
             userInstance.getCurrentExecutionHistory().setContext(exec_context);
 
             if (exec_context.getExit()) {
+                updateAverageCredits(exec_context.getCycles());
                 userInstance.getHistoryManager().addExecutionHistory(
                         usersProgram.getName(),
                         userInstance.getCurrentExecutionHistory());
@@ -169,9 +203,28 @@ public class ExecuteProgramServlet extends HttpServlet {
     }
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
+        response.reset();
         response.setStatus(statusCode);
-        response.setContentType("text/plain");
+        response.setContentType("text/plain;charset=UTF-8");
         response.getWriter().write(message);
+    }
+
+    protected static int runCostsMap(int generation){
+        return switch(generation){
+            case 1 -> 5;
+            case 2 -> 100;
+            case 3 -> 500;
+            default -> 1000;
+        };
+    }
+
+    protected static String genToStr(int gen){
+        return switch(gen){
+            case 1 -> "I";
+            case 2 -> "II";
+            case 3 -> "III";
+            default -> "IV";
+        };
     }
 
 }

@@ -45,7 +45,7 @@ public class CreditsServlet extends HttpServlet {
                 catch(Exception ignored){}
             }
 
-            int credits_available = userMap.get(username).getCreditsAvailable();
+            long credits_available = userMap.get(username).getCreditsAvailable();
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(credits_available + "");
         }

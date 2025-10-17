@@ -4,14 +4,17 @@ import engine.history.ExecutionHistory;
 import engine.history.ExecutionHistoryManager;
 import engine.interpreter.SInterpreter;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 public class UserInstance {
     private String programSelected = "";
     private String programType = "";
-    private Integer degree_selected = 0;
+    private final AtomicInteger degree_selected = new AtomicInteger(0);
     private Integer numProgramsUploaded = 0;
     private Integer numFunctionsUploaded = 0;
-    private Integer creditsAvailable = 0;
-    private Integer creditsUsed = 0;
+    private final AtomicLong creditsAvailable = new AtomicLong(0);
+    private final AtomicLong creditsUsed = new AtomicLong(0);
     private Integer totalRuns = 0;
 
     private Boolean computing = false; // is user instance physically computing something (thread pool currently working on user request)
@@ -28,11 +31,11 @@ public class UserInstance {
     }
 
     public Integer getDegreeSelected() {
-        return degree_selected;
+        return degree_selected.get();
     }
 
     public void setDegreeSelected(Integer degree_selected) {
-        this.degree_selected = degree_selected;
+        this.degree_selected.set(degree_selected);
     }
 
     public Integer getNumProgramsUploaded() {
@@ -51,28 +54,28 @@ public class UserInstance {
         this.numFunctionsUploaded = numFunctionsUploaded;
     }
 
-    public Integer getCreditsAvailable() {
-        return creditsAvailable;
+    public Long getCreditsAvailable() {
+        return creditsAvailable.get();
     }
 
-    public void setCreditsAvailable(Integer creditsAvailable) {
-        this.creditsAvailable = creditsAvailable;
+    public void setCreditsAvailable(Long creditsAvailable) {
+        this.creditsAvailable.set(creditsAvailable);
     }
 
-    public void addCreditsAvailable(Integer creditsAvailable) {
-        this.creditsAvailable += creditsAvailable;
+    public void addCreditsAvailable(int value) {
+        this.creditsAvailable.addAndGet(value);
     }
 
-    public Integer getCreditsUsed() {
-        return creditsUsed;
+    public Long getCreditsUsed() {
+        return creditsUsed.get();
     }
 
-    public void setCreditsUsed(Integer creditsUsed) {
-        this.creditsUsed = creditsUsed;
+    public void setCreditsUsed(Long creditsUsed) {
+        this.creditsUsed.set(creditsUsed);
     }
 
-    public void addCreditsUsed(Integer creditsUsed) {
-        this.creditsUsed += creditsUsed;
+    public void addCreditsUsed(int value) {
+        this.creditsUsed.addAndGet(value);
     }
 
     public Integer getTotalRuns() {
