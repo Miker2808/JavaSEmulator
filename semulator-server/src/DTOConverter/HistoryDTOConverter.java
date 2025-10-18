@@ -20,7 +20,6 @@ public class HistoryDTOConverter {
     public static ExecutionHistoryDTO convertToDTO(ExecutionHistory executionHistory){
         ExecutionHistoryDTO dto = new ExecutionHistoryDTO();
         dto.inputVariables = executionHistory.getInputVariables();
-        dto.resultVariables = executionHistory.getVariables();
         dto.degree = executionHistory.getDegree();
         dto.cycles = executionHistory.getCycles();
         dto.y = executionHistory.getY();

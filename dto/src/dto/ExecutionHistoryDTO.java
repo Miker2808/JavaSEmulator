@@ -12,6 +12,5 @@ public class ExecutionHistoryDTO {
     public int y;
     public int cycles;
     public LinkedHashMap<String, Integer> inputVariables;
-    public LinkedHashMap<String, Integer> resultVariables;
 
 }
