@@ -3,12 +3,16 @@ package ui.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import ui.App;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
 import ui.netcode.NetCode;
 import ui.storage.AppContext;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LoginController implements StatefulController{
 
@@ -20,6 +24,7 @@ public class LoginController implements StatefulController{
     @Override
     public void setAppContext(AppContext context) {
         this.context = context;
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
     }
 
     @Override

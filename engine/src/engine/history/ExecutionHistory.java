@@ -22,7 +22,7 @@ public class ExecutionHistory implements Serializable {
         this.inputVariables = new LinkedHashMap<>(inputVariables);
         this.degree = degree;
         this.programName = program.getName();
-        this.type = String.valueOf(program.getProgramType());
+        this.type = String.valueOf(program.getProgramType()).toLowerCase();
         this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
 
     }
@@ -34,7 +34,7 @@ public class ExecutionHistory implements Serializable {
         this.degree = degree;
         this.y = variables.get("y");
         this.programName = program.getName();
-        this.type = String.valueOf(program.getProgramType()).toUpperCase();
+        this.type = String.valueOf(program.getProgramType()).toLowerCase();
         this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
     }
 

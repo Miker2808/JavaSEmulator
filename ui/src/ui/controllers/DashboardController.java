@@ -21,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import ui.App;
 import ui.NetworkException;
@@ -31,9 +32,12 @@ import ui.netcode.NetCode;
 import ui.storage.AppContext;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DashboardController implements StatefulController {
     private AppContext appContext;
@@ -88,6 +92,7 @@ public class DashboardController implements StatefulController {
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         initializeUI();
     }
 
@@ -411,8 +416,16 @@ public class DashboardController implements StatefulController {
     void onShowStatusButton(MouseEvent event) {
         ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
         if(selectedHistory != null){
-            // TODO: may need to reimplement
-            // new VariableTablePopup(selectedHistory.resultVariables);
+            try {
+                LinkedHashMap<String, Integer> variables = NetCode.getHistoryStatusVariables(appContext.getUsername(),
+                        selectedUser,
+                        selectedHistory.num);
+                // ^ throws exception if an issue makes it impossible to set a popup
+                new VariableTablePopup(variables);
+
+            } catch (Exception e) {
+                InfoMessage.showInfoMessage("Failure", e.getMessage());
+            }
         }
     }
 

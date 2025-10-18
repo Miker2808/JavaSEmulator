@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -192,6 +193,30 @@ public class NetCode {
                 .build();
 
         return client.newCall(request).execute();
+    }
+
+
+    public static LinkedHashMap<String, Integer> getHistoryStatusVariables(String username, String historyUser, Integer index) throws IOException
+    {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+
+        String url = String.format("%s/dashboard/history-status?user=%s&history=%s&index=%d", URL, username, historyUser, index);
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        Response response = client.newCall(request).execute();
+
+        if(response.isSuccessful()) {
+            String jsonString = response.body().string();
+            Type type = new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
+            return gson.fromJson(jsonString, type);
+        }
+        else{
+            throw new NetworkException(response.code(), response.body().string());
+        }
     }
 
 
