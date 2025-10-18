@@ -145,6 +145,13 @@ public class MainController implements StatefulController {
 // ** Initializers **
     @FXML
     public void initializeUI() {
+
+        // passed from dashboard
+        degree_selected = appContext.getDegree();
+        if(appContext.getInputVariables() != null) {
+            setInputTableValues(appContext.getInputVariables());
+        }
+
         onNewRunClicked(null);
         initializeInstructionTable();
         initializeHighlightSelectionBox();
@@ -154,7 +161,6 @@ public class MainController implements StatefulController {
         initializeChooseDegreeTextField();
         updateUIOnExpansion();
         startAutoRefresh();
-        collapseButton.setDisable(true);
         expandButton.setDisable(max_degree == 0);
 
         archiGenGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
@@ -162,8 +168,6 @@ public class MainController implements StatefulController {
                 updateInstructionsTableSummary(programDTO);
             }
         });
-
-
     }
 
     private void startAutoRefresh() {
@@ -865,6 +869,7 @@ public class MainController implements StatefulController {
 
     @FXML
     private void onBackToDashboardClicked(MouseEvent event) {
+        appContext.reset();
         App.loadScreen("/fxml/dashboard.fxml");
 
     }

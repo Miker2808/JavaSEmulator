@@ -47,7 +47,7 @@ public class LoginController implements StatefulController{
             if (response.isSuccessful()) {
                 // Save user info to context
                 context.setUsername(username);
-
+                context.reset();
                 // Transition to setup screen
                 App.loadScreen("/fxml/dashboard.fxml");
             }
