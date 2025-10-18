@@ -171,7 +171,9 @@ public class DashboardController implements StatefulController {
 
         usersTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
-                    selectedUser = (newSelection != null) ? newSelection.username : null;
+                    if(newSelection != null){
+                        selectedUser = newSelection.username;
+                    }
                 }
         );
     }
@@ -289,6 +291,7 @@ public class DashboardController implements StatefulController {
         updateTableKeepSelection(programsTable, dto.programStats);
         updateTableKeepSelection(functionsTable, dto.functionStats);
         updateTableKeepSelection(usersTable, dto.userStats);
+        updateTableKeepSelection(historyTable, dto.executionHistory);
 
     }
 
@@ -361,6 +364,7 @@ public class DashboardController implements StatefulController {
             else{
                 InfoMessage.showInfoMessage("Failed to select program", response.body().string());
             }
+            response.close();
         }
         catch(Exception e){
             InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
@@ -381,6 +385,7 @@ public class DashboardController implements StatefulController {
             else{
                 InfoMessage.showInfoMessage("Failed to select function", response.body().string());
             }
+            response.close();
         }
         catch(Exception e){
             InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
@@ -407,12 +412,13 @@ public class DashboardController implements StatefulController {
         ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
         if(selectedHistory != null){
             // TODO: may need to reimplement
-            new VariableTablePopup(selectedHistory.resultVariables);
+            // new VariableTablePopup(selectedHistory.resultVariables);
         }
     }
 
     @FXML
     void onDeselectButtonClicked(MouseEvent event) {
         usersTable.getSelectionModel().clearSelection();
+        selectedUser = null;
     }
 }
