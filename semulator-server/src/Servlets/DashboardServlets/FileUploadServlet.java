@@ -80,7 +80,6 @@ public class FileUploadServlet extends HttpServlet {
 
             // share updated available programs with QuoteInstruction
             QuoteInstruction.setProgramViews(programsStorage.getFullProgramsView());
-
             sendPlain(response, HttpServletResponse.SC_OK, "Successfully uploaded file: " + filePart.getSubmittedFileName());
 
         }
@@ -94,7 +93,7 @@ public class FileUploadServlet extends HttpServlet {
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
         response.setStatus(statusCode);
-        response.setContentType("text/plain");
+        response.setContentType("text/plain;charset=UTF-8");
         response.getWriter().write(message);
     }
 }

@@ -1,34 +1,22 @@
 package engine.history;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ExecutionHistoryManager {
-    private final HashMap<String, ArrayList<ExecutionHistory>> executionHistoryMap = new HashMap<>();
-
+    private final ArrayList<ExecutionHistory> executionHistoryList = new ArrayList<>();
 
     public void clearHistory(){
-        executionHistoryMap.clear();
+        executionHistoryList.clear();
     }
 
-    public ArrayList<ExecutionHistory> getExecutionHistory(String programName){
-        if(!executionHistoryMap.containsKey(programName)){
-            executionHistoryMap.put(programName, new ArrayList<>());
-        }
-
-        return executionHistoryMap.get(programName);
+    public ArrayList<ExecutionHistory> getExecutionHistory(){
+        return executionHistoryList;
     }
 
-    public void addExecutionHistory(String programName, ExecutionHistory executionHistory){
+    public void addExecutionHistory(ExecutionHistory executionHistory){
 
-        if(!executionHistoryMap.containsKey(programName)){
-            executionHistoryMap.put(programName, new ArrayList<>());
-
-        }
-
-        executionHistoryMap.get(programName).add(executionHistory);
-        ArrayList<ExecutionHistory> executionHistoryList = executionHistoryMap.get(programName);
-        executionHistoryList.getLast().setNum(executionHistoryList.size());
+        executionHistory.setNum(executionHistoryList.size() + 1);
+        executionHistoryList.add(executionHistory);
     }
 
 

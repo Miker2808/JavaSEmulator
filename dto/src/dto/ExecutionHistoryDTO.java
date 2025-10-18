@@ -4,12 +4,14 @@ import java.util.LinkedHashMap;
 
 public class ExecutionHistoryDTO {
 
+    public int num;
+    public String type;
+    public String name;
+    public String gen;
     public int degree;
-    public LinkedHashMap<String, Integer> inputVariables;
-    public LinkedHashMap<String, Integer> variables;
     public int y;
     public int cycles;
-    public int num;
-    public String genStr;
+    public LinkedHashMap<String, Integer> inputVariables;
+    public LinkedHashMap<String, Integer> resultVariables;
 
 }

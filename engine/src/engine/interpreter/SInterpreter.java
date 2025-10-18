@@ -22,6 +22,7 @@ public class SInterpreter
     private RunState state = RunState.RUNNING;
     private AtomicLong creditsAvail;
     private AtomicLong creditsConsumed;
+    private HashMap<Integer, AtomicLong> stepsByGen;
 
     public SInterpreter(SInstructionsView sInstructions, HashMap<String, Integer> inputVariables, AtomicLong creditsAvail, AtomicLong creditsConsumed){
         this.sInstructions = sInstructions;

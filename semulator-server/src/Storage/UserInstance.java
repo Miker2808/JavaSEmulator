@@ -18,8 +18,6 @@ public class UserInstance {
     private Integer totalRuns = 0;
 
     private Boolean computing = false; // is user instance physically computing something (thread pool currently working on user request)
-    private Boolean stop = false;
-    private Boolean debug = false;
     private String exceptionString = ""; // if exception was raised from thread pool, message will appear here
 
     private SInterpreter interpreter = null;
@@ -118,24 +116,6 @@ public class UserInstance {
 
     public ExecutionHistoryManager getHistoryManager() {
         return historyManager;
-    }
-
-    public void setHistoryManager(ExecutionHistoryManager historyManager) {
-        this.historyManager = historyManager;
-    }
-
-    public void setStop(Boolean stop) {
-        this.stop = stop;
-    }
-    public Boolean getStop() {
-        return stop;
-    }
-
-    public void setDebug(Boolean debug) {
-        this.debug = debug;
-    }
-    public Boolean getDebug() {
-        return debug;
     }
 
     public void setCurrentExecutionHistory(ExecutionHistory currentExecutionHistory) {

@@ -1,11 +1,14 @@
 package Servlets.DashboardServlets;
 
+import DTOConverter.HistoryDTOConverter;
 import DTOConverter.UserStatDTOConverter;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;
 import dto.DashboardDTO;
+import dto.ExecutionHistoryDTO;
 import dto.UserStatDTO;
+import engine.history.ExecutionHistory;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,10 +24,15 @@ import java.util.Objects;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
     private final Gson gson = new Gson();
+    private String historyUsername = null;
+    private String username = null;
+    private UserInstance userInstance = null;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String username = request.getParameter("user");
+        username = request.getParameter("user");
+        historyUsername = request.getParameter("history");
+
         response.setContentType("text/plain;charset=UTF-8");
 
         if (username == null || username.isEmpty()) {
@@ -35,14 +43,14 @@ public class DashboardServlet extends HttpServlet {
 
         ServletContext context = getServletContext();
         Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
-        UserInstance userInstance = userInstanceMap.get(username);
+        userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
             sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
             return;
         }
 
-        DashboardDTO dto = getDashboardDTO(request, userInstance);
+        DashboardDTO dto = getDashboardDTO(userInstance);
 
         String dto_json = gson.toJson(dto);
 
@@ -52,7 +60,7 @@ public class DashboardServlet extends HttpServlet {
         response.getWriter().write(dto_json);
     }
 
-    private DashboardDTO getDashboardDTO(HttpServletRequest request, UserInstance userInstance) throws IOException {
+    private DashboardDTO getDashboardDTO(UserInstance userInstance) throws IOException {
 
         DashboardDTO dto = new DashboardDTO();
         dto.credits = userInstance.getCreditsAvailable();
@@ -62,10 +70,24 @@ public class DashboardServlet extends HttpServlet {
         ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
         dto.programStats = programsStorage.getFullProgramsStats();
         dto.functionStats = programsStorage.getFullFunctionsStats();
-
-        // TODO: add history
+        dto.executionHistory = getExecutionHistory();
 
         return dto;
+
+    }
+
+
+    private ArrayList<ExecutionHistoryDTO> getExecutionHistory() throws IOException {
+        ServletContext context = getServletContext();
+        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
+        UserInstance historyUserInstance = userInstanceMap.get(historyUsername);
+
+        if(historyUserInstance == null){
+            historyUserInstance = userInstance;
+        }
+        ArrayList<ExecutionHistory> history = historyUserInstance.getHistoryManager().getExecutionHistory();
+
+        return HistoryDTOConverter.convertToDTO(history);
 
     }
 

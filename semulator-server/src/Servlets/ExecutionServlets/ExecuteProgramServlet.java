@@ -150,9 +150,7 @@ public class ExecuteProgramServlet extends HttpServlet {
 
             if (exec_context.getExit()) {
                 updateAverageCredits(exec_context.getCycles());
-                userInstance.getHistoryManager().addExecutionHistory(
-                        usersProgram.getName(),
-                        userInstance.getCurrentExecutionHistory());
+                userInstance.getHistoryManager().addExecutionHistory(userInstance.getCurrentExecutionHistory());
             }
         });
     }
@@ -169,9 +167,7 @@ public class ExecuteProgramServlet extends HttpServlet {
             userInstance.getCurrentExecutionHistory().setContext(exec_context);
 
             if (exec_context.getExit()) {
-                userInstance.getHistoryManager().addExecutionHistory(
-                        usersProgram.getName(),
-                        userInstance.getCurrentExecutionHistory());
+                userInstance.getHistoryManager().addExecutionHistory(userInstance.getCurrentExecutionHistory());
             }
         });
     }
@@ -185,7 +181,7 @@ public class ExecuteProgramServlet extends HttpServlet {
         ExecutionContext context = userInstance.getInterpreter().step(true);
         userInstance.getCurrentExecutionHistory().setContext(context);
         if(context.getExit()){
-            userInstance.getHistoryManager().addExecutionHistory(usersProgram.getName(), userInstance.getCurrentExecutionHistory());
+            userInstance.getHistoryManager().addExecutionHistory(userInstance.getCurrentExecutionHistory());
         }
     }
 
@@ -206,7 +202,7 @@ public class ExecuteProgramServlet extends HttpServlet {
             return;
         }
         userInstance.getInterpreter().Stop();
-        userInstance.getHistoryManager().addExecutionHistory(usersProgram.getName(), userInstance.getCurrentExecutionHistory());
+        userInstance.getHistoryManager().addExecutionHistory(userInstance.getCurrentExecutionHistory());
     }
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {

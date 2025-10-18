@@ -34,9 +34,10 @@ public class NetCode {
     public static Response uploadFile(String user, File file) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("text/plain");
+
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("file",file.getAbsolutePath(),
+                .addFormDataPart("file",
+                        file.getName(),
                         RequestBody.create(MediaType.parse("application/octet-stream"), file))
                 .build();
 
@@ -63,10 +64,17 @@ public class NetCode {
         return client.newCall(request).execute();
     }
 
-    public static DashboardDTO getDashboardDTO(String username) throws IOException {
+    public static DashboardDTO getDashboardDTO(String username, String historyUsername) throws IOException {
         OkHttpClient client = new OkHttpClient();
+        String url;
 
-        String url = String.format("%s/dashboard?user=%s", URL, username);
+        if(historyUsername != null){
+            url = String.format("%s/dashboard?user=%s&history=%s", URL, username, historyUsername);
+        }
+        else{
+            url = String.format("%s/dashboard?user=%s", URL, username);
+        }
+
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)

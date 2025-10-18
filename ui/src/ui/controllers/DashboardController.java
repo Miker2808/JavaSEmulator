@@ -1,6 +1,7 @@
 package ui.controllers;
 
 import dto.DashboardDTO;
+import dto.ExecutionHistoryDTO;
 import dto.SProgramViewStatsDTO;
 import dto.UserStatDTO;
 import javafx.animation.Animation;
@@ -9,6 +10,8 @@ import javafx.animation.Timeline;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -23,6 +26,7 @@ import ui.App;
 import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
+import ui.elements.VariableTablePopup;
 import ui.netcode.NetCode;
 import ui.storage.AppContext;
 
@@ -35,7 +39,9 @@ public class DashboardController implements StatefulController {
     private AppContext appContext;
     private Stage stage;
     private Timeline refreshPullTimeline;
+    private String selectedUser;
 
+    // <-- FXML -->
     @FXML private Label usernameLabel;
     @FXML private Button loadFileButton;
     @FXML private TextField loadedFilePathTextField;
@@ -65,6 +71,20 @@ public class DashboardController implements StatefulController {
     @FXML private TableColumn<UserStatDTO, String> userStatsUsernameColumn;
     @FXML private TableView<UserStatDTO> usersTable;
 
+    @FXML private Button deselectButton;
+
+    @FXML private TableColumn<ExecutionHistoryDTO, Number> historyCyclesCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, Number> historyDegreeCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, String> historyGenCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, String> historyNameCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, Number> historyNumCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, String> historyTypeCol;
+    @FXML private TableColumn<ExecutionHistoryDTO, Number> historyYCol;
+    @FXML private TableView<ExecutionHistoryDTO> historyTable;
+
+    @FXML private Button reRunButton;
+    @FXML private Button showStatusButton;
+
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
@@ -82,6 +102,7 @@ public class DashboardController implements StatefulController {
         initializeProgramStatsTable();
         initializeFunctionStatsTable();
         initializeUserStatsTable();
+        initializeHistoryTable();
         startAutoRefresh();
     }
 
@@ -147,6 +168,57 @@ public class DashboardController implements StatefulController {
                 new SimpleStringProperty(cell.getValue().username)
         );
         functionsTable.setItems(FXCollections.observableArrayList());
+
+        usersTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    selectedUser = (newSelection != null) ? newSelection.username : null;
+                }
+        );
+    }
+
+    private void initializeHistoryTable(){
+        historyNumCol.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().num)
+        );
+        historyTypeCol.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().type)
+        );
+        historyNameCol.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().name)
+        );
+        historyGenCol.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().gen)
+        );
+        historyDegreeCol.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().degree)
+        );
+
+        historyYCol.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().y)
+        );
+        historyCyclesCol.setCellValueFactory(cell ->
+                new SimpleIntegerProperty(cell.getValue().cycles)
+        );
+
+        // prepare table list
+        historyTable.setItems(FXCollections.observableArrayList());
+
+        historyTable.setRowFactory(tv -> new TableRow<ExecutionHistoryDTO>() {
+            @Override
+            protected void updateItem(ExecutionHistoryDTO item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setStyle("");
+                }
+            }
+        });
+
+        historyTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+            showStatusButton.setDisable(newSel == null);
+            reRunButton.setDisable((newSel == null));
+        });
+
     }
 
     private void initCreditsTextField(){
@@ -182,7 +254,7 @@ public class DashboardController implements StatefulController {
             protected DashboardDTO call() throws Exception {
                 if (appContext == null) return null;
 
-                return NetCode.getDashboardDTO(appContext.getUsername());
+                return NetCode.getDashboardDTO(appContext.getUsername(), selectedUser);
             }
         };
 
@@ -313,5 +385,34 @@ public class DashboardController implements StatefulController {
         catch(Exception e){
             InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
         }
+    }
+
+    @FXML
+    void onReRunButtonClicked(MouseEvent event) {
+        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        if(selectedHistory != null){
+
+            // TODO: implement
+            /*
+            degree_selected = selectedHistory.getDegree();
+            updateUIOnExpansion();
+            setInputTableValues(selectedHistory.getInputVariables());
+
+             */
+        }
+    }
+
+    @FXML
+    void onShowStatusButton(MouseEvent event) {
+        ExecutionHistoryDTO selectedHistory = historyTable.getSelectionModel().getSelectedItem();
+        if(selectedHistory != null){
+            // TODO: may need to reimplement
+            new VariableTablePopup(selectedHistory.resultVariables);
+        }
+    }
+
+    @FXML
+    void onDeselectButtonClicked(MouseEvent event) {
+        usersTable.getSelectionModel().clearSelection();
     }
 }
