@@ -15,7 +15,6 @@ public class ExecutionContext {
     private int pc;
     private int cycles;
     private boolean exit;
-    private boolean complete;
 
     public ExecutionContext(SInstructionsView sInstructions, HashMap<String, Integer> InputVariables){
 
@@ -31,9 +30,11 @@ public class ExecutionContext {
 
             variablesSmartMap.get(new SVariable(variable));
         }
+
+        System.out.println(variablesSmartMap.getOrderedMap());
+
         labelMap = mapLabels(sInstructions);
         exit = false;
-        complete = false;
         pc = 1;
         cycles = 0;
     }
@@ -45,7 +46,6 @@ public class ExecutionContext {
         cycles = other.cycles;
         exit = other.exit;
         pc = other.pc;
-        complete = other.complete;
     }
 
     private HashMap<String, Integer> mapLabels(SInstructionsView sInstructions){

@@ -72,7 +72,7 @@ public class SVariablesMap {
         // Handle all x{i} keys
         xVariables.keySet().stream()
                 .sorted() // sort integers ascending
-                .forEach(k -> result.put("z" + k, xVariables.get(k)));
+                .forEach(k -> result.put("x" + k, xVariables.get(k)));
 
         // Handle all z{j} keys
         zVariables.keySet().stream()
