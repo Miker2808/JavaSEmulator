@@ -111,7 +111,7 @@ public class DashboardController implements StatefulController {
         startAutoRefresh();
     }
 
-    private void initializeProgramStatsTable(){
+    private void initializeFunctionStatsTable(){
         functionMaxDegree.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().maxDegree)
         );
@@ -130,7 +130,7 @@ public class DashboardController implements StatefulController {
         functionsTable.setItems(FXCollections.observableArrayList());
     }
 
-    private void initializeFunctionStatsTable(){
+    private void initializeProgramStatsTable(){
         programAvgCreditsColumn.setCellValueFactory(cell ->
                 new SimpleIntegerProperty(cell.getValue().average_credits_cost)
         );
@@ -417,33 +417,6 @@ public class DashboardController implements StatefulController {
             }catch(Exception e){
                 InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
             }
-
-            // TODO: implement
-            /*
-            degree_selected = selectedHistory.getDegree();
-            updateUIOnExpansion();
-            setInputTableValues(selectedHistory.getInputVariables());
-
-             */
-            /*
-            SProgramViewStatsDTO selected = programsTable.getSelectionModel().getSelectedItem();
-            if(selected == null) return;
-            String program_name = programNameColumn.getCellObservableValue(selected).getValue();
-
-            try {
-                Response response = NetCode.selectProgram(appContext.getUsername(), program_name, "PROGRAM");
-                if(response.isSuccessful()) {
-                    App.loadScreen("/fxml/main.fxml");
-                }
-                else{
-                    InfoMessage.showInfoMessage("Failed to select program", response.body().string());
-                }
-                response.close();
-            }
-            catch(Exception e){
-                InfoMessage.showInfoMessage("Failed to reach the server", "Network error");
-            }
-             */
         }
     }
 

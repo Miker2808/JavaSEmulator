@@ -7,6 +7,7 @@ public class ExecutionHistoryDTO {
     public int num;
     public String type;
     public String name;
+    public String userstring;
     public String gen;
     public int degree;
     public int y;

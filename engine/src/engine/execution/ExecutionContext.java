@@ -31,8 +31,6 @@ public class ExecutionContext {
             variablesSmartMap.get(new SVariable(variable));
         }
 
-        System.out.println(variablesSmartMap.getOrderedMap());
-
         labelMap = mapLabels(sInstructions);
         exit = false;
         pc = 1;

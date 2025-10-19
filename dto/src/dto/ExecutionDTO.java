@@ -14,5 +14,6 @@ public class ExecutionDTO {
     public RunState state;
     public Boolean computing;
     public Long steps;
+    public LinkedHashMap<String, Long> genUsage;
 
 }

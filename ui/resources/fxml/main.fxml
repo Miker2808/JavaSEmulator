@@ -52,7 +52,8 @@
                               <ColumnConstraints minWidth="10.0" />
                               <ColumnConstraints minWidth="10.0" />
                               <ColumnConstraints minWidth="10.0" />
-                              <ColumnConstraints minWidth="10.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                              <ColumnConstraints minWidth="30.0" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -63,6 +64,11 @@
                               <Label fx:id="genIILabel" GridPane.columnIndex="2" />
                               <Label fx:id="genIIILabel" GridPane.columnIndex="3" />
                               <Label fx:id="genIVLabel" GridPane.columnIndex="4" />
+                              <CheckBox fx:id="genHighlightCheckBox" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text="Gen Highlight" GridPane.columnIndex="5">
+                                 <GridPane.margin>
+                                    <Insets right="5.0" />
+                                 </GridPane.margin>
+                              </CheckBox>
                            </children>
                         </GridPane>
                      </children>

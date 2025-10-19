@@ -12,6 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet("/execution")
@@ -62,9 +65,12 @@ public class ExecutionServlet extends HttpServlet {
             dto.steps = userInstance.getInterpreter().getSteps();
             dto.runPCHighlight = userInstance.getInterpreter().getPC();
             dto.runVariables = userInstance.getInterpreter().getOrderedVariables();
+            dto.genUsage = userInstance.getInterpreter().getGenUsage();
         }
         return dto;
     }
+
+
 
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
         response.setStatus(statusCode);

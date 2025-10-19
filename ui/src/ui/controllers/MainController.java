@@ -29,6 +29,7 @@ import ui.App;
 import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
+import ui.elements.UtilityConverters;
 import ui.netcode.NetCode;
 import ui.storage.AppContext;
 import ui.storage.VariableRow;
@@ -118,6 +119,8 @@ public class MainController implements StatefulController {
 
     @FXML private GridPane genSelectionGrid;
 
+    @FXML private CheckBox genHighlightCheckBox;
+
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
@@ -166,9 +169,18 @@ public class MainController implements StatefulController {
         archiGenGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
                 updateInstructionsTableSummary(programDTO);
+                instructionsTable.refresh();
+            }
+        });
+
+        genHighlightCheckBox.selectedProperty().addListener((obs, oldToggle, newToggle) -> {
+            if(newToggle != null) {
+                instructionsTable.refresh();
             }
         });
     }
+
+
 
     private void startAutoRefresh() {
         refreshPullTimeline = new Timeline(
@@ -237,8 +249,17 @@ public class MainController implements StatefulController {
 
         }
         if (dto.steps != null) sb.append("Steps: ").append(dto.steps).append("\n");
-        if (dto.runPCHighlight != null) sb.append("PC: ").append(dto.runPCHighlight).append("\n");
 
+        if(dto.genUsage != null){
+            sb.append("Gen Usage:(  ");
+            dto.genUsage.forEach((key, value) ->
+                    sb.append(key)
+                        .append(": ")
+                        .append(value)
+                        .append("  ")
+            );
+            sb.append(")\n");
+        }
 
         running = dto.state.equals(RunState.RUNNING);
         computing = dto.computing;
@@ -303,14 +324,24 @@ public class MainController implements StatefulController {
 
                 List<String> styles = new ArrayList<>();
 
+                if(genHighlightCheckBox.isSelected()){
+                    int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
+                    if(UtilityConverters.romanToIntegerGen(item.generation) <= selected_generation){
+                        styles.add("-fx-background-color: PaleGreen;");
+                    }
+                    else{
+                        styles.add("-fx-background-color: rgba(254,41,22,0.8);");
+                    }
+                }
+
                 // Search highlight
                 if (searchHighlightedLines.contains(item.line)) {
-                    styles.add("-fx-background-color: yellow;");
+                    styles.add("-fx-background-color: gold;");
                 }
 
                 // Line highlight
                 if (lineHighlighted != null && item.line == lineHighlighted) {
-                    styles.add("-fx-background-color: lightgreen;"); // stronger color
+                    styles.add("-fx-background-color: CornflowerBlue;"); // stronger color
                 }
 
                 setStyle(String.join("", styles));
@@ -405,14 +436,28 @@ public class MainController implements StatefulController {
         inputTableValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         inputTableValueColumn.setCellFactory(col -> new TextFieldTableCell<>(
                 new IntegerStringConverter()) {
+
             @Override
             public void startEdit() {
                 VariableRow row = getTableRow().getItem();
                 if (row != null && row.getVariable() != null && !row.getVariable().isEmpty()) {
-                    super.startEdit(); // only editable if left column is not empty
+                    super.startEdit();
+
+                    // Get the text field used for editing
+                    TextField textField = (TextField) getGraphic();
+                    if (textField != null) {
+                        textField.setTextFormatter(new TextFormatter<>(change -> {
+                            String newText = change.getControlNewText();
+                            if (newText.matches("\\d*")) { // only digits
+                                return change;
+                            }
+                            return null; // reject anything else (letters, signs, decimals)
+                        }));
+                    }
                 }
             }
         });
+
     }
 
     private void initBreakpointColumn() {
@@ -569,7 +614,7 @@ public class MainController implements StatefulController {
         label.setText(String.format(" Gen %s: %d ", genStr, count));
         int selected_generation = Integer.parseInt(archiGenGroup.getSelectedToggle().getUserData().toString());
         if(gen > selected_generation && count > 0){
-            label.setStyle("-fx-background-color: rgba(255,54,54,0.84);");
+            label.setStyle("-fx-background-color: rgba(254,41,22,0.8);");
         }
         else{
             label.setStyle("-fx-background-color: transparent;");
