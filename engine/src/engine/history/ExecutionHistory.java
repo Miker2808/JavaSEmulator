@@ -16,6 +16,7 @@ public class ExecutionHistory implements Serializable {
     private String programName;
     private String type;
     private String generation;
+    private String userString;
 
     public ExecutionHistory(SProgramView program, LinkedHashMap<String, Integer> inputVariables, int degree)
     {
@@ -24,6 +25,7 @@ public class ExecutionHistory implements Serializable {
         this.programName = program.getName();
         this.type = String.valueOf(program.getProgramType()).toLowerCase();
         this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
+        this.userString = program.getUserString();
 
     }
     public ExecutionHistory(SProgramView program, LinkedHashMap<String, Integer> inputVariables, ExecutionContext executionContext, int degree)
@@ -36,6 +38,7 @@ public class ExecutionHistory implements Serializable {
         this.programName = program.getName();
         this.type = String.valueOf(program.getProgramType()).toLowerCase();
         this.generation = setGeneration(program.getInstructionsView().getRequiredGen());
+        this.userString = program.getUserString();
     }
 
     protected String setGeneration(int gen){
@@ -96,6 +99,10 @@ public class ExecutionHistory implements Serializable {
         this.y = this.variables.get("y");
         this.cycles = context.getCycles();;
 
+    }
+
+    public String getUserString(){
+        return userString;
     }
 
 

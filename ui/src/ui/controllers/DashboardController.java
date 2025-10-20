@@ -192,7 +192,7 @@ public class DashboardController implements StatefulController {
                 new SimpleStringProperty(cell.getValue().type)
         );
         historyNameCol.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().name)
+                new SimpleStringProperty(cell.getValue().userstring)
         );
         historyGenCol.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().gen)
@@ -430,7 +430,8 @@ public class DashboardController implements StatefulController {
                         selectedUser,
                         selectedHistory.num);
                 // ^ throws exception if an issue makes it impossible to set a popup
-                new VariableTablePopup(variables);
+                String title = String.format("Variables Info #%d", selectedHistory.num);
+                new VariableTablePopup(title,variables);
 
             } catch (Exception e) {
                 InfoMessage.showInfoMessage("Failure", e.getMessage());

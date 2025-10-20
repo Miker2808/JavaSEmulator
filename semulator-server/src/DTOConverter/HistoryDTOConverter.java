@@ -26,6 +26,7 @@ public class HistoryDTOConverter {
         dto.num = executionHistory.getNum();
         dto.gen = executionHistory.getGeneration();
         dto.name = executionHistory.getName();
+        dto.userstring = executionHistory.getUserString();
         dto.type = executionHistory.getType();
 
         return dto;

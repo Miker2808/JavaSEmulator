@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class VariableTablePopup {
 
-    public VariableTablePopup(LinkedHashMap<String, Integer> variables) {
+    public VariableTablePopup(String title, LinkedHashMap<String, Integer> variables) {
         // Convert map to observable list of entries
         ObservableList<Map.Entry<String, Integer>> data =
                 FXCollections.observableArrayList(variables.entrySet());
@@ -38,8 +38,9 @@ public class VariableTablePopup {
 
         // Popup window
         Stage popup = new Stage();
-        popup.setTitle("Variables Info");
+        popup.setTitle(title);
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.setScene(new Scene(new VBox(table), 200, 300));
+        popup.show();
     }
 }
