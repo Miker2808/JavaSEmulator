@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import dto.*;
-import javafx.application.Platform;
 import okhttp3.*;
 import ui.NetworkException;
 import ui.elements.InfoMessage;

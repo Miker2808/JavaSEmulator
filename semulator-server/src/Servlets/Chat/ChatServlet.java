@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Date;
+import java.util.Deque;
 
 @WebServlet("/chat")
 public class ChatServlet extends HttpServlet {

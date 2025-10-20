@@ -2,7 +2,6 @@ package dto;
 
 import enums.RunState;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 public class ExecutionDTO {
