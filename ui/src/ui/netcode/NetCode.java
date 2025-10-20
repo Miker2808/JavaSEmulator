@@ -1,10 +1,13 @@
 package ui.netcode;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import dto.*;
+import javafx.application.Platform;
 import okhttp3.*;
 import ui.NetworkException;
+import ui.elements.InfoMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -221,6 +224,57 @@ public class NetCode {
         }
         else{
             throw new NetworkException(response.code(), response.body().string());
+        }
+    }
+
+    public static boolean sendMessageToServer(String username, String message) throws IOException {
+        JsonObject json = new JsonObject();
+        json.addProperty("username", username);
+        json.addProperty("message", message);
+
+        String url = URL + "/chat";
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+
+        RequestBody body = RequestBody.create(
+                gson.toJson(json), MediaType.get("application/json; charset=utf-8"));
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        Response response = client.newCall(request).execute();
+
+        if(response.isSuccessful()) {
+            response.close();
+            return true;
+        }
+        else{
+            throw new NetworkException(response.code(), response.body().string());
+        }
+    }
+
+    // Method to get chat from server as a string (single-call, blocking)
+    public static String getChatFromServer() {
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+
+        Request request = new Request.Builder()
+                .url(URL + "/chat")
+                .get()
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                InfoMessage.showInfoMessage("Failure", response.body().string());
+                return null;
+            }
+            return response.body().string();
+        } catch (IOException e) {
+            InfoMessage.showInfoMessage("Failure", e.getMessage());
+            return null;
         }
     }
 

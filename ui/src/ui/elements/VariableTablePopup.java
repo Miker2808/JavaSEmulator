@@ -41,6 +41,5 @@ public class VariableTablePopup {
         popup.setTitle("Variables Info");
         popup.initModality(Modality.APPLICATION_MODAL);
         popup.setScene(new Scene(new VBox(table), 200, 300));
-        popup.showAndWait();
     }
 }

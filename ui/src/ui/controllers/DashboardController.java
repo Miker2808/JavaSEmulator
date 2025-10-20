@@ -26,6 +26,7 @@ import okhttp3.Response;
 import ui.App;
 import ui.NetworkException;
 import ui.StatefulController;
+import ui.elements.ChatWindow;
 import ui.elements.InfoMessage;
 import ui.elements.VariableTablePopup;
 import ui.netcode.NetCode;
@@ -441,5 +442,10 @@ public class DashboardController implements StatefulController {
     void onDeselectButtonClicked(MouseEvent event) {
         usersTable.getSelectionModel().clearSelection();
         selectedUser = null;
+    }
+
+    @FXML
+    void onChatButtonClicked(MouseEvent event) {
+        new ChatWindow(appContext.getUsername());
     }
 }

@@ -53,6 +53,7 @@ public class MainController implements StatefulController {
     private final Set<Integer> searchHighlightedLines = new HashSet<>();
     private final Set<Integer> breakPoints = new HashSet<>();
     private Integer lineHighlighted = null; // only one line at a time
+    private RunState prev_state;
 
     private SProgramDTO programDTO;
 
@@ -180,8 +181,6 @@ public class MainController implements StatefulController {
         });
     }
 
-
-
     private void startAutoRefresh() {
         refreshPullTimeline = new Timeline(
                 new KeyFrame(Duration.millis(500), event -> refreshExecutionAsync())
@@ -275,8 +274,11 @@ public class MainController implements StatefulController {
         }
 
         if(dto.runVariables != null){
-            updateProgramVariablesTable(dto.runVariables, true);
+            if(running || prev_state != dto.state) {
+                updateProgramVariablesTable(dto.runVariables, true);
+            }
         }
+        prev_state = dto.state;
 
         updateInputControllers();
 
@@ -866,6 +868,12 @@ public class MainController implements StatefulController {
     public void updateProgramVariablesTable(LinkedHashMap<String, Integer> result, boolean highlight) {
         Map<String, Integer> oldValues = programVariablesTable.getItems().stream()
                 .collect(Collectors.toMap(VariableRow::getVariable, VariableRow::getValue));
+
+        int selectedIndex = programVariablesTable.getSelectionModel().getSelectedIndex();
+
+        if (selectedIndex >= 0 && selectedIndex < programVariablesTable.getItems().size()) {
+            programVariablesTable.getSelectionModel().select(selectedIndex);
+        }
 
         programVariablesTable.getItems().setAll(
                 result.entrySet().stream()
