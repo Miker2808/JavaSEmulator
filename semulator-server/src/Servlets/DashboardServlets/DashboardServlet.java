@@ -24,14 +24,11 @@ import java.util.Objects;
 @WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
     private final Gson gson = new Gson();
-    private String historyUsername = null;
-    private String username = null;
-    private UserInstance userInstance = null;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        username = request.getParameter("user");
-        historyUsername = request.getParameter("history");
+        String username = request.getParameter("user");
+        String historyUsername = request.getParameter("history");
 
         response.setContentType("text/plain;charset=UTF-8");
 
@@ -43,14 +40,14 @@ public class DashboardServlet extends HttpServlet {
 
         ServletContext context = getServletContext();
         Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
-        userInstance = userInstanceMap.get(username);
+        UserInstance userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
             sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
             return;
         }
 
-        DashboardDTO dto = getDashboardDTO(userInstance);
+        DashboardDTO dto = getDashboardDTO(userInstance, historyUsername);
 
         String dto_json = gson.toJson(dto);
 
@@ -60,7 +57,7 @@ public class DashboardServlet extends HttpServlet {
         response.getWriter().write(dto_json);
     }
 
-    private DashboardDTO getDashboardDTO(UserInstance userInstance) throws IOException {
+    private DashboardDTO getDashboardDTO(UserInstance userInstance, String historyUsername) throws IOException {
 
         DashboardDTO dto = new DashboardDTO();
         dto.credits = userInstance.getCreditsAvailable();
@@ -70,14 +67,14 @@ public class DashboardServlet extends HttpServlet {
         ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");
         dto.programStats = programsStorage.getFullProgramsStats();
         dto.functionStats = programsStorage.getFullFunctionsStats();
-        dto.executionHistory = getExecutionHistory();
+        dto.executionHistory = getExecutionHistory(userInstance, historyUsername);
 
         return dto;
 
     }
 
 
-    private ArrayList<ExecutionHistoryDTO> getExecutionHistory() throws IOException {
+    private ArrayList<ExecutionHistoryDTO> getExecutionHistory(UserInstance userInstance, String historyUsername) throws IOException {
         ServletContext context = getServletContext();
         Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
         UserInstance historyUserInstance = userInstanceMap.get(historyUsername);

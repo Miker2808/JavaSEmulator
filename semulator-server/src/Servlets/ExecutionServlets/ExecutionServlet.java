@@ -67,8 +67,6 @@ public class ExecutionServlet extends HttpServlet {
         return dto;
     }
 
-
-
     private void sendPlain(HttpServletResponse response, int statusCode, String message) throws IOException {
         response.setStatus(statusCode);
         response.setContentType("text/plain");

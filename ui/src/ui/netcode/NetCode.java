@@ -20,7 +20,7 @@ public class NetCode {
     private static final String URL = "http://localhost:8080/semulator-server";
     private static final Gson gson = new Gson();
 
-    public static Response login(String username) throws IOException {
+    public static void login(String username) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
@@ -31,10 +31,15 @@ public class NetCode {
                 .method("POST", body)
                 .build();
 
-        return client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String errorBody = response.body().string();
+                throw new NetworkException(response.code(), errorBody);
+            }
+        }
     }
 
-    public static Response uploadFile(String user, File file) throws IOException {
+    public static void uploadFile(String user, File file) throws IOException {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
@@ -51,7 +56,12 @@ public class NetCode {
                 .method("POST", body)
                 .build();
 
-        return client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String errorBody = response.body().string();
+                throw new NetworkException(response.code(), errorBody);
+            }
+        }
     }
 
     public static void chargeCredits(String username, int credits) throws IOException {
@@ -64,12 +74,12 @@ public class NetCode {
                 .url(url)
                 .method("POST", body)
                 .build();
-        Response response = client.newCall(request).execute();
-        if(response.isSuccessful()) {
-            response.close();
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String errorBody = response.body().string();
+                throw new NetworkException(response.code(), errorBody);
+            }
         }
 
     }
@@ -89,15 +99,14 @@ public class NetCode {
                 .url(url)
                 .method("GET", null)
                 .build();
-        Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()) {
-            String json = response.body().string();
-            Gson gson = new Gson();
-            return gson.fromJson(json, DashboardDTO.class);
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            if (response.isSuccessful()) {
+                return new Gson().fromJson(responseBody, DashboardDTO.class);
+            } else {
+                throw new NetworkException(response.code(), responseBody);
+            }
         }
     }
 
@@ -109,14 +118,14 @@ public class NetCode {
                 .url(url)
                 .method("GET", null)
                 .build();
-        Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()) {
-            String json = response.body().string();
-            return gson.fromJson(json, ExecutionDTO.class);
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            if (response.isSuccessful()) {
+                return new Gson().fromJson(responseBody, ExecutionDTO.class);
+            } else {
+                throw new NetworkException(response.code(), responseBody);
+            }
         }
     }
 
@@ -132,14 +141,14 @@ public class NetCode {
                 .url(url)
                 .method("GET", null)
                 .build();
-        Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()) {
-            String jsonString = response.body().string();
-            return gson.fromJson(jsonString, SProgramDTO.class);
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+            if (response.isSuccessful()) {
+                return new Gson().fromJson(responseBody, SProgramDTO.class);
+            } else {
+                throw new NetworkException(response.code(), responseBody);
+            }
         }
     }
 
@@ -174,19 +183,20 @@ public class NetCode {
                 .url(url)
                 .method("GET", null)
                 .build();
-        Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()) {
-            String jsonString = response.body().string();
-            Type type = new TypeToken<List<SInstructionDTO>>() {}.getType();
-            return gson.fromJson(jsonString, type);
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+
+            if (response.isSuccessful()) {
+                Type type = new TypeToken<List<SInstructionDTO>>() {}.getType();
+                return gson.fromJson(responseBody, type);
+            } else {
+                throw new NetworkException(response.code(), responseBody);
+            }
         }
     }
 
-    public static Response sendExecutionCommand(String username, ExecutionRequestDTO dto) throws IOException
+    public static void sendExecutionCommand(String username, ExecutionRequestDTO dto) throws IOException
     {
         OkHttpClient client = new OkHttpClient();
         String url = String.format("%s/execution/execute?user=%s", URL, username);
@@ -201,7 +211,12 @@ public class NetCode {
                 .method("POST", body)
                 .build();
 
-        return client.newCall(request).execute();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String errorBody = response.body().string();
+                throw new NetworkException(response.code(), errorBody);
+            }
+        }
     }
 
 
@@ -214,15 +229,16 @@ public class NetCode {
                 .url(url)
                 .method("GET", null)
                 .build();
-        Response response = client.newCall(request).execute();
 
-        if(response.isSuccessful()) {
-            String jsonString = response.body().string();
-            Type type = new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
-            return gson.fromJson(jsonString, type);
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string();
+
+            if (response.isSuccessful()) {
+                Type type = new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
+                return gson.fromJson(responseBody, type);
+            } else {
+                throw new NetworkException(response.code(), responseBody);
+            }
         }
     }
 
@@ -244,14 +260,13 @@ public class NetCode {
                 .post(body)
                 .build();
 
-        Response response = client.newCall(request).execute();
-
-        if(response.isSuccessful()) {
-            response.close();
-            return true;
-        }
-        else{
-            throw new NetworkException(response.code(), response.body().string());
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                return true;
+            } else {
+                String errorBody = response.body().string();
+                throw new NetworkException(response.code(), errorBody);
+            }
         }
     }
 

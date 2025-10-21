@@ -91,7 +91,6 @@ public class DashboardController implements StatefulController {
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         initializeUI();
     }
 
@@ -102,6 +101,8 @@ public class DashboardController implements StatefulController {
 
     @FXML
     public void initializeUI(){
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+
         initCreditsTextField();
         initializeProgramStatsTable();
         initializeFunctionStatsTable();
@@ -320,16 +321,14 @@ public class DashboardController implements StatefulController {
         if (selectedFile != null) {
 
             try {
-                Response response = NetCode.uploadFile(appContext.getUsername(), selectedFile);
+                NetCode.uploadFile(appContext.getUsername(), selectedFile);
 
-                if(response.isSuccessful()) {
-                    loadedFilePathTextField.setText(selectedFile.getAbsolutePath());
-                    InfoMessage.showInfoMessage("Success", response.body().string());
-                }
-                else{
-                    InfoMessage.showInfoMessage("Failed to load XML file", response.body().string());
-                }
+                loadedFilePathTextField.setText(selectedFile.getAbsolutePath());
+                InfoMessage.showInfoMessage("Success", String.format("Successfully loaded file %s", selectedFile.getName()));
 
+            }
+            catch (NetworkException ne){
+                InfoMessage.showInfoMessage("Failure", ne.getMessage());
             }
             catch(Exception e){
                 // add alert window

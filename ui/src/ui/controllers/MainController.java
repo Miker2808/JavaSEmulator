@@ -125,7 +125,7 @@ public class MainController implements StatefulController {
     @Override
     public void setAppContext(AppContext context) {
         this.appContext = context;
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
+
         initializeUI(); // appContext needs to be defined before initialize is called.
     }
 
@@ -149,6 +149,7 @@ public class MainController implements StatefulController {
 // ** Initializers **
     @FXML
     public void initializeUI() {
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
 
         // passed from dashboard
         degree_selected = appContext.getDegree();
@@ -719,11 +720,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "new_run";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -746,18 +746,14 @@ public class MainController implements StatefulController {
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
 
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
-            response.close();
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
         }
-
     }
 
     @FXML
@@ -772,14 +768,10 @@ public class MainController implements StatefulController {
             dto.generation = selected_generation;
             dto.breakpoints = breakPoints;
             dto.inputVariables = getInputVariablesFromUI();
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
-            response.close();
-
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -793,13 +785,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stepover";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
-            response.close();
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -814,14 +803,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "backstep";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
-            response.close();
-
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());
@@ -834,14 +819,10 @@ public class MainController implements StatefulController {
         try{
             ExecutionRequestDTO dto = new ExecutionRequestDTO();
             dto.command = "stop";
-            Response response = NetCode.sendExecutionCommand(appContext.getUsername(), dto);
-            String responseBody = response.body().string();
-
-            if (!response.isSuccessful()) {
-                InfoMessage.showInfoMessage("Failure", responseBody);
-            }
-            response.close();
-
+            NetCode.sendExecutionCommand(appContext.getUsername(), dto);
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Error", e.getMessage());

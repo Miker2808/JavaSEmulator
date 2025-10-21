@@ -4,8 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
 import ui.App;
+import ui.NetworkException;
 import ui.StatefulController;
 import ui.elements.InfoMessage;
 import ui.netcode.NetCode;
@@ -42,18 +42,17 @@ public class LoginController implements StatefulController{
         }
 
         try{
-            Response response = NetCode.login(username);
+            NetCode.login(username); // throws exception if not 200 OK
 
-            if (response.isSuccessful()) {
-                // Save user info to context
-                context.setUsername(username);
-                context.reset();
-                // Transition to setup screen
-                App.loadScreen("/fxml/dashboard.fxml");
-            }
-            else{
-                InfoMessage.showInfoMessage("Login failed", response.body().string());
-            }
+            // Save user info to context
+            context.setUsername(username);
+            context.reset();
+            // Transition to setup screen
+            App.loadScreen("/fxml/dashboard.fxml");
+
+        }
+        catch (NetworkException ne){
+            InfoMessage.showInfoMessage("Login failed", ne.getMessage());
         }
         catch (Exception e){
             InfoMessage.showInfoMessage("Login failed", "Network error");

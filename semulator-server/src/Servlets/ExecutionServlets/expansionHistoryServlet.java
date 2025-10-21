@@ -25,21 +25,28 @@ import java.util.Map;
 public class expansionHistoryServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
-    String username;
-    Integer degree;
-    Integer line;
-    UserInstance userInstance;
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String username = request.getParameter("user");
+        int degree;
+        int line;
         try{
-            validateRequest(request);
+            degree = Integer.parseInt(request.getParameter("degree"));
+            line = Integer.parseInt(request.getParameter("line"));
         }
-        catch (UserNotFoundException e){
-            sendPlain(response, HttpServletResponse.SC_GONE, e.getMessage());
+        catch(NumberFormatException e){
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
+            return;
         }
-        catch(Exception e){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+
+        ServletContext context = getServletContext();
+        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
+        UserInstance userInstance = userInstanceMap.get(username);
+
+        if (userInstance == null) {
+            sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
+            return;
         }
 
         List<SInstructionDTO> dto = getExpansionHistoryDTO(userInstance, degree, line);
@@ -52,25 +59,6 @@ public class expansionHistoryServlet extends HttpServlet {
         response.getWriter().write(dto_json);
     }
 
-    void validateRequest(HttpServletRequest request) throws Exception {
-
-        username = request.getParameter("user");
-        try {
-            degree = Integer.parseInt(request.getParameter("degree"));
-            line = Integer.parseInt(request.getParameter("line"));
-        }
-        catch (NumberFormatException e) {
-            throw new Exception("'degree' and 'line' parameters must be integers");
-        }
-
-        ServletContext context = getServletContext();
-        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
-        userInstance = userInstanceMap.get(username);
-
-        if (userInstance == null) {
-            throw new UserNotFoundException("User instance not found");
-        }
-    }
 
     List<SInstructionDTO> getExpansionHistoryDTO(UserInstance userInstance, Integer degree, Integer line) {
         ServletContext context = getServletContext();

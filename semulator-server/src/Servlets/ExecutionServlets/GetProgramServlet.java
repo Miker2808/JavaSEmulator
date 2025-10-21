@@ -24,24 +24,32 @@ import java.util.Map;
 public class GetProgramServlet extends HttpServlet {
     private final Gson gson = new Gson();
 
-    String username;
-    Integer degree;
-    UserInstance userInstance;
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        String username = request.getParameter("user");
+        int degree;
         try{
-            validateRequest(request);
+            degree = Integer.parseInt(request.getParameter("degree"));
         }
-        catch (UserNotFoundException e){
-            sendPlain(response, HttpServletResponse.SC_GONE, e.getMessage());
-        }
-        catch(Exception e){
-            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        catch (NumberFormatException e) {
+            sendPlain(response, HttpServletResponse.SC_GONE, "Degree must be an integer");
+            return;
         }
 
-        SProgramDTO executionDTO = getSProgramDTO(userInstance);
+        ServletContext context = getServletContext();
+        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
+        UserInstance userInstance = userInstanceMap.get(username);
+
+        if (username == null || username.isEmpty()) {
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid request parameters");
+            return;
+        }
+        if (userInstance == null) {
+            sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "User instance not found");
+            return;
+        }
+
+        SProgramDTO executionDTO = getSProgramDTO(userInstance, degree);
 
         userInstance.setDegreeSelected(degree);
 
@@ -54,30 +62,7 @@ public class GetProgramServlet extends HttpServlet {
 
     }
 
-    void validateRequest(HttpServletRequest request) throws Exception {
-
-        username = request.getParameter("user");
-        try {
-            degree = Integer.parseInt(request.getParameter("degree"));
-        }
-        catch (NumberFormatException e) {
-            throw new Exception("Degree must be an integer");
-        }
-
-        ServletContext context = getServletContext();
-        Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
-         userInstance = userInstanceMap.get(username);
-
-        if (username == null || degree == null || username.isEmpty()) {
-            throw new Exception("Invalid request parameters");
-        }
-        if (userInstance == null) {
-            throw new UserNotFoundException("User instance not found");
-        }
-
-    }
-
-    private SProgramDTO getSProgramDTO(UserInstance userInstance) throws IOException {
+    private SProgramDTO getSProgramDTO(UserInstance userInstance, int degree) throws IOException {
         SProgramDTO dto = new SProgramDTO();
         ServletContext context = getServletContext();
         ProgramsStorage programsStorage = (ProgramsStorage) context.getAttribute("programsStorage");

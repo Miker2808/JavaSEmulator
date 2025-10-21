@@ -19,16 +19,12 @@ import java.util.Map;
 public class HistoryVariablesServlet extends HttpServlet {
 
     private final Gson gson = new Gson();
-    private String historyUsername = null;
-    private int historyIndex;
-    private String username = null;
-    private UserInstance userInstance = null;
-    private UserInstance historyUserInstance = null;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        username = request.getParameter("user");
-        historyUsername = request.getParameter("history");
+        String username = request.getParameter("user");
+        String historyUsername = request.getParameter("history");
+        int historyIndex;
 
         try {
             historyIndex = Integer.parseInt(request.getParameter("index").strip());
@@ -45,7 +41,7 @@ public class HistoryVariablesServlet extends HttpServlet {
 
         ServletContext context = getServletContext();
         Map<String, UserInstance> userInstanceMap = (Map<String, UserInstance>) context.getAttribute("userInstanceMap");
-        userInstance = userInstanceMap.get(username);
+        UserInstance userInstance = userInstanceMap.get(username);
 
         if(userInstance == null){
             sendPlain(response, HttpServletResponse.SC_GONE, "User instance not found");
