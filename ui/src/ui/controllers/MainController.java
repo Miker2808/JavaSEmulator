@@ -8,6 +8,7 @@ import enums.RunState;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -149,8 +150,6 @@ public class MainController implements StatefulController {
 // ** Initializers **
     @FXML
     public void initializeUI() {
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-
         // passed from dashboard
         degree_selected = appContext.getDegree();
         if(appContext.getInputVariables() != null) {
@@ -167,6 +166,7 @@ public class MainController implements StatefulController {
         updateUIOnExpansion();
         startAutoRefresh();
         expandButton.setDisable(max_degree == 0);
+
 
         archiGenGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
             if (newToggle != null) {
@@ -272,6 +272,8 @@ public class MainController implements StatefulController {
 
         if(running && dto.runPCHighlight != null) {
             highLightInstructionTableLine(dto.runPCHighlight);
+        }else{
+            clearInstructionTableHighlight();
         }
 
         if(dto.runVariables != null){
@@ -651,6 +653,7 @@ public class MainController implements StatefulController {
     void updateUIOnExpansion(){
 
         breakPoints.clear();
+        breakPoints.add(1);
         lineHighlighted = null;
         try {
             this.programDTO = NetCode.getSProgramDTO(appContext.getUsername(), degree_selected);
