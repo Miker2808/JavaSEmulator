@@ -8,7 +8,6 @@ import enums.RunState;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -24,8 +23,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.IntegerStringConverter;
-import okhttp3.OkHttpClient;
-import okhttp3.Response;
 import ui.App;
 import ui.NetworkException;
 import ui.StatefulController;
@@ -37,8 +34,6 @@ import ui.storage.VariableRow;
 
 import java.net.URL;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -195,7 +190,6 @@ public class MainController implements StatefulController {
             @Override
             protected ExecutionDTO call() throws Exception {
                 if (appContext == null) return null;
-
                 return NetCode.getExecutionDTO(appContext.getUsername());
             }
         };
@@ -204,8 +198,6 @@ public class MainController implements StatefulController {
             ExecutionDTO dto = task.getValue();
             if (dto == null) return;
             refreshExecutionUI(dto);
-
-
         });
 
         task.setOnFailed(e -> {
@@ -251,14 +243,14 @@ public class MainController implements StatefulController {
         if (dto.steps != null) sb.append("Steps: ").append(dto.steps).append("\n");
 
         if(dto.genUsage != null){
-            sb.append("Gen Usage:(  ");
+            sb.append("Gen Usage:  ");
             dto.genUsage.forEach((key, value) ->
                     sb.append(key)
                         .append(": ")
                         .append(value)
                         .append("  ")
             );
-            sb.append(")\n");
+            sb.append("\n");
         }
 
         running = dto.state.equals(RunState.RUNNING);
@@ -277,14 +269,11 @@ public class MainController implements StatefulController {
         }
 
         if(dto.runVariables != null){
-            if(running || prev_state != dto.state) {
-                updateProgramVariablesTable(dto.runVariables, true);
-            }
+            updateProgramVariablesTable(dto.runVariables, true);
         }
         prev_state = dto.state;
 
         updateInputControllers();
-
     }
 
     private void initializeInstructionTable(){

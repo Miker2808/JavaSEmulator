@@ -54,7 +54,7 @@ public class ExecutionServlet extends HttpServlet {
 
         dto.programName = userInstance.getProgramSelected();
         dto.credits = userInstance.getCreditsAvailable();
-        dto.computing = userInstance.isComputing();
+        dto.computing = false;
         dto.state = RunState.IDLE;
         if(userInstance.getInterpreter() != null) {
             dto.state = userInstance.getInterpreter().getState();
@@ -63,6 +63,7 @@ public class ExecutionServlet extends HttpServlet {
             dto.runPCHighlight = userInstance.getInterpreter().getPC();
             dto.runVariables = userInstance.getInterpreter().getOrderedVariables();
             dto.genUsage = userInstance.getInterpreter().getGenUsage();
+            dto.computing = userInstance.isComputing();
         }
         return dto;
     }

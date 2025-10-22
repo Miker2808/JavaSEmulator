@@ -101,8 +101,6 @@ public class DashboardController implements StatefulController {
 
     @FXML
     public void initializeUI(){
-        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-
         initCreditsTextField();
         initializeProgramStatsTable();
         initializeFunctionStatsTable();

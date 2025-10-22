@@ -1,7 +1,6 @@
 package Servlets.ExecutionServlets;
 
 import DTOConverter.SInstructionDTOConverter;
-import Exceptions.UserNotFoundException;
 import Storage.ProgramsStorage;
 import Storage.UserInstance;
 import com.google.gson.Gson;

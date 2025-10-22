@@ -21,8 +21,9 @@ public class ExecutionPool {
                 userInstance.setExceptionString("");
             } catch (Exception e) {
                 userInstance.setExceptionString(e.getMessage());
+            } finally {
+                userInstance.setComputing(false);
             }
-            userInstance.setComputing(false);
 
         });
     }
