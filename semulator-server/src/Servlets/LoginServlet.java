@@ -24,6 +24,12 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Invalid username format.\nOnly letters (a-z, A-Z), numbers (0-9), and underscores (_) are allowed.");
+            return;
+        }
+
         boolean success = false;
 
         ServletContext context = getServletContext();
