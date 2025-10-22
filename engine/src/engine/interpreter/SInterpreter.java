@@ -55,7 +55,7 @@ public class SInterpreter
             sInstructions.getInstruction(context.getPC()).execute(context);
         }
 
-        if(!(context.getPC() <= num_lines) || (steps >= Long.MAX_VALUE - 1)){
+        if(!(context.getPC() <= num_lines) || (steps >= Long.MAX_VALUE - 1) || context.getExit()){
             context.setExit(true);
             this.state = RunState.COMPLETE;
         }
@@ -65,8 +65,6 @@ public class SInterpreter
             context.setExit(true);
             this.state = RunState.ABORTED;
         }
-
-
 
         long credits_consume = Math.min(credits_used, this.creditsAvail.get());
         this.creditsAvail.addAndGet(-1 * credits_consume);

@@ -224,13 +224,9 @@ public class MainController implements StatefulController {
         availCreditsLabel.setText(String.format("Available Credits: %d", dto.credits));
 
         StringBuilder sb = new StringBuilder();
-        if (dto.state.equals(RunState.RUNNING)) {
-            sb.append("Running\n");
-        }
-        else if(dto.state.equals(RunState.COMPLETE)) {
-            sb.append("Completed\n");
-        }
-        else if(dto.state.equals(RunState.ABORTED)){
+        sb.append(dto.state.toString().toLowerCase()).append("\n");
+
+        if(dto.state.equals(RunState.ABORTED)){
             refreshPullTimeline.stop();
             InfoMessage.showInfoMessage("Insufficient balance", "Program was aborted due to insufficient credit balance");
             App.loadScreen("/fxml/dashboard.fxml");

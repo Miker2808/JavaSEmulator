@@ -88,12 +88,13 @@ public class ExecuteProgramServlet extends HttpServlet {
         userInstance.setInterpreter(null);
     }
 
-    private boolean validateExecute
-            (UserInstance userInstance,
+    private boolean validateExecute(
+            UserInstance userInstance,
             ExecutionRequestDTO requestDTO,
             SProgramView usersProgram,
             SProgramView originalProgram,
-            HttpServletResponse response) throws IOException
+            HttpServletResponse response
+    ) throws IOException
     {
         int requiredGen = usersProgram.getInstructionsView().getRequiredGen();
         String genStr = genToStr(requiredGen);
@@ -135,9 +136,9 @@ public class ExecuteProgramServlet extends HttpServlet {
         if(validateExecute(userInstance, requestDTO, usersProgram, originalProgram, response)) return;
 
         userInstance.setInterpreter(new SInterpreter(usersProgram.getInstructionsView(),
-                requestDTO.inputVariables,
-                                                        userInstance.getCreditsAvailRef(),
-                                                        userInstance.getCreditsUsedRef()
+                                                requestDTO.inputVariables,
+                                                userInstance.getCreditsAvailRef(),
+                                                userInstance.getCreditsUsedRef()
                                                     ));
 
         userInstance.setCurrentExecutionHistory(new ExecutionHistory(usersProgram,
