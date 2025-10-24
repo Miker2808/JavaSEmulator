@@ -54,7 +54,7 @@ public class HistoryVariablesServlet extends HttpServlet {
 
         ArrayList<ExecutionHistory> history = historyUserInstance.getHistoryManager().getExecutionHistory();
 
-        if(historyIndex > history.size() + 1 || historyIndex < 1){
+        if(historyIndex > history.size() || historyIndex < 1){
             sendPlain(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid index");
             return;
         }
