@@ -295,13 +295,6 @@ Davis, M. D., Sigal, R., & Weyuker, E. J. (1994). *Computability, Complexity, an
 
 ---
 
-## Author
-
-Michael Ratmanski (Miker2808)  
-GitHub: https://github.com/Miker2808
-
----
-
 ## License
 
 [License information to be added]
